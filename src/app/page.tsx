@@ -139,7 +139,7 @@ export default function Home() {
           </h2>
           <p className="text-neutral-60 text-lg mb-8">
             Join our community of passionate traders and take your skills to the next level. 
-            Whether you're a beginner or have some experience, we have something for everyone.
+            Whether you&apos;re a beginner or have some experience, we have something for everyone.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

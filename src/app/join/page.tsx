@@ -131,7 +131,7 @@ export default function JoinPage() {
             Ready to Get Started?
           </h2>
           <p className="text-neutral-60 text-lg mb-8">
-            Don't miss out on this opportunity to develop your trading skills and 
+            Don&apos;t miss out on this opportunity to develop your trading skills and 
             connect with fellow finance enthusiasts. Apply today!
           </p>
           <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">

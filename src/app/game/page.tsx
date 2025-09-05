@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface GameState {
   balance: number;
@@ -308,8 +308,8 @@ export default function GamePage() {
               <ul className="space-y-1">
                 <li>• Watch market trends and price movements</li>
                 <li>• Consider your risk tolerance</li>
-                <li>• Don't put all your money in one trade</li>
-                <li>• Learn from each round's outcome</li>
+                <li>• Don&apos;t put all your money in one trade</li>
+                <li>• Learn from each round&apos;s outcome</li>
               </ul>
             </div>
           </div>

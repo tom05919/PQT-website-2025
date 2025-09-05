@@ -10,7 +10,7 @@ export default function SponsorsPage() {
             Our Sponsors
           </h1>
           <p className="text-xl text-neutral-60 max-w-3xl mx-auto">
-            We're grateful for the support of our sponsors who help make our club activities 
+            We&apos;re grateful for the support of our sponsors who help make our club activities 
             and educational programs possible.
           </p>
         </div>
