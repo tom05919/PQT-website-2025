@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Princeton Quantitative Traders - Interactive Trading Game",
+  title: "Princeton Quantitative Traders",
   description: "Join Princeton Quantitative Traders and test your skills with our interactive 2D trading game. Fostering a community of students in quantitative finance and applied mathematics.",
 };
 
