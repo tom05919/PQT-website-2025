@@ -157,7 +157,6 @@ export default function JoinPage() {
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-neutral-60">
             <span>📧 pqt@princeton.edu</span>
             <span>💬 Discord: Princeton Quantitative Traders</span>
-            <span>📅 Info Sessions: Weekly</span>
           </div>
         </div>
       </section>
