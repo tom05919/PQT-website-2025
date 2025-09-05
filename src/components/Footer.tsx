@@ -38,11 +38,6 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/game" className="text-neutral-60 hover:text-bright transition-colors text-sm">
-                  Trading Game
-                </Link>
-              </li>
-              <li>
                 <Link href="/join" className="text-neutral-60 hover:text-bright transition-colors text-sm">
                   Join Us
                 </Link>
