@@ -1,0 +1,108 @@
+export default function AboutPage() {
+  return (
+    <div className="bg-neutral-100 min-h-screen">
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-neutral-05 mb-6">
+            About Princeton Quantitative Traders
+          </h1>
+          <p className="text-xl text-neutral-60 max-w-3xl mx-auto">
+            We are a community of Princeton students passionate about quantitative finance and applied mathematics, 
+            dedicated to gaining practical experience and conducting original research in quantitative analysis.
+          </p>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-05 mb-6">Our Mission</h2>
+              <p className="text-neutral-60 text-lg mb-6">
+                Princeton Quantitative Traders is dedicated to fostering a community of mutually interested 
+                students in quantitative finance and applied mathematics. We provide opportunities to gain 
+                practical experience for quantitative trading interview processes and conduct original research projects.
+              </p>
+              <p className="text-neutral-60 text-lg">
+                Our club is open to all undergraduate and graduate students at Princeton University, 
+                creating an inclusive environment for learning and collaboration.
+              </p>
+            </div>
+            <div className="bg-neutral-90 rounded-2xl p-8 shadow-md">
+              <h3 className="text-xl font-semibold text-neutral-05 mb-4">What We Do</h3>
+              <ul className="space-y-3 text-neutral-60">
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Interview preparation for quantitative trading positions
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Original research projects in quantitative analysis
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Trading competition team formation and participation
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Community building for quantitative finance enthusiasts
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Officers Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">Meet Our Officers</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
+              { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
+              { name: "Rodrigo Porto", role: "Treasurer", description: "Junior, Math major" },
+              { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
+              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, Chemical Engineering major" },
+              { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
+              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" },
+              { name: "Joshua Chen", role: "Tournament Events Officer", description: "Junior, Math major" }
+            ].map((officer, index) => (
+              <div key={index} className="bg-neutral-85 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-semibold text-neutral-05 mb-2">{officer.name}</h3>
+                <p className="text-bright font-medium mb-3">{officer.role}</p>
+                <p className="text-neutral-60 text-sm">{officer.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Events Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">Upcoming Events</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              { 
+                title: "Princeton Quantitative Traders Info Session", 
+                date: "September 12th, Friday 5pm-6pm", 
+                description: "Meet our leadership team and hear about upcoming events, trading competitions, workshops, and more!",
+                location: "Lewis Library Room 121"
+              }
+            ].map((event, index) => (
+              <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
+                <h3 className="text-xl font-semibold text-neutral-05 mb-2">{event.title}</h3>
+                <p className="text-bright font-medium mb-2">{event.date}</p>
+                <p className="text-neutral-60 mb-3">{event.description}</p>
+                <p className="text-neutral-40 text-sm">{event.location}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,103 +1,162 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="bg-neutral-100 min-h-screen">
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl md:text-7xl font-bold text-neutral-05 mb-6">
+            Princeton
+            <span className="block text-bright">Quantitative Traders</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-neutral-60 max-w-4xl mx-auto mb-8">
+            Fostering a community of mutually interested students in quantitative finance 
+            and applied mathematics through practical experience and original research.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/join"
+              className="bg-bright text-neutral-100 px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
+            >
+              Join Our Club
+            </Link>
+            <Link
+              href="/about"
+              className="border border-bright text-bright px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright hover:text-neutral-100 transition-colors duration-200"
+            >
+              Learn More
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">
+            What Makes Us Different
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+                          {
+              title: "Interview Preparation",
+              description: "Gain practical experience for quantitative trading interview processes",
+              icon: "🎯"
+            },
+            {
+              title: "Research Projects",
+              description: "Conduct original research projects related to quantitative analysis",
+              icon: "🔬"
+            },
+            {
+              title: "Trading Competitions",
+              description: "Form teams to participate in trading competitions",
+              icon: "🏆"
+            }
+            ].map((feature, index) => (
+              <div key={index} className="bg-neutral-85 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
+                <div className="text-5xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-neutral-05 mb-3">{feature.title}</h3>
+                <p className="text-neutral-60">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Research & Learning Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-neutral-05 mb-6">
+                Research & Learning
+              </h2>
+              <p className="text-neutral-60 text-lg mb-6">
+                Our club provides hands-on experience in quantitative finance through 
+                original research projects, interview preparation, and collaborative learning 
+                with fellow Princeton students.
+              </p>
+              <ul className="space-y-3 text-neutral-60 mb-8">
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Original research in quantitative analysis
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Interview preparation for top firms
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Trading competition participation
+                </li>
+                <li className="flex items-start">
+                  <span className="text-bright mr-3">•</span>
+                  Community of passionate students
+                </li>
+              </ul>
+              <Link
+                href="/about"
+                className="bg-bright text-neutral-100 px-8 py-3 rounded-full font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
+              >
+                Learn More
+              </Link>
+            </div>
+            <div className="bg-neutral-90 rounded-2xl p-8 shadow-md">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🔬</div>
+                <h3 className="text-xl font-semibold text-neutral-05 mb-4">Research Focus</h3>
+                <div className="space-y-3 text-sm text-neutral-60">
+                  <div className="flex justify-between">
+                    <span>Research Areas:</span>
+                    <span className="text-bright">Quantitative Analysis</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Members:</span>
+                    <span className="text-bright">Princeton Students</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Focus:</span>
+                    <span className="text-bright">Applied Mathematics</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Goal:</span>
+                    <span className="text-bright">Career Preparation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-neutral-05 mb-6">
+            Ready to Start Your Trading Journey?
+          </h2>
+          <p className="text-neutral-60 text-lg mb-8">
+            Join our community of passionate traders and take your skills to the next level. 
+            Whether you're a beginner or have some experience, we have something for everyone.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/join"
+              className="bg-bright text-neutral-100 px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
+            >
+              Become a Member
+            </Link>
+            <Link
+              href="/about"
+              className="border border-bright text-bright px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright hover:text-neutral-100 transition-colors duration-200"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
