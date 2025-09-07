@@ -50,7 +50,7 @@ const Footer = () => {
             <h4 className="text-neutral-05 text-base font-semibold mb-4">Contact</h4>
             <div className="space-y-2 text-sm text-neutral-60">
               <p>Email: pqt@princeton.edu</p>
-              <p>Discord: #pqt-club</p>
+              <p>Discord: Princeton Quantitative Traders</p>
             </div>
           </div>
         </div>
@@ -58,7 +58,7 @@ const Footer = () => {
         <div className="border-t border-neutral-80 mt-8 pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <p className="text-neutral-60 text-sm">
-              © 2024 Princeton Quantitative Traders. All rights reserved.
+              © 2025 Princeton Quantitative Traders. All rights reserved.
             </p>
             <div className="flex space-x-4 mt-4 sm:mt-0">
               <a href="#" className="text-neutral-60 hover:text-bright transition-colors text-sm">

@@ -62,13 +62,14 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
-              { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
+              { name: "Loc Tran", role: "Co-Vice President", description: "Sophomore, ORFE major" },
+              { name: "Jishnu Roychoudhury", role: "Co-Vice President", description: "Junior, COS major" },
               { name: "Rodrigo Porto", role: "Treasurer", description: "Junior, Math major" },
-              { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
-              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, Chemical Engineering major" },
               { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
-              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" },
-              { name: "Joshua Chen", role: "Tournament Events Officer", description: "Junior, Math major" }
+              { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
+              { name: "Joshua Lin", role: "Tournament Events Officer", description: "Junior, Math major" },
+              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, Chemical Engineering major" },
+              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" }
             ].map((officer, index) => (
               <div key={index} className="bg-neutral-85 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
                 <h3 className="text-xl font-semibold text-neutral-05 mb-2">{officer.name}</h3>
