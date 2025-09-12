@@ -278,7 +278,7 @@ export default function GamePage() {
     const price = gameState.currentRoom.marketData.prices[symbol];
     const cost = price * quantity;
 
-    let updatedPlayer = { ...currentPlayer };
+    const updatedPlayer = { ...currentPlayer };
     let actionMessage = '';
 
     if (action === 'buy' && currentPlayer.balance >= cost) {
