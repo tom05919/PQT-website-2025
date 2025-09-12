@@ -64,6 +64,7 @@ export default function GamePage() {
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [selectedGameMode, setSelectedGameMode] = useState<'speed' | 'prediction' | 'classic' | 'volatility'>('classic');
   const gameTimerRef = useRef<number | null>(null);
+  const syncTimerRef = useRef<number | null>(null);
 
   // Generate unique player ID
   useEffect(() => {
@@ -74,6 +75,138 @@ export default function GamePage() {
       }));
     }
   }, [gameState.playerId]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (gameTimerRef.current) {
+        clearInterval(gameTimerRef.current);
+      }
+      if (syncTimerRef.current) {
+        clearInterval(syncTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Multiplayer synchronization functions
+  const getRoomStorageKey = (roomId: string) => `trading_game_room_${roomId}`;
+  const getPlayerStorageKey = (roomId: string, playerId: string) => `trading_game_player_${roomId}_${playerId}`;
+
+  // Save room state to localStorage
+  const saveRoomState = (room: GameRoom) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(getRoomStorageKey(room.id), JSON.stringify({
+        ...room,
+        lastUpdated: Date.now()
+      }));
+    }
+  };
+
+  // Load room state from localStorage
+  const loadRoomState = (roomId: string): GameRoom | null => {
+    if (typeof window === 'undefined') return null;
+    
+    const roomData = localStorage.getItem(getRoomStorageKey(roomId));
+    if (!roomData) return null;
+    
+    try {
+      const parsed = JSON.parse(roomData);
+      // Check if room data is recent (within 30 seconds)
+      if (Date.now() - parsed.lastUpdated > 30000) {
+        localStorage.removeItem(getRoomStorageKey(roomId));
+        return null;
+      }
+      return parsed;
+    } catch {
+      return null;
+    }
+  };
+
+  // Save player state
+  const savePlayerState = (roomId: string, player: Player) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(getPlayerStorageKey(roomId, player.id), JSON.stringify({
+        ...player,
+        lastSeen: Date.now()
+      }));
+    }
+  };
+
+  // Load all players in room
+  const loadAllPlayers = (roomId: string): Player[] => {
+    if (typeof window === 'undefined') return [];
+    
+    const players: Player[] = [];
+    const keys = Object.keys(localStorage);
+    
+    keys.forEach(key => {
+      if (key.startsWith(`trading_game_player_${roomId}_`)) {
+        try {
+          const playerData = JSON.parse(localStorage.getItem(key) || '{}');
+          // Only include active players (seen within 10 seconds)
+          if (Date.now() - playerData.lastSeen < 10000) {
+            players.push(playerData);
+          }
+        } catch {
+          // Ignore invalid data
+        }
+      }
+    });
+    
+    return players;
+  };
+
+  // Start multiplayer synchronization
+  const startMultiplayerSync = (roomId: string) => {
+    if (syncTimerRef.current) clearInterval(syncTimerRef.current);
+    
+    syncTimerRef.current = window.setInterval(() => {
+      if (!gameState.currentRoom) return;
+      
+      // Save current player state
+      const currentPlayer = gameState.currentRoom.players.find(p => p.id === gameState.playerId);
+      if (currentPlayer) {
+        savePlayerState(roomId, currentPlayer);
+      }
+      
+      // Load room state to sync game progress
+      const roomState = loadRoomState(roomId);
+      if (roomState && roomState.id === roomId) {
+        // Load all players and update room
+        const allPlayers = loadAllPlayers(roomId);
+        if (allPlayers.length > 0) {
+          // Sort players by total value
+          allPlayers.sort((a, b) => b.totalValue - a.totalValue);
+          allPlayers.forEach((player, index) => {
+            player.rank = index + 1;
+          });
+          
+          setGameState(prev => {
+            if (!prev.currentRoom) return prev;
+            
+            return {
+              ...prev,
+              currentRoom: {
+                ...roomState,
+                players: allPlayers,
+                leaderboard: allPlayers
+              },
+              gamePhase: roomState.status === 'playing' ? 'playing' : 
+                        roomState.status === 'finished' ? 'ended' : 'lobby'
+            };
+          });
+        }
+      }
+    }, 1000); // Sync every second
+  };
+
+  // Stop multiplayer synchronization
+  const stopMultiplayerSync = () => {
+    if (syncTimerRef.current) {
+      clearInterval(syncTimerRef.current);
+      syncTimerRef.current = null;
+    }
+  };
 
   // Generate market data
   const generateMarketData = (): MarketData => {
@@ -134,6 +267,11 @@ export default function GamePage() {
       leaderboard: [newPlayer]
     };
 
+    // Save room state and start multiplayer sync
+    saveRoomState(newRoom);
+    savePlayerState(roomId, newPlayer);
+    startMultiplayerSync(roomId);
+
     setGameState((prev: GameState) => ({
       ...prev,
       currentRoom: newRoom,
@@ -159,29 +297,67 @@ export default function GamePage() {
       profitLoss: 0
     };
 
-    // For demo purposes, create a room with just the current player
-    // In a real implementation, this would connect to an existing room
-    const newRoom: GameRoom = {
-      id: roomId,
-      name: `Room ${roomId.slice(-4)}`,
-      players: [newPlayer],
-      gameMode: 'classic',
-      status: 'waiting',
-      currentRound: 0,
-      maxRounds: 8,
-      timeLeft: 0,
-      marketData: generateMarketData(),
-      leaderboard: [newPlayer]
-    };
+    // Try to load existing room
+    const existingRoom = loadRoomState(roomId);
+    
+    if (existingRoom) {
+      // Join existing room
+      const existingPlayers = loadAllPlayers(roomId);
+      const allPlayers = [...existingPlayers, newPlayer];
+      
+      // Sort players by total value
+      allPlayers.sort((a, b) => b.totalValue - a.totalValue);
+      allPlayers.forEach((player, index) => {
+        player.rank = index + 1;
+      });
 
-    setGameState((prev: GameState) => ({
-      ...prev,
-      currentRoom: newRoom,
-      playerName: playerNameInput.trim(),
-      gamePhase: 'lobby',
-      isHost: true, // Make the joiner the host for demo purposes
-      showJoinRoom: false
-    }));
+      const updatedRoom: GameRoom = {
+        ...existingRoom,
+        players: allPlayers,
+        leaderboard: allPlayers
+      };
+
+      // Save player state and start sync
+      savePlayerState(roomId, newPlayer);
+      startMultiplayerSync(roomId);
+
+      setGameState((prev: GameState) => ({
+        ...prev,
+        currentRoom: updatedRoom,
+        playerName: playerNameInput.trim(),
+        gamePhase: 'lobby',
+        isHost: false,
+        showJoinRoom: false
+      }));
+    } else {
+      // Room doesn't exist, create new one
+      const newRoom: GameRoom = {
+        id: roomId,
+        name: `Room ${roomId.slice(-4)}`,
+        players: [newPlayer],
+        gameMode: 'classic',
+        status: 'waiting',
+        currentRound: 0,
+        maxRounds: 8,
+        timeLeft: 0,
+        marketData: generateMarketData(),
+        leaderboard: [newPlayer]
+      };
+
+      // Save room state and start sync
+      saveRoomState(newRoom);
+      savePlayerState(roomId, newPlayer);
+      startMultiplayerSync(roomId);
+
+      setGameState((prev: GameState) => ({
+        ...prev,
+        currentRoom: newRoom,
+        playerName: playerNameInput.trim(),
+        gamePhase: 'lobby',
+        isHost: true,
+        showJoinRoom: false
+      }));
+    }
   };
 
   // Generate mock players for demonstration
@@ -254,6 +430,9 @@ export default function GamePage() {
       currentRound: 1,
       timeLeft: 30 // 30 seconds per round
     };
+
+    // Save room state for all players
+    saveRoomState(updatedRoom);
 
     setGameState((prev: GameState) => ({
       ...prev,
@@ -344,6 +523,9 @@ export default function GamePage() {
             marketData: generateMarketData()
           };
 
+          // Save room state for all players
+          saveRoomState(updatedRoom);
+
           if (isGameOver) {
             clearInterval(gameTimerRef.current!);
             return {
@@ -415,6 +597,9 @@ export default function GamePage() {
       player.rank = index + 1;
     });
 
+    // Save updated player state
+    savePlayerState(gameState.currentRoom.id, updatedPlayer);
+
     setGameState((prev: GameState) => ({
       ...prev,
       currentRoom: {
@@ -430,6 +615,17 @@ export default function GamePage() {
     if (gameTimerRef.current) {
       clearInterval(gameTimerRef.current);
     }
+    if (syncTimerRef.current) {
+      clearInterval(syncTimerRef.current);
+    }
+    
+    // Clean up player data
+    if (gameState.currentRoom) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(getPlayerStorageKey(gameState.currentRoom.id, gameState.playerId));
+      }
+    }
+    
     setGameState(initialGameState);
   };
 
