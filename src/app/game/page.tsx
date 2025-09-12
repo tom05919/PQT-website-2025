@@ -159,26 +159,27 @@ export default function GamePage() {
       profitLoss: 0
     };
 
-    // Simulate joining a room (in real implementation, this would be a WebSocket call)
-    const mockRoom: GameRoom = {
+    // For demo purposes, create a room with just the current player
+    // In a real implementation, this would connect to an existing room
+    const newRoom: GameRoom = {
       id: roomId,
       name: `Room ${roomId.slice(-4)}`,
-      players: [newPlayer, ...generateMockPlayers()],
+      players: [newPlayer],
       gameMode: 'classic',
       status: 'waiting',
       currentRound: 0,
       maxRounds: 8,
       timeLeft: 0,
       marketData: generateMarketData(),
-      leaderboard: []
+      leaderboard: [newPlayer]
     };
 
     setGameState((prev: GameState) => ({
       ...prev,
-      currentRoom: mockRoom,
+      currentRoom: newRoom,
       playerName: playerNameInput.trim(),
       gamePhase: 'lobby',
-      isHost: false,
+      isHost: true, // Make the joiner the host for demo purposes
       showJoinRoom: false
     }));
   };
@@ -198,9 +199,54 @@ export default function GamePage() {
     }));
   };
 
+  // Add AI players for solo mode
+  const addAIPlayers = () => {
+    if (!gameState.currentRoom) return;
+
+    const aiPlayers: Player[] = [
+      {
+        id: 'ai_alice',
+        name: 'Alice (AI)',
+        balance: 10000,
+        portfolio: {},
+        totalValue: 10000,
+        rank: 2,
+        isConnected: true,
+        profitLoss: 0
+      },
+      {
+        id: 'ai_bob',
+        name: 'Bob (AI)',
+        balance: 10000,
+        portfolio: {},
+        totalValue: 10000,
+        rank: 3,
+        isConnected: true,
+        profitLoss: 0
+      }
+    ];
+
+    const updatedPlayers = [...gameState.currentRoom.players, ...aiPlayers];
+    const updatedRoom = {
+      ...gameState.currentRoom,
+      players: updatedPlayers,
+      leaderboard: updatedPlayers
+    };
+
+    setGameState((prev: GameState) => ({
+      ...prev,
+      currentRoom: updatedRoom
+    }));
+  };
+
   // Start the game
   const startGame = () => {
     if (!gameState.currentRoom || !gameState.isHost) return;
+
+    // Add AI players if playing solo
+    if (gameState.currentRoom.players.length === 1) {
+      addAIPlayers();
+    }
 
     const updatedRoom = {
       ...gameState.currentRoom,
@@ -219,6 +265,41 @@ export default function GamePage() {
     startGameTimer();
   };
 
+  // AI trading logic
+  const makeAITrade = (player: Player, marketData: MarketData) => {
+    const symbols = marketData.symbols.slice(0, 4);
+    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const price = marketData.prices[randomSymbol];
+    const trend = marketData.trends[randomSymbol];
+    
+    // AI decision making based on market trends
+    const shouldBuy = trend === 'bull' && Math.random() > 0.3;
+    const shouldSell = trend === 'bear' && Math.random() > 0.4;
+    
+    if (shouldBuy && player.balance >= price) {
+      const quantity = Math.floor(Math.random() * 3) + 1;
+      const cost = price * quantity;
+      if (player.balance >= cost) {
+        player.balance -= cost;
+        player.portfolio[randomSymbol] = (player.portfolio[randomSymbol] || 0) + quantity;
+        player.lastAction = `Bought ${quantity} ${randomSymbol}`;
+      }
+    } else if (shouldSell && (player.portfolio[randomSymbol] || 0) > 0) {
+      const quantity = Math.min(player.portfolio[randomSymbol] || 0, Math.floor(Math.random() * 2) + 1);
+      const revenue = price * quantity;
+      player.balance += revenue;
+      player.portfolio[randomSymbol] = (player.portfolio[randomSymbol] || 0) - quantity;
+      player.lastAction = `Sold ${quantity} ${randomSymbol}`;
+    }
+    
+    // Update total value
+    player.totalValue = player.balance;
+    Object.entries(player.portfolio).forEach(([sym, qty]) => {
+      player.totalValue += (qty as number) * marketData.prices[sym];
+    });
+    player.profitLoss = player.totalValue - 10000;
+  };
+
   // Game timer logic
   const startGameTimer = () => {
     if (gameTimerRef.current) clearInterval(gameTimerRef.current);
@@ -228,6 +309,27 @@ export default function GamePage() {
         if (!prev.currentRoom || prev.currentRoom.status !== 'playing') return prev;
 
         const newTimeLeft = prev.currentRoom.timeLeft - 1;
+        
+        // Make AI trades every 5 seconds
+        if (newTimeLeft % 5 === 0) {
+          const updatedPlayers = prev.currentRoom.players.map(player => {
+            if (player.id.startsWith('ai_')) {
+              const aiPlayer = { ...player };
+              makeAITrade(aiPlayer, prev.currentRoom!.marketData);
+              return aiPlayer;
+            }
+            return player;
+          });
+          
+          // Sort players by total value
+          updatedPlayers.sort((a: Player, b: Player) => b.totalValue - a.totalValue);
+          updatedPlayers.forEach((player: Player, index: number) => {
+            player.rank = index + 1;
+          });
+          
+          prev.currentRoom.players = updatedPlayers;
+          prev.currentRoom.leaderboard = updatedPlayers;
+        }
         
         if (newTimeLeft <= 0) {
           // Round ended, update market and move to next round
@@ -513,19 +615,33 @@ export default function GamePage() {
                   </div>
                 </div>
 
+                {/* Add AI Players Button */}
+                {gameState.isHost && gameState.currentRoom.players.length === 1 && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={addAIPlayers}
+                      className="bg-neutral-70 text-neutral-05 px-6 py-2 rounded-lg font-medium hover:bg-neutral-60 transition-colors duration-200"
+                    >
+                      Add AI Players for Competition
+                    </button>
+                  </div>
+                )}
+
                 {/* Start Game Button (Host Only) */}
                 {gameState.isHost && (
                   <div className="mt-6 text-center">
                     <button
                       onClick={startGame}
-                      disabled={gameState.currentRoom.players.length < 2}
-                      className="bg-bright text-neutral-100 px-8 py-3 rounded-xl font-semibold hover:bg-bright-light transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-bright text-neutral-100 px-8 py-3 rounded-xl font-semibold hover:bg-bright-light transition-colors duration-200"
                     >
-                      Start Game ({gameState.currentRoom.players.length} players)
+                      Start Game ({gameState.currentRoom.players.length} player{gameState.currentRoom.players.length !== 1 ? 's' : ''})
                     </button>
-                    {gameState.currentRoom.players.length < 2 && (
-                      <p className="text-neutral-60 text-sm mt-2">Need at least 2 players to start</p>
-                    )}
+                    <p className="text-neutral-60 text-sm mt-2">
+                      {gameState.currentRoom.players.length === 1 
+                        ? "Playing solo mode - you can still trade and compete against the market!"
+                        : "Ready to compete with other players!"
+                      }
+                    </p>
                   </div>
                 )}
               </div>
