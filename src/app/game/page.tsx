@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface Player {
   id: string;
@@ -27,12 +28,39 @@ interface GameRoom {
   leaderboard: Player[];
 }
 
+interface StockMetrics {
+  price: number;
+  previousClose: number;
+  volume: number;
+  marketCap: number;
+  pe: number; // Price-to-Earnings ratio
+  pb: number; // Price-to-Book ratio
+  debtToEquity: number;
+  roe: number; // Return on Equity
+  revenue: number;
+  profitMargin: number;
+  beta: number;
+  dividendYield: number;
+  rsi: number; // Relative Strength Index
+  sma20: number; // 20-day Simple Moving Average
+  sma50: number; // 50-day Simple Moving Average
+  volatility: number;
+  trend: 'bull' | 'bear' | 'neutral';
+  support: number;
+  resistance: number;
+}
+
 interface MarketData {
   symbols: string[];
-  prices: { [symbol: string]: number };
-  trends: { [symbol: string]: 'bull' | 'bear' | 'neutral' };
-  volatility: number;
+  stocks: { [symbol: string]: StockMetrics };
+  marketVolatility: number;
   news: string[];
+  economicIndicators: {
+    inflation: number;
+    interestRate: number;
+    gdp: number;
+    unemployment: number;
+  };
 }
 
 interface GameState {
@@ -65,6 +93,7 @@ export default function GamePage() {
   const [selectedGameMode, setSelectedGameMode] = useState<'speed' | 'prediction' | 'classic' | 'volatility'>('classic');
   const gameTimerRef = useRef<number | null>(null);
   const syncTimerRef = useRef<number | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   // Generate unique player ID
   useEffect(() => {
@@ -76,6 +105,38 @@ export default function GamePage() {
     }
   }, [gameState.playerId]);
 
+  // Initialize Socket.IO connection
+  useEffect(() => {
+    const socket = io('http://localhost:3002', {
+      transports: ['websocket', 'polling']
+    });
+    
+    socketRef.current = socket;
+    
+    // Handle room updates
+    socket.on('roomUpdate', (room: GameRoom) => {
+      setGameState(prev => ({
+        ...prev,
+        currentRoom: room,
+        gamePhase: room.status === 'playing' ? 'playing' : 
+                  room.status === 'finished' ? 'ended' : 'lobby'
+      }));
+    });
+    
+    // Handle connection events
+    socket.on('connect', () => {
+      console.log('Connected to multiplayer server');
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('Disconnected from multiplayer server');
+    });
+    
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -85,156 +146,133 @@ export default function GamePage() {
       if (syncTimerRef.current) {
         clearInterval(syncTimerRef.current);
       }
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
   }, []);
 
-  // Multiplayer synchronization functions
-  const getRoomStorageKey = (roomId: string) => `trading_game_room_${roomId}`;
-  const getPlayerStorageKey = (roomId: string, playerId: string) => `trading_game_player_${roomId}_${playerId}`;
-
-  // Save room state to localStorage
-  const saveRoomState = (room: GameRoom) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(getRoomStorageKey(room.id), JSON.stringify({
-        ...room,
-        lastUpdated: Date.now()
-      }));
+  // Join room via Socket.IO
+  const joinRoomSocket = (roomId: string, playerName: string) => {
+    if (socketRef.current) {
+      socketRef.current.emit('joinRoom', {
+        roomId,
+        playerName,
+        playerId: gameState.playerId
+      });
     }
   };
 
-  // Load room state from localStorage
-  const loadRoomState = (roomId: string): GameRoom | null => {
-    if (typeof window === 'undefined') return null;
-    
-    const roomData = localStorage.getItem(getRoomStorageKey(roomId));
-    if (!roomData) return null;
-    
-    try {
-      const parsed = JSON.parse(roomData);
-      // Check if room data is recent (within 30 seconds)
-      if (Date.now() - parsed.lastUpdated > 30000) {
-        localStorage.removeItem(getRoomStorageKey(roomId));
-        return null;
-      }
-      return parsed;
-    } catch {
-      return null;
+  // Update player data via Socket.IO
+  const updatePlayerSocket = (playerData: Partial<Player>) => {
+    if (socketRef.current && gameState.currentRoom) {
+      socketRef.current.emit('updatePlayer', {
+        playerId: gameState.playerId,
+        playerData
+      });
     }
   };
 
-  // Save player state
-  const savePlayerState = (roomId: string, player: Player) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(getPlayerStorageKey(roomId, player.id), JSON.stringify({
-        ...player,
-        lastSeen: Date.now()
-      }));
+  // Update room data via Socket.IO
+  const updateRoomSocket = (roomData: Partial<GameRoom>) => {
+    if (socketRef.current && gameState.currentRoom) {
+      socketRef.current.emit('updateRoom', {
+        roomId: gameState.currentRoom.id,
+        roomData
+      });
     }
   };
 
-  // Load all players in room
-  const loadAllPlayers = (roomId: string): Player[] => {
-    if (typeof window === 'undefined') return [];
+  // Generate realistic stock metrics
+  const generateStockMetrics = (symbol: string): StockMetrics => {
+    const basePrice = 50 + Math.random() * 200;
+    const previousClose = basePrice * (0.95 + Math.random() * 0.1);
+    const priceChange = basePrice - previousClose;
+    const priceChangePercent = (priceChange / previousClose) * 100;
     
-    const players: Player[] = [];
-    const keys = Object.keys(localStorage);
+    // Generate realistic financial metrics
+    const marketCap = basePrice * (1000000 + Math.random() * 9000000); // 1M to 10M shares
+    const pe = 10 + Math.random() * 40; // PE ratio 10-50
+    const pb = 0.5 + Math.random() * 5; // PB ratio 0.5-5.5
+    const debtToEquity = Math.random() * 2; // 0-2
+    const roe = -10 + Math.random() * 30; // ROE -10% to 20%
+    const revenue = marketCap * (0.1 + Math.random() * 0.5); // Revenue as % of market cap
+    const profitMargin = -5 + Math.random() * 25; // Profit margin -5% to 20%
+    const beta = 0.5 + Math.random() * 1.5; // Beta 0.5-2.0
+    const dividendYield = Math.random() * 5; // Dividend yield 0-5%
     
-    keys.forEach(key => {
-      if (key.startsWith(`trading_game_player_${roomId}_`)) {
-        try {
-          const playerData = JSON.parse(localStorage.getItem(key) || '{}');
-          // Only include active players (seen within 10 seconds)
-          if (Date.now() - playerData.lastSeen < 10000) {
-            players.push(playerData);
-          }
-        } catch {
-          // Ignore invalid data
-        }
-      }
-    });
+    // Technical indicators
+    const rsi = 20 + Math.random() * 60; // RSI 20-80
+    const sma20 = basePrice * (0.95 + Math.random() * 0.1);
+    const sma50 = basePrice * (0.9 + Math.random() * 0.2);
+    const volatility = 0.1 + Math.random() * 0.4; // 10-50% volatility
     
-    return players;
-  };
-
-  // Start multiplayer synchronization
-  const startMultiplayerSync = (roomId: string) => {
-    if (syncTimerRef.current) clearInterval(syncTimerRef.current);
-    
-    syncTimerRef.current = window.setInterval(() => {
-      if (!gameState.currentRoom) return;
-      
-      // Save current player state
-      const currentPlayer = gameState.currentRoom.players.find(p => p.id === gameState.playerId);
-      if (currentPlayer) {
-        savePlayerState(roomId, currentPlayer);
-      }
-      
-      // Load room state to sync game progress
-      const roomState = loadRoomState(roomId);
-      if (roomState && roomState.id === roomId) {
-        // Load all players and update room
-        const allPlayers = loadAllPlayers(roomId);
-        if (allPlayers.length > 0) {
-          // Sort players by total value
-          allPlayers.sort((a, b) => b.totalValue - a.totalValue);
-          allPlayers.forEach((player, index) => {
-            player.rank = index + 1;
-          });
-          
-          setGameState(prev => {
-            if (!prev.currentRoom) return prev;
-            
-            return {
-              ...prev,
-              currentRoom: {
-                ...roomState,
-                players: allPlayers,
-                leaderboard: allPlayers
-              },
-              gamePhase: roomState.status === 'playing' ? 'playing' : 
-                        roomState.status === 'finished' ? 'ended' : 'lobby'
-            };
-          });
-        }
-      }
-    }, 1000); // Sync every second
-  };
-
-  // Stop multiplayer synchronization
-  const stopMultiplayerSync = () => {
-    if (syncTimerRef.current) {
-      clearInterval(syncTimerRef.current);
-      syncTimerRef.current = null;
+    // Determine trend based on technical analysis
+    let trend: 'bull' | 'bear' | 'neutral' = 'neutral';
+    if (basePrice > sma20 && sma20 > sma50 && rsi > 50) {
+      trend = 'bull';
+    } else if (basePrice < sma20 && sma20 < sma50 && rsi < 50) {
+      trend = 'bear';
     }
+    
+    // Support and resistance levels
+    const support = basePrice * (0.85 + Math.random() * 0.1);
+    const resistance = basePrice * (1.05 + Math.random() * 0.1);
+    
+    return {
+      price: basePrice,
+      previousClose,
+      volume: Math.floor(Math.random() * 10000000) + 1000000,
+      marketCap,
+      pe,
+      pb,
+      debtToEquity,
+      roe,
+      revenue,
+      profitMargin,
+      beta,
+      dividendYield,
+      rsi,
+      sma20,
+      sma50,
+      volatility,
+      trend,
+      support,
+      resistance
+    };
   };
 
   // Generate market data
   const generateMarketData = (): MarketData => {
     const symbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'NVDA', 'META', 'NFLX'];
-    const prices: { [symbol: string]: number } = {};
-    const trends: { [symbol: string]: 'bull' | 'bear' | 'neutral' } = {};
-    const news = [
-      'Tech stocks rally on AI breakthrough news',
-      'Federal Reserve hints at rate cuts',
-      'Earnings season shows mixed results',
-      'Market volatility increases amid uncertainty',
-      'Crypto market shows signs of recovery',
-      'Energy sector faces headwinds'
-    ];
-
+    const stocks: { [symbol: string]: StockMetrics } = {};
+    
     symbols.forEach(symbol => {
-      const basePrice = 50 + Math.random() * 200;
-      prices[symbol] = basePrice;
-      const trendRand = Math.random();
-      trends[symbol] = trendRand < 0.4 ? 'bull' : trendRand < 0.7 ? 'bear' : 'neutral';
+      stocks[symbol] = generateStockMetrics(symbol);
     });
+
+    const news = [
+      'Tech stocks rally on AI breakthrough news - NVDA, META leading gains',
+      'Federal Reserve hints at rate cuts - Financial sector mixed',
+      'Earnings season shows mixed results - TSLA beats, NFLX misses',
+      'Market volatility increases amid uncertainty - Defensive stocks favored',
+      'Crypto market shows signs of recovery - Tech stocks benefit',
+      'Energy sector faces headwinds - Oil prices decline',
+      'Inflation data shows cooling trend - Growth stocks rally',
+      'Unemployment rate drops to 3.5% - Consumer stocks gain'
+    ];
 
     return {
       symbols,
-      prices,
-      trends,
-      volatility: 0.1 + Math.random() * 0.3,
-      news: [news[Math.floor(Math.random() * news.length)]]
+      stocks,
+      marketVolatility: 0.15 + Math.random() * 0.25,
+      news: [news[Math.floor(Math.random() * news.length)]],
+      economicIndicators: {
+        inflation: 2.5 + Math.random() * 2, // 2.5-4.5%
+        interestRate: 4.5 + Math.random() * 1.5, // 4.5-6%
+        gdp: 1.5 + Math.random() * 3, // 1.5-4.5%
+        unemployment: 3.5 + Math.random() * 2 // 3.5-5.5%
+      }
     };
   };
 
@@ -243,38 +281,12 @@ export default function GamePage() {
     if (!playerNameInput.trim()) return;
 
     const roomId = `room_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-    const newPlayer: Player = {
-      id: gameState.playerId,
-      name: playerNameInput.trim(),
-      balance: 10000,
-      portfolio: {},
-      totalValue: 10000,
-      rank: 1,
-      isConnected: true,
-      profitLoss: 0
-    };
-
-    const newRoom: GameRoom = {
-      id: roomId,
-      name: roomNameInput.trim() || `Room ${roomId.slice(-4)}`,
-      players: [newPlayer],
-      gameMode: selectedGameMode,
-      status: 'waiting',
-      currentRound: 0,
-      maxRounds: selectedGameMode === 'speed' ? 10 : selectedGameMode === 'prediction' ? 5 : 8,
-      timeLeft: 0,
-      marketData: generateMarketData(),
-      leaderboard: [newPlayer]
-    };
-
-    // Save room state and start multiplayer sync
-    saveRoomState(newRoom);
-    savePlayerState(roomId, newPlayer);
-    startMultiplayerSync(roomId);
+    
+    // Join room via Socket.IO
+    joinRoomSocket(roomId, playerNameInput.trim());
 
     setGameState((prev: GameState) => ({
       ...prev,
-      currentRoom: newRoom,
       playerName: playerNameInput.trim(),
       gamePhase: 'lobby',
       isHost: true,
@@ -286,78 +298,16 @@ export default function GamePage() {
   const joinRoom = (roomId: string) => {
     if (!playerNameInput.trim()) return;
 
-    const newPlayer: Player = {
-      id: gameState.playerId,
-      name: playerNameInput.trim(),
-      balance: 10000,
-      portfolio: {},
-      totalValue: 10000,
-      rank: 1,
-      isConnected: true,
-      profitLoss: 0
-    };
+    // Join room via Socket.IO
+    joinRoomSocket(roomId, playerNameInput.trim());
 
-    // Try to load existing room
-    const existingRoom = loadRoomState(roomId);
-    
-    if (existingRoom) {
-      // Join existing room
-      const existingPlayers = loadAllPlayers(roomId);
-      const allPlayers = [...existingPlayers, newPlayer];
-      
-      // Sort players by total value
-      allPlayers.sort((a, b) => b.totalValue - a.totalValue);
-      allPlayers.forEach((player, index) => {
-        player.rank = index + 1;
-      });
-
-      const updatedRoom: GameRoom = {
-        ...existingRoom,
-        players: allPlayers,
-        leaderboard: allPlayers
-      };
-
-      // Save player state and start sync
-      savePlayerState(roomId, newPlayer);
-      startMultiplayerSync(roomId);
-
-      setGameState((prev: GameState) => ({
-        ...prev,
-        currentRoom: updatedRoom,
-        playerName: playerNameInput.trim(),
-        gamePhase: 'lobby',
-        isHost: false,
-        showJoinRoom: false
-      }));
-    } else {
-      // Room doesn't exist, create new one
-      const newRoom: GameRoom = {
-        id: roomId,
-        name: `Room ${roomId.slice(-4)}`,
-        players: [newPlayer],
-        gameMode: 'classic',
-        status: 'waiting',
-        currentRound: 0,
-        maxRounds: 8,
-        timeLeft: 0,
-        marketData: generateMarketData(),
-        leaderboard: [newPlayer]
-      };
-
-      // Save room state and start sync
-      saveRoomState(newRoom);
-      savePlayerState(roomId, newPlayer);
-      startMultiplayerSync(roomId);
-
-      setGameState((prev: GameState) => ({
-        ...prev,
-        currentRoom: newRoom,
-        playerName: playerNameInput.trim(),
-        gamePhase: 'lobby',
-        isHost: true,
-        showJoinRoom: false
-      }));
-    }
+    setGameState((prev: GameState) => ({
+      ...prev,
+      playerName: playerNameInput.trim(),
+      gamePhase: 'lobby',
+      isHost: false,
+      showJoinRoom: false
+    }));
   };
 
   // Generate mock players for demonstration
@@ -428,11 +378,12 @@ export default function GamePage() {
       ...gameState.currentRoom,
       status: 'playing' as const,
       currentRound: 1,
-      timeLeft: 30 // 30 seconds per round
+      timeLeft: 30, // 30 seconds per round
+      marketData: generateMarketData()
     };
 
-    // Save room state for all players
-    saveRoomState(updatedRoom);
+    // Update room via Socket.IO
+    updateRoomSocket(updatedRoom);
 
     setGameState((prev: GameState) => ({
       ...prev,
@@ -444,37 +395,55 @@ export default function GamePage() {
     startGameTimer();
   };
 
-  // AI trading logic
+  // AI trading logic with financial analysis
   const makeAITrade = (player: Player, marketData: MarketData) => {
     const symbols = marketData.symbols.slice(0, 4);
     const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-    const price = marketData.prices[randomSymbol];
-    const trend = marketData.trends[randomSymbol];
+    const stock = marketData.stocks[randomSymbol];
     
-    // AI decision making based on market trends
-    const shouldBuy = trend === 'bull' && Math.random() > 0.3;
-    const shouldSell = trend === 'bear' && Math.random() > 0.4;
+    // AI decision making based on financial metrics
+    let shouldBuy = false;
+    let shouldSell = false;
     
-    if (shouldBuy && player.balance >= price) {
+    // Fundamental analysis
+    const goodPE = stock.pe > 0 && stock.pe < 25; // Reasonable PE ratio
+    const goodROE = stock.roe > 10; // Good return on equity
+    const lowDebt = stock.debtToEquity < 1; // Low debt
+    const goodMargin = stock.profitMargin > 5; // Profitable
+    
+    // Technical analysis
+    const bullishTrend = stock.trend === 'bull';
+    const oversold = stock.rsi < 30; // Oversold condition
+    const aboveSMA = stock.price > stock.sma20; // Above moving average
+    const nearSupport = stock.price <= stock.support * 1.05; // Near support level
+    
+    // AI decision logic
+    if (goodPE && goodROE && lowDebt && (bullishTrend || oversold || nearSupport)) {
+      shouldBuy = Math.random() > 0.2; // 80% chance to buy good fundamentals
+    } else if (stock.trend === 'bear' || stock.rsi > 70) {
+      shouldSell = Math.random() > 0.3; // 70% chance to sell in bearish conditions
+    }
+    
+    if (shouldBuy && player.balance >= stock.price) {
       const quantity = Math.floor(Math.random() * 3) + 1;
-      const cost = price * quantity;
+      const cost = stock.price * quantity;
       if (player.balance >= cost) {
         player.balance -= cost;
         player.portfolio[randomSymbol] = (player.portfolio[randomSymbol] || 0) + quantity;
-        player.lastAction = `Bought ${quantity} ${randomSymbol}`;
+        player.lastAction = `Bought ${quantity} ${randomSymbol} (PE:${stock.pe.toFixed(1)})`;
       }
     } else if (shouldSell && (player.portfolio[randomSymbol] || 0) > 0) {
       const quantity = Math.min(player.portfolio[randomSymbol] || 0, Math.floor(Math.random() * 2) + 1);
-      const revenue = price * quantity;
+      const revenue = stock.price * quantity;
       player.balance += revenue;
       player.portfolio[randomSymbol] = (player.portfolio[randomSymbol] || 0) - quantity;
-      player.lastAction = `Sold ${quantity} ${randomSymbol}`;
+      player.lastAction = `Sold ${quantity} ${randomSymbol} (RSI:${stock.rsi.toFixed(0)})`;
     }
     
     // Update total value
     player.totalValue = player.balance;
     Object.entries(player.portfolio).forEach(([sym, qty]) => {
-      player.totalValue += (qty as number) * marketData.prices[sym];
+      player.totalValue += (qty as number) * marketData.stocks[sym].price;
     });
     player.profitLoss = player.totalValue - 10000;
   };
@@ -523,8 +492,8 @@ export default function GamePage() {
             marketData: generateMarketData()
           };
 
-          // Save room state for all players
-          saveRoomState(updatedRoom);
+          // Update room via Socket.IO
+          updateRoomSocket(updatedRoom);
 
           if (isGameOver) {
             clearInterval(gameTimerRef.current!);
@@ -549,7 +518,7 @@ export default function GamePage() {
           }
         };
       });
-    }, 1000);
+      }, 1000);
   };
 
   // Make a trade
@@ -559,7 +528,8 @@ export default function GamePage() {
     const currentPlayer = gameState.currentRoom.players.find((p: Player) => p.id === gameState.playerId);
     if (!currentPlayer) return;
 
-    const price = gameState.currentRoom.marketData.prices[symbol];
+    const stock = gameState.currentRoom.marketData.stocks[symbol];
+    const price = stock.price;
     const cost = price * quantity;
 
     const updatedPlayer = { ...currentPlayer };
@@ -568,11 +538,11 @@ export default function GamePage() {
     if (action === 'buy' && currentPlayer.balance >= cost) {
       updatedPlayer.balance -= cost;
       updatedPlayer.portfolio[symbol] = (updatedPlayer.portfolio[symbol] || 0) + quantity;
-      actionMessage = `Bought ${quantity} ${symbol} at $${price.toFixed(2)}`;
+      actionMessage = `Bought ${quantity} ${symbol} at $${price.toFixed(2)} (PE:${stock.pe.toFixed(1)})`;
     } else if (action === 'sell' && (updatedPlayer.portfolio[symbol] || 0) >= quantity) {
       updatedPlayer.balance += cost;
       updatedPlayer.portfolio[symbol] = (updatedPlayer.portfolio[symbol] || 0) - quantity;
-      actionMessage = `Sold ${quantity} ${symbol} at $${price.toFixed(2)}`;
+      actionMessage = `Sold ${quantity} ${symbol} at $${price.toFixed(2)} (RSI:${stock.rsi.toFixed(0)})`;
     } else {
       return; // Invalid trade
     }
@@ -580,7 +550,7 @@ export default function GamePage() {
     // Update total value
     updatedPlayer.totalValue = updatedPlayer.balance;
     Object.entries(updatedPlayer.portfolio).forEach(([sym, qty]) => {
-      updatedPlayer.totalValue += (qty as number) * gameState.currentRoom!.marketData.prices[sym];
+      updatedPlayer.totalValue += (qty as number) * gameState.currentRoom!.marketData.stocks[sym].price;
     });
 
     updatedPlayer.profitLoss = updatedPlayer.totalValue - 10000;
@@ -597,8 +567,8 @@ export default function GamePage() {
       player.rank = index + 1;
     });
 
-    // Save updated player state
-    savePlayerState(gameState.currentRoom.id, updatedPlayer);
+    // Update player via Socket.IO
+    updatePlayerSocket(updatedPlayer);
 
     setGameState((prev: GameState) => ({
       ...prev,
@@ -619,11 +589,9 @@ export default function GamePage() {
       clearInterval(syncTimerRef.current);
     }
     
-    // Clean up player data
-    if (gameState.currentRoom) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(getPlayerStorageKey(gameState.currentRoom.id, gameState.playerId));
-      }
+    // Disconnect from socket
+    if (socketRef.current) {
+      socketRef.current.disconnect();
     }
     
     setGameState(initialGameState);
@@ -885,46 +853,122 @@ export default function GamePage() {
                 </div>
 
                 {/* Market Data */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   {gameState.currentRoom.marketData.symbols.slice(0, 4).map((symbol: string) => {
-                    const price = gameState.currentRoom!.marketData.prices[symbol];
-                    const trend = gameState.currentRoom!.marketData.trends[symbol];
+                    const stock = gameState.currentRoom!.marketData.stocks[symbol];
                     const currentPlayer = getCurrentPlayer();
                     const owned = currentPlayer?.portfolio[symbol] || 0;
+                    const priceChange = stock.price - stock.previousClose;
+                    const priceChangePercent = (priceChange / stock.previousClose) * 100;
                     
                     return (
-                      <div key={symbol} className="bg-neutral-85 rounded-xl p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-bold text-neutral-05">{symbol}</span>
-                          <span className={`text-sm px-2 py-1 rounded ${
-                            trend === 'bull' ? 'bg-green-900 text-green-300' :
-                            trend === 'bear' ? 'bg-red-900 text-red-300' :
+                      <div key={symbol} className="bg-neutral-85 rounded-xl p-6">
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-4">
+                          <div>
+                            <span className="font-bold text-neutral-05 text-xl">{symbol}</span>
+                            <div className="text-2xl font-bold text-neutral-05">${stock.price.toFixed(2)}</div>
+                            <div className={`text-sm ${priceChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)} ({priceChangePercent.toFixed(1)}%)
+                            </div>
+                          </div>
+                          <div className={`text-sm px-3 py-1 rounded-full ${
+                            stock.trend === 'bull' ? 'bg-green-900 text-green-300' :
+                            stock.trend === 'bear' ? 'bg-red-900 text-red-300' :
                             'bg-neutral-80 text-neutral-40'
                           }`}>
-                            {trend === 'bull' ? '📈' : trend === 'bear' ? '📉' : '➡️'}
-                          </span>
+                            {stock.trend === 'bull' ? '📈 Bull' : stock.trend === 'bear' ? '📉 Bear' : '➡️ Neutral'}
+                          </div>
                         </div>
-                        <div className="text-2xl font-bold text-neutral-05 mb-2">${price.toFixed(2)}</div>
-                        <div className="text-sm text-neutral-60 mb-3">Owned: {owned}</div>
-                        <div className="grid grid-cols-2 gap-2">
+
+                        {/* Financial Metrics */}
+                        <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">P/E Ratio</div>
+                            <div className="text-neutral-05 font-medium">{stock.pe.toFixed(1)}</div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">P/B Ratio</div>
+                            <div className="text-neutral-05 font-medium">{stock.pb.toFixed(1)}</div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">ROE</div>
+                            <div className="text-neutral-05 font-medium">{stock.roe.toFixed(1)}%</div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">Debt/Equity</div>
+                            <div className="text-neutral-05 font-medium">{stock.debtToEquity.toFixed(1)}</div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">RSI</div>
+                            <div className={`font-medium ${stock.rsi > 70 ? 'text-red-400' : stock.rsi < 30 ? 'text-green-400' : 'text-neutral-05'}`}>
+                              {stock.rsi.toFixed(0)}
+                            </div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">Beta</div>
+                            <div className="text-neutral-05 font-medium">{stock.beta.toFixed(1)}</div>
+                          </div>
+                        </div>
+
+                        {/* Technical Levels */}
+                        <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">Support</div>
+                            <div className="text-green-400 font-medium">${stock.support.toFixed(2)}</div>
+                          </div>
+                          <div className="bg-neutral-90 p-2 rounded">
+                            <div className="text-neutral-60">Resistance</div>
+                            <div className="text-red-400 font-medium">${stock.resistance.toFixed(2)}</div>
+                          </div>
+                        </div>
+
+                        {/* Trading Section */}
+                        <div className="border-t border-neutral-70 pt-4">
+                          <div className="text-sm text-neutral-60 mb-2">Owned: {owned} shares</div>
+                          <div className="grid grid-cols-2 gap-2">
                 <button
-                            onClick={() => makeTrade(symbol, 'buy')}
-                            disabled={!getCurrentPlayer() || getCurrentPlayer()!.balance < price}
-                            className="bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={() => makeTrade(symbol, 'buy')}
+                              disabled={!getCurrentPlayer() || getCurrentPlayer()!.balance < stock.price}
+                              className="bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Buy
                 </button>
                 <button
-                            onClick={() => makeTrade(symbol, 'sell')}
-                            disabled={!getCurrentPlayer() || owned === 0}
-                            className="bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={() => makeTrade(symbol, 'sell')}
+                              disabled={!getCurrentPlayer() || owned === 0}
+                              className="bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Sell
                 </button>
+                          </div>
                         </div>
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Economic Indicators */}
+                <div className="bg-neutral-85 rounded-xl p-4 mb-4">
+                  <h4 className="font-semibold text-neutral-05 mb-3">📊 Economic Indicators</h4>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="text-neutral-60">Inflation</div>
+                      <div className="text-neutral-05 font-medium">{gameState.currentRoom.marketData.economicIndicators.inflation.toFixed(1)}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-neutral-60">Interest Rate</div>
+                      <div className="text-neutral-05 font-medium">{gameState.currentRoom.marketData.economicIndicators.interestRate.toFixed(1)}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-neutral-60">GDP Growth</div>
+                      <div className="text-neutral-05 font-medium">{gameState.currentRoom.marketData.economicIndicators.gdp.toFixed(1)}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-neutral-60">Unemployment</div>
+                      <div className="text-neutral-05 font-medium">{gameState.currentRoom.marketData.economicIndicators.unemployment.toFixed(1)}%</div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Market News */}
@@ -1039,7 +1083,7 @@ export default function GamePage() {
         {/* Game Instructions */}
         <div className="mt-8 bg-neutral-90 rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-neutral-05 mb-4">🎮 How to Play</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-neutral-60">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm text-neutral-60">
             <div>
               <h4 className="font-semibold text-neutral-10 mb-2">Game Modes:</h4>
               <ul className="space-y-1">
@@ -1050,21 +1094,30 @@ export default function GamePage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-neutral-10 mb-2">Trading:</h4>
+              <h4 className="font-semibold text-neutral-10 mb-2">Financial Metrics:</h4>
               <ul className="space-y-1">
-                <li>• Start with $10,000</li>
-                <li>• Buy/sell stocks in real-time</li>
-                <li>• Watch market trends and news</li>
-                <li>• Compete for the top spot!</li>
+                <li>• <strong>P/E Ratio:</strong> Lower is often better (10-25 ideal)</li>
+                <li>• <strong>ROE:</strong> Higher return on equity (10%+ good)</li>
+                <li>• <strong>RSI:</strong> &lt;30 oversold, &gt;70 overbought</li>
+                <li>• <strong>Debt/Equity:</strong> Lower is safer (&lt;1 ideal)</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-neutral-10 mb-2">Technical Analysis:</h4>
+              <ul className="space-y-1">
+                <li>• <strong>Support/Resistance:</strong> Key price levels</li>
+                <li>• <strong>Trend:</strong> Bull/Bear/Neutral indicators</li>
+                <li>• <strong>Beta:</strong> Volatility vs market (1.0 = market avg)</li>
+                <li>• <strong>Moving Averages:</strong> Price momentum</li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-neutral-10 mb-2">Strategy Tips:</h4>
               <ul className="space-y-1">
+                <li>• Analyze fundamentals first</li>
+                <li>• Use technical indicators</li>
+                <li>• Watch economic indicators</li>
                 <li>• Diversify your portfolio</li>
-                <li>• Watch for market trends</li>
-                <li>• Manage risk carefully</li>
-                <li>• Learn from other players</li>
               </ul>
             </div>
           </div>
