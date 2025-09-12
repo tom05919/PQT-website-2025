@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 interface Player {
   id: string;
@@ -107,33 +107,41 @@ export default function GamePage() {
 
   // Initialize Socket.IO connection
   useEffect(() => {
-    const socket = io('http://localhost:3002', {
-      transports: ['websocket', 'polling']
-    });
-    
-    socketRef.current = socket;
-    
-    // Handle room updates
-    socket.on('roomUpdate', (room: GameRoom) => {
-      setGameState(prev => ({
-        ...prev,
-        currentRoom: room,
-        gamePhase: room.status === 'playing' ? 'playing' : 
-                  room.status === 'finished' ? 'ended' : 'lobby'
-      }));
-    });
-    
-    // Handle connection events
-    socket.on('connect', () => {
-      console.log('Connected to multiplayer server');
-    });
-    
-    socket.on('disconnect', () => {
-      console.log('Disconnected from multiplayer server');
-    });
+    let mounted = true;
+
+    const connect = async () => {
+      const { io } = await import('socket.io-client');
+      const base = process.env.NEXT_PUBLIC_MULTIPLAYER_ORIGIN || 'http://localhost:3002';
+      const socket = io(base, { transports: ['websocket', 'polling'] });
+
+      if (!mounted) return;
+      socketRef.current = socket;
+      
+      // Handle room updates
+      socket.on('roomUpdate', (room: GameRoom) => {
+        setGameState(prev => ({
+          ...prev,
+          currentRoom: room,
+          gamePhase: room.status === 'playing' ? 'playing' : 
+                    room.status === 'finished' ? 'ended' : 'lobby'
+        }));
+      });
+      
+      // Handle connection events
+      socket.on('connect', () => {
+        console.log('Connected to multiplayer server');
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('Disconnected from multiplayer server');
+      });
+    };
+
+    connect();
     
     return () => {
-      socket.disconnect();
+      mounted = false;
+      socketRef.current?.disconnect();
     };
   }, []);
 
@@ -294,12 +302,40 @@ export default function GamePage() {
     }));
   };
 
+  // Resolve room code to full room ID
+  const resolveRoomIdByCode = async (code: string): Promise<string | null> => {
+    const base = process.env.NEXT_PUBLIC_MULTIPLAYER_ORIGIN || 'http://localhost:3002';
+    try {
+      const res = await fetch(`${base}/api/rooms`, { cache: 'no-store' });
+      if (!res.ok) return null;
+      const rooms: Array<{ id: string; name: string }> = await res.json();
+      const normalized = code.trim().toUpperCase();
+      const match = rooms.find(r => 
+        r.id.slice(-6).toUpperCase() === normalized || 
+        r.name.toUpperCase() === normalized
+      );
+      return match ? match.id : null;
+    } catch {
+      return null;
+    }
+  };
+
   // Join an existing room
-  const joinRoom = (roomId: string) => {
+  const joinRoom = async (codeOrId: string) => {
     if (!playerNameInput.trim()) return;
 
+    let targetId = codeOrId.trim();
+    if (targetId.length <= 8) { // Assuming short codes are 8 chars or less
+      const resolved = await resolveRoomIdByCode(targetId);
+      if (!resolved) {
+        alert('Room not found. Please check the room code.');
+        return;
+      }
+      targetId = resolved;
+    }
+
     // Join room via Socket.IO
-    joinRoomSocket(roomId, playerNameInput.trim());
+    joinRoomSocket(targetId, playerNameInput.trim());
 
     setGameState((prev: GameState) => ({
       ...prev,
