@@ -92,13 +92,33 @@ export default function AboutPage() {
                 date: "September 12th, Friday 5pm-6pm", 
                 description: "Meet our leadership team and hear about upcoming events, trading competitions, workshops, and more!",
                 location: "Lewis Library Room 121"
+              },
+              { 
+                title: "Princeton: Citadel Securities Trading Challenge", 
+                date: "September 25th, Thursday 5:30pm", 
+                description: "Interested in learning more about trading at Citadel Securities? Apply to the Princeton trading challenge to test your market making skills against other students.",
+                location: "Friend Center 08",
+                link: "https://princetoncitadelsecuritiestrad.splashthat.com/"
               }
             ].map((event, index) => (
               <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
                 <h3 className="text-xl font-semibold text-neutral-05 mb-2">{event.title}</h3>
                 <p className="text-bright font-medium mb-2">{event.date}</p>
                 <p className="text-neutral-60 mb-3">{event.description}</p>
-                <p className="text-neutral-40 text-sm">{event.location}</p>
+                <p className="text-neutral-40 text-sm mb-4">{event.location}</p>
+                {event.link && (
+                  <a
+                    href={event.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-bright text-neutral-100 font-medium rounded-lg hover:bg-bright/90 transition-colors duration-200 text-sm"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Learn More & Apply
+                  </a>
+                )}
               </div>
             ))}
           </div>
