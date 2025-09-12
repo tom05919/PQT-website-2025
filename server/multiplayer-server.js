@@ -7,15 +7,26 @@ const app = express();
 const server = http.createServer(app);
 
 // Enable CORS for all origins
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // Create Socket.IO instance
 const io = socketIo(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  },
+  transports: ['websocket', 'polling']
 });
 
 // Store game rooms and players
