@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 export default function ChallengePage() {
-  const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   return (
@@ -68,9 +67,7 @@ export default function ChallengePage() {
                       width="100%"
                       height="800"
                       className="w-full"
-                      onLoad={() => setIsLoading(false)}
                       onError={() => {
-                        setIsLoading(false);
                         setHasError(true);
                       }}
                       title="PQT Questions PDF"
@@ -90,15 +87,15 @@ export default function ChallengePage() {
                 </li>
                 <li className="flex items-start">
                   <span className="text-bright mr-3">•</span>
-                  Use the browser's built-in PDF controls to navigate and zoom
+                  Use the browser&apos;s built-in PDF controls to navigate and zoom
                 </li>
                 <li className="flex items-start">
                   <span className="text-bright mr-3">•</span>
-                  If the PDF doesn't load, click the download link to view it directly
+                  If the PDF doesn&apos;t load, click the download link to view it directly
                 </li>
                 <li className="flex items-start">
                   <span className="text-bright mr-3">•</span>
-                  Click "Submit Your Solutions" to access the Google form
+                  Click &quot;Submit Your Solutions&quot; to access the Google form
                 </li>
               </ul>
             </div>
