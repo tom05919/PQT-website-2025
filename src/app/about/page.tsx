@@ -88,12 +88,6 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               { 
-                title: "Princeton Quantitative Traders Info Session", 
-                date: "September 12th, Friday 5pm-6pm", 
-                description: "Meet our leadership team and hear about upcoming events, trading competitions, workshops, and more!",
-                location: "Lewis Library Room 121"
-              },
-              { 
                 title: "Princeton: Citadel Securities Trading Challenge", 
                 date: "September 25th, Thursday 5:30pm", 
                 description: "Interested in learning more about trading at Citadel Securities? Apply to the Princeton trading challenge to test your market making skills against other students.",

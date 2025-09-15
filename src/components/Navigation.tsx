@@ -13,6 +13,7 @@ const Navigation = () => {
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
     { name: 'Sponsors', href: '/sponsors' },
+    { name: 'Past Events', href: '/past-events' },
     // { name: 'Game', href: '/game' }, // Hidden for future development
     { name: 'Join', href: '/join' },
   ];
