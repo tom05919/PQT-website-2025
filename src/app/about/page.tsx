@@ -93,6 +93,17 @@ export default function AboutPage() {
                 description: "Interested in learning more about trading at Citadel Securities? Apply to the Princeton trading challenge to test your market making skills against other students.",
                 location: "Friend Center 08",
                 link: "https://princetoncitadelsecuritiestrad.splashthat.com/"
+              },
+              { 
+                title: "Jane Street x Princeton Quantitative Traders Game Night ", 
+                date: "September 25th, Thursday 6:00pm", 
+                description: "Interested in learning more about Jane Street? Students of all backgrounds and tenures are encouraged to attend - you don't need experience in finance to work at Jane Street. We hope to meet intellectually curious problem solvers!",
+              },
+              { 
+                title: "PQT Educational Session", 
+                date: "September 25th, Thursday 8:00pm", 
+                description: "Come and learn about quantitative trading from our briliant class leaders!",
+                location: "TBD"
               }
             ].map((event, index) => (
               <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
