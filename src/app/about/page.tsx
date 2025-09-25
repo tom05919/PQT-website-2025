@@ -62,8 +62,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
-              { name: "Loc Tran", role: "Co-Vice President", description: "Sophomore, ORFE major" },
-              { name: "Jishnu Roychoudhury", role: "Co-Vice President", description: "Junior, COS major" },
+              { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
               { name: "Rodrigo Porto", role: "Treasurer", description: "Junior, Math major" },
               { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
               { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
@@ -101,9 +100,9 @@ export default function AboutPage() {
               },
               { 
                 title: "PQT Educational Session", 
-                date: "September 25th, Thursday 8:00pm", 
+                date: "September 25th, Thursday 8:30pm", 
                 description: "Come and learn about quantitative trading from our briliant class leaders!",
-                location: "TBD"
+                location: "Friend Center 08/Friend Center 06"
               }
             ].map((event, index) => (
               <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
