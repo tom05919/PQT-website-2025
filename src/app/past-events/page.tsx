@@ -18,6 +18,24 @@ interface Event {
 
 const events: Event[] = [
   {
+    id: 'PQT Education Series - Probabilites',
+    title: 'PQT Education Series - Probabilites',
+    date: '9/25/2025',
+    description: 'Introduction to the probabily theories that is commonly used in quant fiance.',
+    materials: [
+      {
+        name: 'Beginner slides',
+        url: '/documents/pqt_ed_series_beginner.pdf',
+        type: 'slideshow'
+      },
+      {
+        name: 'Advanced slides',
+        url: '/documents/pqt_ed_series_advanced.pdf',
+        type: 'slideshow'
+      }
+    ]
+  },
+  {
     id: 'Princeton Quantitative Traders Info Session',
     title: 'Princeton Quantitative Traders Info Session',
     date: '9/12/2025',
