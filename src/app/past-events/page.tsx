@@ -25,12 +25,12 @@ const events: Event[] = [
     materials: [
       {
         name: 'Beginner slides',
-        url: '/documents/pqt_ed_series_advanced.pdf',
+        url: '/documents/pqt_ed_series_beginner.pdf',
         type: 'slideshow'
       },
       {
         name: 'Advanced slides',
-        url: '/documents/pqt_ed_series_beginner.pdf',
+        url: '/documents/pqt_ed_series_advanced.pdf',
         type: 'slideshow'
       }
     ]
