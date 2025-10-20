@@ -77,8 +77,7 @@ export default function PastEvents() {
             Past Events
           </h1>
           <p className="text-xl text-neutral-60 max-w-3xl mx-auto">
-            Explore our previous workshops, seminars, and events. Access slideshows, 
-            materials, and resources from past sessions.
+            Access slideshows, materials, and resources from past sessions.
           </p>
         </div>
       </section>

@@ -2,10 +2,10 @@
   "name": "trading-game-multiplayer-server",
   "version": "1.0.0",
   "description": "Multiplayer server for trading game",
-  "main": "server-multiplayer.js",
+  "main": "multiplayer-server.js",
   "scripts": {
-    "start": "node server-multiplayer.js",
-    "dev": "nodemon server-multiplayer.js"
+    "start": "node multiplayer-server.js",
+    "dev": "nodemon multiplayer-server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
