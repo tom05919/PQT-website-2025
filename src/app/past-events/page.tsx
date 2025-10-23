@@ -19,7 +19,7 @@ const events: Event[] = [
     title: 'PQT Project Series',
     date: 'October 22, 2025',
     description:
-      'A showcase of our ongoing projects—from algorithmic research to data-driven experiments. Explore and contribute via our open GitHub repository.',
+      'A showcase of our ongoing projects — from algorithmic research to data-driven experiments. Explore and contribute via our open GitHub repository.',
     materials: [
       {
         name: 'Project GitHub Link',
@@ -34,7 +34,7 @@ const events: Event[] = [
     description:
       'An introduction to the probability theories commonly used in quantitative finance, connecting mathematical ideas with practical intuition.',
     materials: [
-      { name: "Beginner Slides", url: '/documents/pqt_ed_series_beginner.pdf' },
+      { name: 'Beginner Slides', url: '/documents/pqt_ed_series_beginner.pdf' },
       { name: 'Advanced Slides', url: '/documents/pqt_ed_series_advanced.pdf' },
     ],
   },
@@ -52,12 +52,12 @@ const events: Event[] = [
 
 export default function PastEvents() {
   return (
-    <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
+    <main className="min-h-screen bg-[#d1c3b3] text-[#2e2b28] font-sans antialiased">
       {/* Hero Section */}
       <section className="py-24 px-6 text-center">
-      <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-            Past <span className="text-[#d26b2c]">Events</span>
-          </h1>
+        <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
+          Past <span className="text-[#d26b2c]">Events</span>
+        </h1>
         <p className="text-lg text-[#5c5045] max-w-2xl mx-auto leading-relaxed">
           A look back at the sessions, projects, and discussions of our club.
         </p>
@@ -65,31 +65,34 @@ export default function PastEvents() {
 
       {/* Events */}
       <section className="max-w-5xl mx-auto px-6 space-y-20 pb-32">
-        {events.map((event, i) => (
+        {events.map((event) => (
           <div
             key={event.id}
-            className="relative bg-[#e9e1d9] rounded-3xl shadow-sm border border-[#d2c7b8] px-8 py-12 hover:shadow-md transition-shadow duration-300"
+            className="relative bg-[#a36843] rounded-3xl shadow-sm border border-[#3c2e26] px-8 py-12 hover:shadow-md transition-shadow duration-300"
           >
-            <div className="absolute -top-5 left-8 bg-[#a87445] text-[#f8f4ef] text-sm px-4 py-1 rounded-full font-seriffont-medium tracking-wide">
+            <div className="absolute -top-5 left-8 bg-[#d26b2c] text-[#fff7f0] text-sm px-4 py-1 rounded-full font-serif font-medium tracking-wide">
               {event.date}
             </div>
-            <h2 className="text-3xl font-serif font-semibold mb-4">{event.title}</h2>
-            <p className="text-[#5c5045] text-lg leading-relaxed mb-8 max-w-3xl">
+
+            <h2 className="text-3xl font-serif font-semibold mb-4 text-[#fff7f0]">
+              {event.title}
+            </h2>
+
+            <p className="text-[#e3d9d0] text-lg leading-relaxed mb-8 max-w-3xl">
               {event.description}
             </p>
 
             {event.materials && event.materials.length > 0 && (
-              <div className="space-y-3">
+              <div className="flex flex-wrap gap-3">
                 {event.materials.map((m, index) => (
                   <Link
                     key={index}
                     href={m.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#d8cfc5] hover:bg-[#cfc4b8] rounded-full px-4 py-3 transition-colors"
+                    className="inline-block bg-[#7b6354] hover:bg-[#6b5547] text-[#f8f4ef] rounded-full px-5 py-3 transition-colors text-sm font-medium"
                   >
-                    <span className="font-medium">{m.name}</span>
-                    <span className="text-sm text-[#5c5045] capitalize"></span>
+                    {m.name}
                   </Link>
                 ))}
               </div>
@@ -100,7 +103,7 @@ export default function PastEvents() {
 
       {/* CTA Section */}
       <section className="bg-[#c3b6aa] py-24 px-6 text-center">
-        <h2 className="text-3xl font-seriffont-semibold mb-4 tracking-tight">Stay Connected</h2>
+        <h2 className="text-3xl font-serif font-semibold mb-4 tracking-tight">Stay Connected</h2>
         <p className="text-[#4b4138] max-w-xl mx-auto mb-10 leading-relaxed">
           Be the first to hear about new projects, workshops, and education sessions — join our
           community today.

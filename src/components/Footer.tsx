@@ -1,11 +1,11 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="bg-neutral-90 border-t border-neutral-80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-[#4a3b32] border-t border-[#3c2e26] text-[#e9e2db]">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Club Info */}
           <div>
             <div className="flex items-center space-x-3 mb-4">
@@ -16,29 +16,43 @@ const Footer = () => {
                 height={40}
                 className="w-10 h-10"
               />
-              <h3 className="text-neutral-05 text-lg font-semibold">Princeton Quantitative Traders</h3>
+              <h3 className="text-[#fff7f0] text-lg font-serif font-semibold">
+                Princeton Quantitative Traders
+              </h3>
             </div>
-            <p className="text-neutral-60 text-sm">
-              Fostering a community of mutually interested students in quantitative finance and applied mathematics.
+            <p className="text-[#d3c6bc] text-sm leading-relaxed">
+              Fostering a community of students passionate about quantitative
+              finance, research, and applied mathematics.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-neutral-05 text-base font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-[#fff7f0] text-base font-serif font-semibold mb-4">
+              Quick Links
+            </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-neutral-60 hover:text-bright transition-colors text-sm">
+                <Link
+                  href="/about"
+                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/sponsors" className="text-neutral-60 hover:text-bright transition-colors text-sm">
+                <Link
+                  href="/sponsors"
+                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
+                >
                   Sponsors
                 </Link>
               </li>
               <li>
-                <Link href="/join" className="text-neutral-60 hover:text-bright transition-colors text-sm">
+                <Link
+                  href="/join"
+                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
+                >
                   Join Us
                 </Link>
               </li>
@@ -47,26 +61,35 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="text-neutral-05 text-base font-semibold mb-4">Contact</h4>
-            <div className="space-y-2 text-sm text-neutral-60">
+            <h4 className="text-[#fff7f0] text-base font-serif font-semibold mb-4">
+              Contact
+            </h4>
+            <div className="space-y-2 text-sm text-[#d3c6bc]">
               <p>Email: pqt@princeton.edu</p>
               <p>Discord: Princeton Quantitative Traders</p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-neutral-80 mt-8 pt-6">
+        {/* Bottom Bar */}
+        <div className="border-t border-[#3c2e26] mt-10 pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-neutral-60 text-sm">
+            <p className="text-sm text-[#b8ada4]">
               © 2025 Princeton Quantitative Traders. All rights reserved.
             </p>
-            <div className="flex space-x-4 mt-4 sm:mt-0">
-              <a href="#" className="text-neutral-60 hover:text-bright transition-colors text-sm">
+            <div className="flex space-x-5 mt-4 sm:mt-0">
+              <Link
+                href="#"
+                className="text-sm text-[#d3c6bc] hover:text-[#d26b2c] transition-colors"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="text-neutral-60 hover:text-bright transition-colors text-sm">
+              </Link>
+              <Link
+                href="#"
+                className="text-sm text-[#d3c6bc] hover:text-[#d26b2c] transition-colors"
+              >
                 Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -12,10 +12,9 @@ const Navigation = () => {
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
-    { name: 'Sponsors', href: '/sponsors' },
     { name: 'Past Events', href: '/past-events' },
-    // { name: 'Game', href: '/game' }, // Hidden for future development
     { name: 'Join', href: '/join' },
+    { name: 'Sponsors', href: '/sponsors' },
   ];
 
   const isActive = (href: string) => pathname === href;
@@ -23,8 +22,8 @@ const Navigation = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="bg-neutral-90 border-b border-neutral-80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-[#4a3b32] border-b border-[#3c2e26] text-[#e9e2db] sticky top-0 z-50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
@@ -35,7 +34,7 @@ const Navigation = () => {
                 height={40}
                 className="w-10 h-10"
               />
-              <span className="text-neutral-05 text-xl font-bold">
+              <span className="text-[#fff7f0] text-lg sm:text-xl font-serif font-semibold">
                 Princeton Quantitative Traders
               </span>
             </Link>
@@ -46,23 +45,25 @@ const Navigation = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-neutral-10 hover:text-bright transition-colors duration-200 relative ${
-                    isActive(item.href) ? 'text-bright' : ''
+                  className={`relative text-sm font-medium transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? 'text-[#d26b2c]'
+                      : 'text-[#e9e2db] hover:text-[#d26b2c]'
                   }`}
                 >
                   {item.name}
                   {isActive(item.href) && (
-                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-bright"></div>
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#d26b2c]"></span>
                   )}
                 </Link>
               ))}
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-neutral-10 hover:text-bright transition-colors"
+                className="text-[#e9e2db] hover:text-[#d26b2c] transition-colors"
                 aria-label="Toggle mobile menu"
               >
                 <svg
@@ -94,18 +95,18 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-neutral-90 border-t border-neutral-80">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="md:hidden bg-[#4a3b32] border-t border-[#3c2e26]">
+            <div className="px-4 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 ${
-                    isActive(item.href)
-                      ? 'text-bright bg-neutral-85'
-                      : 'text-neutral-10 hover:text-bright hover:bg-neutral-85'
-                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? 'text-[#d26b2c] bg-[#3c2e26]'
+                      : 'text-[#e9e2db] hover:text-[#d26b2c] hover:bg-[#3c2e26]'
+                  }`}
                 >
                   {item.name}
                 </Link>
