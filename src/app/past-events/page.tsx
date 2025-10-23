@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 
 interface Event {
@@ -8,205 +7,109 @@ interface Event {
   title: string;
   date: string;
   description: string;
-  slideshow?: string;
   materials?: Array<{
     name: string;
     url: string;
-    type: 'slideshow' | 'document' | 'video' | 'other';
   }>;
 }
 
 const events: Event[] = [
   {
-    id: 'PQT Education Series - Probabilites',
-    title: 'PQT Education Series - Probabilites',
-    date: '9/25/2025',
-    description: 'Introduction to the probabily theories that is commonly used in quant fiance.',
+    id: '1',
+    title: 'PQT Education Series – Probabilities',
+    date: 'September 25, 2025',
+    description:
+      'An introduction to the probability theories commonly used in quantitative finance, connecting mathematical ideas with practical intuition.',
     materials: [
-      {
-        name: 'Beginner slides',
-        url: '/documents/pqt_ed_series_beginner.pdf',
-        type: 'slideshow'
-      },
-      {
-        name: 'Advanced slides',
-        url: '/documents/pqt_ed_series_advanced.pdf',
-        type: 'slideshow'
-      }
-    ]
+      { name: 'Beginner Slides', url: '/documents/pqt_ed_series_beginner.pdf' },
+      { name: 'Advanced Slides', url: '/documents/pqt_ed_series_advanced.pdf' },
+    ],
   },
   {
-    id: 'Princeton Quantitative Traders Info Session',
+    id: '2',
     title: 'Princeton Quantitative Traders Info Session',
-    date: '9/12/2025',
-    description: 'An overview of the Princeton Quantitative Traders club, our mission, and our upcoming events.',
+    date: 'September 12, 2025',
+    description:
+      'An overview of the Princeton Quantitative Traders club, our mission, and upcoming initiatives for the semester.',
     materials: [
-      {
-        name: 'Presentation Slides',
-        url: '/documents/pqt-info-session.pdf',
-        type: 'slideshow'
-      }
-    ]
+      { name: 'Presentation Slides', url: '/documents/pqt-info-session.pdf' },
+    ],
   },
   {
-    id: 'PQT Project Series',
+    id: '3',
     title: 'PQT Project Series',
-    date: '10/22/2025',
-    description: 'Github for all of our Projects',
+    date: 'October 22, 2025',
+    description:
+      'A showcase of our ongoing projects—from algorithmic research to data-driven experiments. Explore and contribute via our open GitHub repository.',
     materials: [
       {
-        name: 'Project Github Link',
+        name: 'Project GitHub Link',
         url: 'https://github.com/charlespers/PQT_Education_Series_25-26',
-        type: 'other'
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
-
-
 export default function PastEvents() {
-  const [activeEvent, setActiveEvent] = useState(events[0].id);
-
-  const currentEvent = events.find(event => event.id === activeEvent);
-
-  const getMaterialIcon = (type: string) => {
-    switch (type) {
-      case 'slideshow':
-        return '📊';
-      case 'document':
-        return '📄';
-      case 'video':
-        return '🎥';
-      default:
-        return '📁';
-    }
-  };
-
   return (
-    <div className="bg-neutral-100 min-h-screen">
-      {/* Header Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-neutral-05 mb-6">
-            Past Events
-          </h1>
-          <p className="text-xl text-neutral-60 max-w-3xl mx-auto">
-            Access slideshows, materials, and resources from past sessions.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
+      {/* Hero Section */}
+      <section className="py-24 px-6 text-center">
+        <h1 className="text-5xl font-semibold mb-3 tracking-tight">Past Events</h1>
+        <p className="text-lg text-[#5c5045] max-w-2xl mx-auto leading-relaxed">
+          A look back at the sessions, projects, and discussions that have shaped our club’s journey.
+        </p>
       </section>
 
-      {/* Events Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Event Tabs */}
-            <div className="lg:col-span-1">
-              <div className="bg-neutral-90 rounded-2xl p-6 sticky top-8">
-                <h2 className="text-2xl font-bold text-neutral-05 mb-6">Events</h2>
-                <div className="space-y-2">
-                  {events.map((event) => (
-                    <button
-                      key={event.id}
-                      onClick={() => setActiveEvent(event.id)}
-                      className={`w-full text-left p-4 rounded-xl transition-colors duration-200 ${
-                        activeEvent === event.id
-                          ? 'bg-bright text-neutral-100'
-                          : 'bg-neutral-85 text-neutral-10 hover:bg-neutral-80 hover:text-neutral-05'
-                      }`}
-                    >
-                      <div className="font-semibold mb-1">{event.title}</div>
-                      <div className="text-sm opacity-80">{event.date}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Event Details */}
-            <div className="lg:col-span-2">
-              {currentEvent && (
-                <div className="bg-neutral-90 rounded-2xl p-8">
-                  <div className="mb-6">
-                    <h3 className="text-3xl font-bold text-neutral-05 mb-2">
-                      {currentEvent.title}
-                    </h3>
-                    <div className="text-bright font-semibold mb-4">
-                      {currentEvent.date}
-                    </div>
-                    <p className="text-neutral-60 text-lg leading-relaxed">
-                      {currentEvent.description}
-                    </p>
-                  </div>
-
-                  {/* Materials Section */}
-                  {currentEvent.materials && currentEvent.materials.length > 0 && (
-                    <div>
-                      <h4 className="text-xl font-semibold text-neutral-05 mb-4">
-                        Event Materials
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {currentEvent.materials.map((material, index) => (
-                          <Link
-                            key={index}
-                            href={material.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-neutral-85 hover:bg-neutral-80 rounded-xl p-4 transition-colors duration-200 group"
-                          >
-                            <div className="flex items-center space-x-3">
-                              <span className="text-2xl">
-                                {getMaterialIcon(material.type)}
-                              </span>
-                              <div>
-                                <div className="font-semibold text-neutral-05 group-hover:text-bright transition-colors">
-                                  {material.name}
-                                </div>
-                                <div className="text-sm text-neutral-60 capitalize">
-                                  {material.type}
-                                </div>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* No Materials Message */}
-                  {(!currentEvent.materials || currentEvent.materials.length === 0) && (
-                    <div className="text-center py-8">
-                      <div className="text-6xl mb-4">📚</div>
-                      <p className="text-neutral-60">
-                        Materials for this event will be available soon.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-neutral-05 mb-6">
-            Want to Stay Updated?
-          </h2>
-          <p className="text-neutral-60 text-lg mb-8">
-            Join our club to get notified about upcoming events and access to exclusive materials.
-          </p>
-          <Link
-            href="/join"
-            className="bg-bright text-neutral-100 px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
+      {/* Events */}
+      <section className="max-w-5xl mx-auto px-6 space-y-20 pb-32">
+        {events.map((event, i) => (
+          <div
+            key={event.id}
+            className="relative bg-[#e9e1d9] rounded-3xl shadow-sm border border-[#d2c7b8] px-8 py-12 hover:shadow-md transition-shadow duration-300"
           >
-            Join Our Club
-          </Link>
-        </div>
+            <div className="absolute -top-5 left-8 bg-[#a87445] text-[#f8f4ef] text-sm px-4 py-1 rounded-full font-medium tracking-wide">
+              {event.date}
+            </div>
+            <h2 className="text-3xl font-semibold mb-4">{event.title}</h2>
+            <p className="text-[#5c5045] text-lg leading-relaxed mb-8 max-w-3xl">
+              {event.description}
+            </p>
+
+            {event.materials && event.materials.length > 0 && (
+              <div className="space-y-3">
+                {event.materials.map((m, index) => (
+                  <Link
+                    key={index}
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between bg-[#d8cfc5] hover:bg-[#cfc4b8] rounded-full px-6 py-3 transition-colors"
+                  >
+                    <span className="font-medium">{m.name}</span>
+                    <span className="text-sm text-[#5c5045] capitalize">{m.type}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </section>
-    </div>
+
+      {/* CTA Section */}
+      <section className="bg-[#c3b6aa] py-24 px-6 text-center">
+        <h2 className="text-3xl font-semibold mb-4 tracking-tight">Stay Connected</h2>
+        <p className="text-[#4b4138] max-w-xl mx-auto mb-10 leading-relaxed">
+          Be the first to hear about new projects, workshops, and education sessions — join our
+          community today.
+        </p>
+        <Link
+          href="/join"
+          className="inline-block bg-[#a87445] text-[#f8f4ef] px-8 py-4 rounded-full text-lg font-medium hover:bg-[#946b3c] transition-colors"
+        >
+          Join Our Club
+        </Link>
+      </section>
+    </main>
   );
 }

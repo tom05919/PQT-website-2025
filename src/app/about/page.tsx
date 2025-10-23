@@ -1,65 +1,58 @@
 export default function AboutPage() {
   return (
-    <div className="bg-neutral-100 min-h-screen">
+    <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-neutral-05 mb-6">
-            About Princeton Quantitative Traders
+      <section className="py-28 px-6 sm:px-10 lg:px-16 border-b border-[#c0ae9f]/50">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-semibold mb-6 tracking-tight">
+            About <span className="text-[#b46b35]">Princeton Quantitative Traders</span>
           </h1>
-          <p className="text-xl text-neutral-60 max-w-3xl mx-auto">
-            We are a community of Princeton students passionate about quantitative finance and applied mathematics, 
-            dedicated to gaining practical experience and conducting original research in quantitative analysis.
+          <p className="text-lg md:text-xl text-[#463f3a] max-w-3xl mx-auto leading-relaxed">
+            We’re a community of Princeton students exploring quantitative finance, data, and applied mathematics —
+            blending research, collaboration, and professional growth.
           </p>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-neutral-05 mb-6">Our Mission</h2>
-              <p className="text-neutral-60 text-lg mb-6">
-                Princeton Quantitative Traders is dedicated to fostering a community of mutually interested 
-                students in quantitative finance and applied mathematics. We provide opportunities to gain 
-                practical experience for quantitative trading interview processes and conduct original research projects.
-              </p>
-              <p className="text-neutral-60 text-lg">
-                Our club is open to all undergraduate and graduate students at Princeton University, 
-                creating an inclusive environment for learning and collaboration.
-              </p>
-            </div>
-            <div className="bg-neutral-90 rounded-2xl p-8 shadow-md">
-              <h3 className="text-xl font-semibold text-neutral-05 mb-4">What We Do</h3>
-              <ul className="space-y-3 text-neutral-60">
-                <li className="flex items-start">
-                  <span className="text-bright mr-3">•</span>
-                  Interview preparation for quantitative trading positions
+      <section className="py-24 px-6 sm:px-10 lg:px-16 border-b border-[#c0ae9f]/50">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div>
+            <h2 className="text-3xl font-semibold mb-4 text-[#2e2b28]">Our Mission</h2>
+            <p className="text-[#463f3a] text-lg mb-6 leading-relaxed">
+              Princeton Quantitative Traders cultivates a space for curiosity and mastery — where students can grow
+              their skills in mathematics, programming, and financial reasoning. We emphasize real-world projects,
+              mock interviews, and mentorship.
+            </p>
+            <p className="text-[#463f3a] text-lg leading-relaxed">
+              We’re open to all Princeton students, regardless of background, fostering collaboration and exploration
+              over competition.
+            </p>
+          </div>
+          <div className="bg-[#d8c6b8] rounded-2xl p-8">
+            <h3 className="text-xl font-semibold text-[#2e2b28] mb-6">What We Do</h3>
+            <ul className="space-y-3 text-[#463f3a]">
+              {[
+                "Interview preparation for quantitative trading positions",
+                "Original research in data-driven finance",
+                "Team-based trading competitions",
+                "Workshops and talks with industry mentors",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start">
+                  <span className="text-[#b46b35] mr-3 text-lg">•</span>
+                  {item}
                 </li>
-                <li className="flex items-start">
-                  <span className="text-bright mr-3">•</span>
-                  Original research projects in quantitative analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-bright mr-3">•</span>
-                  Trading competition team formation and participation
-                </li>
-                <li className="flex items-start">
-                  <span className="text-bright mr-3">•</span>
-                  Community building for quantitative finance enthusiasts
-                </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
       {/* Officers Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">Meet Our Officers</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="py-24 px-6 sm:px-10 lg:px-16 bg-[#cbb6a6] border-b border-[#bda89a]/40">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold mb-16">Meet Our Officers</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
             {[
               { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
               { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
@@ -67,13 +60,17 @@ export default function AboutPage() {
               { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
               { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
               { name: "Joshua Lin", role: "Tournament Events Officer", description: "Junior, Math major" },
-              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, Chemical Engineering major" },
-              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" }
+              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, ChemE major" },
+              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" },
             ].map((officer, index) => (
-              <div key={index} className="bg-neutral-85 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-semibold text-neutral-05 mb-2">{officer.name}</h3>
-                <p className="text-bright font-medium mb-3">{officer.role}</p>
-                <p className="text-neutral-60 text-sm">{officer.description}</p>
+              <div key={index} className="text-left group">
+                <div className="mb-3">
+                  <h3 className="text-lg font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
+                    {officer.name}
+                  </h3>
+                  <p className="text-[#b46b35] font-medium">{officer.role}</p>
+                </div>
+                <p className="text-sm text-[#463f3a] leading-relaxed">{officer.description}</p>
               </div>
             ))}
           </div>
@@ -81,37 +78,24 @@ export default function AboutPage() {
       </section>
 
       {/* Events Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">Upcoming Events</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="py-24 px-6 sm:px-10 lg:px-16 border-b border-[#bda89a]/40">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold text-center mb-12">Upcoming Events</h2>
+          <div className="space-y-10">
             {[
-              { 
-                title: "PQT Trading Competition", 
-                date: "TBD", 
-                description: "Join us for our first trading competition! Competitors will be using our in-house trading enviorment that simulate real market conditions to test your quantitative trading skills.",
+              {
+                title: "PQT Trading Competition",
+                date: "TBD",
+                description:
+                  "Our first in-house trading competition — test your strategy and quantitative insight in simulated markets inspired by real-world conditions.",
                 location: "TBD",
-                link: undefined
-              }
+              },
             ].map((event, index) => (
-              <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
-                <h3 className="text-xl font-semibold text-neutral-05 mb-2">{event.title}</h3>
-                <p className="text-bright font-medium mb-2">{event.date}</p>
-                <p className="text-neutral-60 mb-3">{event.description}</p>
-                <p className="text-neutral-40 text-sm mb-4">{event.location}</p>
-                {event.link && event.link !== undefined && (
-                  <a
-                    href={event.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-bright text-neutral-100 font-medium rounded-lg hover:bg-bright/90 transition-colors duration-200 text-sm"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    Learn More & Apply
-                  </a>
-                )}
+              <div key={index} className="bg-[#d8c6b8]/60 rounded-xl p-8">
+                <h3 className="text-2xl font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
+                <p className="text-[#b46b35] font-medium mb-3">{event.date}</p>
+                <p className="text-[#463f3a] mb-3 leading-relaxed">{event.description}</p>
+                <p className="text-sm text-[#5b514c]">{event.location}</p>
               </div>
             ))}
           </div>
@@ -119,45 +103,45 @@ export default function AboutPage() {
       </section>
 
       {/* Past Events Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">Past Events</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="py-24 px-6 sm:px-10 lg:px-16">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold text-center mb-12">Past Events</h2>
+          <div className="space-y-10">
             {[
-              { 
-                title: "Princeton: Citadel Securities Trading Challenge", 
-                date: "September 25th, Thursday 5:30pm", 
-                description: "Interested in learning more about trading at Citadel Securities? Apply to the Princeton trading challenge to test your market making skills against other students.",
+              {
+                title: "Princeton: Citadel Securities Trading Challenge",
+                date: "September 25th, Thursday 5:30pm",
+                description:
+                  "A collaborative market-making challenge with Citadel Securities — testing real-world trading strategies among Princeton peers.",
                 location: "Friend Center 08",
-                link: "https://princetoncitadelsecuritiestrad.splashthat.com/"
+                link: "https://princetoncitadelsecuritiestrad.splashthat.com/",
               },
-              { 
-                title: "Jane Street x Princeton Quantitative Traders Game Night ", 
-                date: "September 25th, Thursday 6:00pm", 
-                description: "Interested in learning more about Jane Street? Students of all backgrounds and tenures are encouraged to attend - you don't need experience in finance to work at Jane Street. We hope to meet intellectually curious problem solvers!",
+              {
+                title: "Jane Street x PQT Game Night",
+                date: "September 25th, Thursday 6:00pm",
+                description:
+                  "An open event with Jane Street where problem-solving meets community. Students of all backgrounds are welcome.",
               },
-              { 
-                title: "PQT Educational Session", 
-                date: "September 25th, Thursday 8:30pm", 
-                description: "Come and learn about quantitative trading from our briliant class leaders!",
-                location: "Friend Center 08/Friend Center 06"
-              }
+              {
+                title: "PQT Educational Session",
+                date: "September 25th, Thursday 8:30pm",
+                description:
+                  "A peer-led exploration into quantitative trading fundamentals — practical, collaborative, and concept-focused.",
+                location: "Friend Center 08 / Friend Center 06",
+              },
             ].map((event, index) => (
-              <div key={index} className="bg-neutral-90 rounded-2xl p-6 shadow-md">
-                <h3 className="text-xl font-semibold text-neutral-05 mb-2">{event.title}</h3>
-                <p className="text-bright font-medium mb-2">{event.date}</p>
-                <p className="text-neutral-60 mb-3">{event.description}</p>
-                <p className="text-neutral-40 text-sm mb-4">{event.location}</p>
-                {event.link && event.link !== undefined && (
+              <div key={index} className="bg-[#d8c6b8]/60 rounded-xl p-8">
+                <h3 className="text-2xl font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
+                <p className="text-[#b46b35] font-medium mb-3">{event.date}</p>
+                <p className="text-[#463f3a] mb-3 leading-relaxed">{event.description}</p>
+                <p className="text-sm text-[#5b514c] mb-3">{event.location}</p>
+                {event.link && (
                   <a
                     href={event.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-bright text-neutral-100 font-medium rounded-lg hover:bg-bright/90 transition-colors duration-200 text-sm"
+                    className="inline-block mt-1 px-6 py-3 bg-[#b46b35] text-white font-medium rounded-full hover:bg-[#a06133] transition-colors text-sm"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
                     Learn More & Apply
                   </a>
                 )}
@@ -166,6 +150,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
