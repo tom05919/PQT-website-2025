@@ -47,7 +47,7 @@ const events: Event[] = [
         type: 'slideshow'
       }
     ]
-  }
+  },
   {
     id: 'PQT Project Series',
     title: 'PQT Project Series',
