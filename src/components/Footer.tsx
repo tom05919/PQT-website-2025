@@ -69,29 +69,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-[#3c2e26] mt-10 pt-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-sm text-[#b8ada4]">
-              © 2025 Princeton Quantitative Traders. All rights reserved.
-            </p>
-            <div className="flex space-x-5 mt-4 sm:mt-0">
-              <Link
-                href="#"
-                className="text-sm text-[#d3c6bc] hover:text-[#d26b2c] transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="#"
-                className="text-sm text-[#d3c6bc] hover:text-[#d26b2c] transition-colors"
-              >
-                Terms of Service
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </footer>
   );
