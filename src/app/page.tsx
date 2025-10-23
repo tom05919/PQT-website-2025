@@ -38,7 +38,7 @@ export default function Home() {
             </h2>
             <p className="text-[#4c4742] max-w-2xl">
               Our programs combine quantitative theory, market practice, and
-              collaborative learning — forming a pathway from campus to career.
+              collaborative learning - forming a pathway from campus to career.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export default function Home() {
               {
                 title: "Competitions",
                 description:
-                  "Team up with peers to compete in national trading competitions — a real-world test of your quant skills.",
+                  "Team up with peers to compete in national trading competitions - a real-world test of your quant skills.",
               },
             ].map((item, i) => (
               <div key={i} className="space-y-3">
