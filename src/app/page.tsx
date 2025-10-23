@@ -11,13 +11,12 @@ export default function Home() {
             <span className="block text-bright">Quantitative Traders</span>
           </h1>
           <p className="text-xl md:text-2xl text-neutral-60 max-w-4xl mx-auto mb-8">
-            Fostering a community of mutually interested students in quantitative finance 
-            and applied mathematics through practical experience and original research.
+            Princeton's only Quantitative Trading Club. Working to bridge theory with practical application, placing Princetonians into Quant Trading and Research roles throughout industry.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/join"
-              className="bg-bright text-neutral-100 px-8 py-4 rounded-full text-lg font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
+              className="bg-bright text-neutral-100 px-8 py-4 text-lg font-semibold hover:bg-bright-light hover:text-neutral-100 transition-colors duration-200"
             >
               Join Our Club
             </Link>
@@ -35,24 +34,21 @@ export default function Home() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-90">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-neutral-05 text-center mb-12">
-            What Makes Us Different
+            What we do
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
                           {
               title: "Interview Preparation",
-              description: "Gain practical experience for quantitative trading interview processes",
-              icon: "🎯"
+              description: "Weekly sessions focused on problem solving skills, mock interviews with peers, and outside mentorship from companies and alumni",
             },
             {
-              title: "Research Projects",
-              description: "Conduct original research projects related to quantitative analysis",
-              icon: "🔬"
+              title: "Projects",
+              description: "Build your own trading models, data, and more through our weekly project series",
             },
             {
               title: "Trading Competitions",
-              description: "Form teams to participate in trading competitions",
-              icon: "🏆"
+              description: "Form teams to participate in trading competitions and win prizes",
             }
             ].map((feature, index) => (
               <div key={index} className="bg-neutral-85 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow">
