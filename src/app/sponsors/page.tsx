@@ -5,12 +5,11 @@ export default function SponsorsPage() {
     <main className="bg-[#3b2b21] text-[#f3ede5] font-sans antialiased">
       {/* Hero */}
       <section className="py-28 px-6 sm:px-10 lg:px-16 text-center">
-        <h1 className="text-5xl md:text-6xl font-semibold mb-6 tracking-tight">
+        <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-6 tracking-tight">
           Our <span className="text-[#d98c45]">Sponsors</span>
         </h1>
         <p className="text-lg md:text-xl text-[#d5c7b8] max-w-3xl mx-auto leading-relaxed">
-          We’re deeply grateful to the organizations that fuel our mission —
-          fostering growth, curiosity, and community.
+          We’re deeply grateful to the organizations that fuel our mission.
         </p>
       </section>
 
@@ -18,7 +17,7 @@ export default function SponsorsPage() {
       <section className="py-20 px-6 sm:px-10 lg:px-16 bg-[#4a3a2b]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-semibold text-[#f3ede5] mb-3">
+            <h2 className="text-3xl font-serif font-semibold text-[#f3ede5] mb-3">
               Gold Sponsors
             </h2>
             <p className="text-[#d5c7b8]">
@@ -73,7 +72,7 @@ export default function SponsorsPage() {
                       className="object-contain max-w-full max-h-full"
                     />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-[#f3ede5]">
+                  <h3 className="text-xl font-serif font-semibold mb-3 text-[#f3ede5]">
                     {sponsor.name}
                   </h3>
                   <p className="text-[#d5c7b8] text-sm leading-relaxed">
@@ -89,7 +88,7 @@ export default function SponsorsPage() {
       {/* Silver Sponsors */}
       <section className="py-20 px-6 sm:px-10 lg:px-16 bg-[#3b2b21] border-t border-[#5b4939]">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-3 text-[#f3ede5]">
+          <h2 className="text-3xl font-serif font-semibold mb-3 text-[#f3ede5]">
             Silver Sponsors
           </h2>
           <p className="text-[#d5c7b8] mb-12">
@@ -107,7 +106,7 @@ export default function SponsorsPage() {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-lg font-semibold text-[#f3ede5] mb-2">
+              <h3 className="text-lg font-serif font-semibold text-[#f3ede5] mb-2">
                 Tower Research
               </h3>
               <p className="text-sm text-[#d5c7b8] leading-relaxed">
@@ -121,7 +120,7 @@ export default function SponsorsPage() {
 
       {/* CTA */}
       <section className="py-24 px-6 sm:px-10 lg:px-16 text-center bg-[#2a2018] border-t border-[#5b4939]">
-        <h2 className="text-3xl font-semibold mb-6 text-[#f3ede5]">
+        <h2 className="text-3xl font-serif font-semibold mb-6 text-[#f3ede5]">
           Interested in <span className="text-[#d98c45]">Sponsoring</span> Our Club?
         </h2>
         <p className="text-lg text-[#d5c7b8] max-w-2xl mx-auto mb-10 leading-relaxed">

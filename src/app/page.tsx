@@ -9,19 +9,19 @@ export default function Home() {
           <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
             Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
           </h1>
-          <p className="text-lg text-[#4c4742] max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
           Official Princeton University Quantitative Trading Club
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/join"
-              className="bg-[#d26b2c] text-white px-8 py-3.5 rounded-full font-medium hover:bg-[#bb5e27] transition-colors"
+              className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
             >
               Join Our Club
             </Link>
             <Link
               href="/about"
-              className="text-[#d26b2c] border border-[#d26b2c] px-8 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
+              className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
             >
               Learn More
             </Link>
@@ -37,8 +37,10 @@ export default function Home() {
               What We Do
             </h2>
             <p className="text-[#4c4742] max-w-2xl">
-              Our programs combine quantitative theory, market practice, and
-              collaborative learning - forming a pathway from campus to career.
+              Our goal is to bridge theory in classes with practical projects, 
+              advice, and real world settings to simulate pressure and force real
+              world decision making processes.
+              
             </p>
           </div>
 
@@ -47,17 +49,17 @@ export default function Home() {
               {
                 title: "Interview Preparation",
                 description:
-                  "Hands-on sessions in problem-solving, mock interviews, and guidance from alumni working at leading firms.",
+                  "Hands on problem solving sessions, mock interviews, and guidance from alumni working at leading firms.",
               },
               {
                 title: "Research & Projects",
                 description:
-                  "Collaborate on quantitative research projects and develop your own trading strategies with real data.",
+                  "Collaberate on trading strategies and build your own models through weekly projecting sessions.",
               },
               {
                 title: "Competitions",
                 description:
-                  "Team up with peers to compete in national trading competitions - a real-world test of your quant skills.",
+                  "Team up with peers to compete in national trading competitions.",
               },
             ].map((item, i) => (
               <div key={i} className="space-y-3">
@@ -80,10 +82,9 @@ export default function Home() {
             <h2 className="text-3xl font-serif font-semibold mb-4">
               Research & Learning
             </h2>
-            <p className="text-[#4c4742] text-lg mb-8 leading-relaxed">
-              From theoretical models to practical trading systems, our members
-              explore every layer of quantitative finance. Collaboration and
-              mentorship form the foundation of our learning.
+            <p className="text-[#4c4742] text-lg mb-4 leading-relaxed">
+              From theoretical models to practical trading systems, our members explore different
+              layers of quantitative structure. Collaberation and mentorship drive our learning.
             </p>
             <ul className="space-y-2 text-[#4c4742] mb-8">
               {[
@@ -108,31 +109,31 @@ export default function Home() {
 
           <div className="border-l-2 border-[#d26b2c]/20 pl-10">
             <h3 className="text-xl font-semibold font-serif mb-4">
-              Research Focus
+              Current Programs
             </h3>
             <dl className="space-y-3 text-[#4c4742]">
               <div className="flex justify-between">
-                <dt>Area</dt>
+                <dt>Weekly Project Sessions (Machine Learning and Research)</dt>
                 <dd className="font-medium text-[#d26b2c]">
-                  Quantitative Analysis
+                  Wednesdays 9:00pm
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt>Members</dt>
+                <dt>Weekly Interview Preperation Sessions</dt>
                 <dd className="font-medium text-[#d26b2c]">
-                  Princeton Students
+                  Thursdays 8:00pm
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt>Focus</dt>
+                <dt>COSCONxPQT</dt>
                 <dd className="font-medium text-[#d26b2c]">
-                  Applied Mathematics
+                  November 8th
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt>Goal</dt>
+                <dt>Fall Trading Competition</dt>
                 <dd className="font-medium text-[#d26b2c]">
-                  Career Preparation
+                  November 22nd
                 </dd>
               </div>
             </dl>
@@ -144,11 +145,12 @@ export default function Home() {
       <section className="px-6 sm:px-10 lg:px-16 py-24 text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-serif font-semibold mb-4">
-            Ready to Begin Your Trading Journey?
+            Want to join?
           </h2>
           <p className="text-[#4c4742] text-lg mb-8 leading-relaxed">
-            Join a community of analytical thinkers who bring theory to life
-            through research, teamwork, and curiosity.
+            Interested in Joining a Community of Like Minded Peers, Applying theory 
+            to Practice Through Real World Projects, or Competing in National Trading 
+            competitions?
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

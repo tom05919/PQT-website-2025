@@ -4,12 +4,12 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="py-28 px-6 sm:px-10 lg:px-16 border-b border-[#c0ae9f]/50">
         <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-semibold mb-6 tracking-tight">
-            About <span className="text-[#b46b35]">Princeton Quantitative Traders</span>
+          <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
+            About <span className="text-[#d26b2c]">Princeton Quantitative Traders</span>
           </h1>
           <p className="text-lg md:text-xl text-[#463f3a] max-w-3xl mx-auto leading-relaxed">
-            We’re a community of Princeton students exploring quantitative finance, data, and applied mathematics —
-            blending research, collaboration, and professional growth.
+            We’re a community of Princeton students exploring quantitative finance, data, and applied mathematics - 
+            from all backgrounds, majors, and class years.
           </p>
         </div>
       </section>
@@ -18,24 +18,26 @@ export default function AboutPage() {
       <section className="py-24 px-6 sm:px-10 lg:px-16 border-b border-[#c0ae9f]/50">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <div>
-            <h2 className="text-3xl font-semibold mb-4 text-[#2e2b28]">Our Mission</h2>
-            <p className="text-[#463f3a] text-lg mb-6 leading-relaxed">
-              Princeton Quantitative Traders cultivates a space for curiosity and mastery — where students can grow
-              their skills in mathematics, programming, and financial reasoning. We emphasize real-world projects,
-              mock interviews, and mentorship.
-            </p>
-            <p className="text-[#463f3a] text-lg leading-relaxed">
-              We’re open to all Princeton students, regardless of background, fostering collaboration and exploration
-              over competition.
+            <h3 className="text-3xl font-serif font-semibold mb-3">Our Mission</h3>
+            <p className="text-[#463f3a] text-lg mb-1 leading-relaxed">
+              Princeton Quantitative Traders was founded to solve the bifurcation of theory learned 
+              at Princeton to industry application.
+              </p>
+            <p className="text-[#463f3a] text-lg mb-4 leading-relaxed">
+              Thus, our mission is to cultivate a space for members to apply theoretical ideas
+              into practice. Our main areas of interest are in mathematics, programming, and reasoning. 
+            
+              We’re open to all Princeton students, regardless of background and hope to
+              emphasize collaberation over competition.
             </p>
           </div>
           <div className="bg-[#d8c6b8] rounded-2xl p-8">
-            <h3 className="text-xl font-semibold text-[#2e2b28] mb-6">What We Do</h3>
+            <h3 className="text-3xl font-serif font-semibold mb-3">What We Do</h3>
             <ul className="space-y-3 text-[#463f3a]">
               {[
-                "Interview preparation for quantitative trading positions",
-                "Original research in data-driven finance",
-                "Team-based trading competitions",
+                "Weekly interview preperation for quantitative trading positions. Sessions are held on Thursdays at 8:00pm, more information on location and content can be found on listserv or our GroupMe.",
+                "Weekly project sessions focused on understanding market structure and how to interpret data within a trading system. Project sessions are held on Wednesdays at 9:00pm, more information on location and content can be found on listserv or our GroupMe.",
+                "National trading competitions hosted each semester with opportunities to win prizes and network with industry professionals. ",
                 "Workshops and talks with industry mentors",
               ].map((item, i) => (
                 <li key={i} className="flex items-start">
@@ -51,7 +53,7 @@ export default function AboutPage() {
       {/* Officers Section */}
       <section className="py-24 px-6 sm:px-10 lg:px-16 bg-[#cbb6a6] border-b border-[#bda89a]/40">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-16">Meet Our Officers</h2>
+          <h2 className="text-3xl font-serif font-semibold mb-3">Meet Our Officers</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
             {[
               { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
@@ -65,7 +67,7 @@ export default function AboutPage() {
             ].map((officer, index) => (
               <div key={index} className="text-left group">
                 <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
+                  <h3 className="text-lg font-serif font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
                     {officer.name}
                   </h3>
                   <p className="text-[#b46b35] font-medium">{officer.role}</p>
@@ -80,7 +82,7 @@ export default function AboutPage() {
       {/* Events Section */}
       <section className="py-24 px-6 sm:px-10 lg:px-16 border-b border-[#bda89a]/40">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold text-center mb-12">Upcoming Events</h2>
+          <h2 className="text-3xl font-serif font-semibold text-center mb-12">Upcoming Events</h2>
           <div className="space-y-10">
             {[
               {
@@ -92,7 +94,7 @@ export default function AboutPage() {
               },
             ].map((event, index) => (
               <div key={index} className="bg-[#d8c6b8]/60 rounded-xl p-8">
-                <h3 className="text-2xl font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
+                <h3 className="text-2xl font-serif font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
                 <p className="text-[#b46b35] font-medium mb-3">{event.date}</p>
                 <p className="text-[#463f3a] mb-3 leading-relaxed">{event.description}</p>
                 <p className="text-sm text-[#5b514c]">{event.location}</p>
@@ -105,7 +107,7 @@ export default function AboutPage() {
       {/* Past Events Section */}
       <section className="py-24 px-6 sm:px-10 lg:px-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold text-center mb-12">Past Events</h2>
+          <h2 className="text-3xl font-serif font-semibold text-center mb-12">Past Events</h2>
           <div className="space-y-10">
             {[
               {
@@ -131,7 +133,7 @@ export default function AboutPage() {
               },
             ].map((event, index) => (
               <div key={index} className="bg-[#d8c6b8]/60 rounded-xl p-8">
-                <h3 className="text-2xl font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
+                <h3 className="text-2xl font-serif font-semibold text-[#2e2b28] mb-2">{event.title}</h3>
                 <p className="text-[#b46b35] font-medium mb-3">{event.date}</p>
                 <p className="text-[#463f3a] mb-3 leading-relaxed">{event.description}</p>
                 <p className="text-sm text-[#5b514c] mb-3">{event.location}</p>
