@@ -10,8 +10,7 @@ export default function Home() {
             Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
           </h1>
           <p className="text-lg text-[#4c4742] max-w-2xl mx-auto leading-relaxed mb-10">
-            Bridging Princeton’s academic excellence with the practical world of
-            quantitative trading — through research, mentorship, and community.
+            Princeton's Only Quantitative Trading Club
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

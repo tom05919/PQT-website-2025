@@ -87,7 +87,7 @@ export default function PastEvents() {
                     className="flex items-center justify-between bg-[#d8cfc5] hover:bg-[#cfc4b8] rounded-full px-6 py-3 transition-colors"
                   >
                     <span className="font-medium">{m.name}</span>
-                    <span className="text-sm text-[#5c5045] capitalize">{m.type}</span>
+                    <span className="text-sm text-[#5c5045] capitalize"></span>
                   </Link>
                 ))}
               </div>
