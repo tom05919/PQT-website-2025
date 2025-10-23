@@ -66,7 +66,6 @@ const Footer = () => {
             </h4>
             <div className="space-y-2 text-sm text-[#d3c6bc]">
               <p>Email: pqt@princeton.edu</p>
-              <p>Discord: Princeton Quantitative Traders</p>
             </div>
           </div>
         </div>
