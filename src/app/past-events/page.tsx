@@ -48,7 +48,22 @@ const events: Event[] = [
       }
     ]
   }
+  {
+    id: 'PQT Project Series',
+    title: 'PQT Project Series',
+    date: '10/22/2025',
+    description: 'Github for all of our Projects',
+    materials: [
+      {
+        name: 'Project Github Link',
+        url: 'https://github.com/charlespers/PQT_Education_Series_25-26',
+        type: 'other'
+      }
+    ]
+  }
 ];
+
+
 
 export default function PastEvents() {
   const [activeEvent, setActiveEvent] = useState(events[0].id);
