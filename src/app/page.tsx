@@ -75,6 +75,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Officers Section */}
+      <section className="py-24 px-6 sm:px-10 lg:px-16 bg-[#cbb6a6] border-b border-[#bda89a]/40">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl font-serif font-semibold mb-3">Meet Our Officers</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+            {[
+              { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
+              { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
+              { name: "Rodrigo Porto", role: "Treasurer", description: "Junior, Math major" },
+              { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
+              { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
+              { name: "Joshua Lin", role: "Tournament Events Officer", description: "Junior, Math major" },
+              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, ChemE major" },
+              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" },
+            ].map((officer, index) => (
+              <div key={index} className="text-left group">
+                <div className="mb-3">
+                  <h3 className="text-lg font-serif font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
+                    {officer.name}
+                  </h3>
+                  <p className="text-[#b46b35] font-medium">{officer.role}</p>
+                </div>
+                <p className="text-sm text-[#463f3a] leading-relaxed">{officer.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Research Section */}
       <section className="px-6 sm:px-10 lg:px-16 py-24 border-b border-[#e2dcd6]">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -123,11 +152,18 @@ export default function Home() {
                 <dd className="font-medium text-[#d26b2c]">
                   Thursdays 8:00pm
                 </dd>
-              </div>
+                </div>
+                <div className = "flex justify-between">
+                <Link href = "https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
+                      className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
+                >
+                  Sign Up for COSCON
+                </Link>
+                </div>
               <div className="flex justify-between">
                 <dt>COSCONxPQT</dt>
                 <dd className="font-medium text-[#d26b2c]">
-                  November 8th
+                  November 16th
                 </dd>
               </div>
               <div className="flex justify-between">
