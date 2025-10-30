@@ -153,19 +153,20 @@ export default function Home() {
                   Thursdays 8:00pm
                 </dd>
                 </div>
-                <div className = "flex justify-between">
-                <Link href = "https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
-                      className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
-                >
-                  Sign Up for COSCON
-                </Link>
-                </div>
+  
               <div className="flex justify-between">
                 <dt>COSCONxPQT</dt>
                 <dd className="font-medium text-[#d26b2c]">
                   November 16th
                 </dd>
               </div>
+              <div className = "flex justify-between">
+                <Link href = "https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
+                      className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
+                >
+                  Sign Up for COSCON
+                </Link>
+                </div>
               <div className="flex justify-between">
                 <dt>Fall Trading Competition</dt>
                 <dd className="font-medium text-[#d26b2c]">
