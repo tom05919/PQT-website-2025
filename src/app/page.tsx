@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Linkedin, Instagram } from "lucide-react";
+import { Linkedin, Instagram, MessageSquare} from "lucide-react";
 
 // Helper: social icon wrapper
 const SocialIcon = ({
@@ -23,9 +23,17 @@ const SocialIcon = ({
 // Icon components
 const LinkedinIcon = () => <Linkedin className="w-5 h-5" strokeWidth={2} />;
 const InstagramIcon = () => <Instagram className="w-5 h-5" strokeWidth={2} />;
+const GroupMeIcon = () => <MessageSquare className="w-5 h-5" strokeWidth={2} />;
 
 export default function Home() {
   const officers = [
+    {
+      name: 'Club Socials',
+      role: 'Follow us on Instagram and join our GroupMe to stay updated on club events and opportunities!',
+      img_src: '/images/logo-no-text.png',
+      groupme_url: 'https://groupme.com/join_group/111159295/jL93cFqW',
+      instagram_url: 'https://www.instagram.com/princetonquanttraders/',
+    },
     {
       name: "Charles Muehlberger",
       role: "President",
@@ -165,6 +173,11 @@ export default function Home() {
                       <InstagramIcon />
                     </SocialIcon>
                   )}
+                  {officer.groupme_url && (
+                    <SocialIcon href={officer.groupme_url}>
+                      <GroupMeIcon />
+                    </SocialIcon>
+                  ) }
                 </div>
               </div>
             ))}
