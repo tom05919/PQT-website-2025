@@ -46,13 +46,13 @@ export default function OfficersSection({ officers }: { officers: Officer[] }) {
         <h2 className="text-3xl font-serif font-semibold mb-12">
           Meet Our Officers
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-12">
           {officers.map((officer, index) => (
             <div
               key={index}
               className="group w-full max-w-xs mx-auto [perspective:1000px]"
             >
-              <div className="relative w-full h-96 transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+              <div className="relative w-full h-85 transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 {/* Front */}
                 <div className="absolute inset-0 bg-[#f6f2ee]/80 rounded-2xl shadow-sm hover:shadow-md [backface-visibility:hidden] flex flex-col items-center justify-center p-6">
                   <Image
@@ -72,7 +72,7 @@ export default function OfficersSection({ officers }: { officers: Officer[] }) {
                 {/* Back */}
                 <div className="absolute inset-0 bg-[#f6f2ee]/90 rounded-2xl [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between p-6">
                   {officer.description && (
-                    <p className="text-sm text-[#463f3a] mb-6">
+                    <p className="text-sm text-[#463f3a] mb-6 mt-25 whitespace-pre-line"> 
                       {officer.description}
                     </p>
                   )}

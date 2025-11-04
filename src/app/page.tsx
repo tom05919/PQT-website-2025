@@ -40,7 +40,7 @@ export default function Home() {
     {
       name: "Charles Muehlberger",
       role: "President",
-      description: "Sophomore, ECE major",
+      description: "Sophomore, ECE major \n\nInterested in AI, stochastic modeling, and reliable autonomy research.",
       img_src:
         "https://media.licdn.com/dms/image/v2/D5603AQEiL4nYie2M0w/profile-displayphoto-scale_400_400/B56ZosMDtcJQAg-/0/1761677951076?e=1762992000&v=beta&t=PVSCfriKs3Ao9lg2Y1ka0XrTscDyqlXjEYbEX5HqdDE",
       linkedin_url: "https://www.linkedin.com/in/charlesmuehl/",
@@ -76,7 +76,7 @@ export default function Home() {
     {
       name: "Tom Wang",
       role: "Web Development Lead",
-      description: "Sophomore, ECE major",
+      description: "Sophomore, ECE major \n\n Interested in generalist robots, machine learning, and embedded systems",
       img_src:
         "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1763596800&v=beta&t=eh3wSvKyQBI4oqdff4hELLzXmRrGpgu-yfzcok0Wk_U",
       linkedin_url: "https://www.linkedin.com/in/tom-wang-105a6722b/",
