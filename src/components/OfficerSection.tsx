@@ -4,11 +4,11 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Linkedin, Instagram, MessageSquare } from "lucide-react";
 
-// Define the Officer type
+// Define Officer type with optional fields
 interface Officer {
   name: string;
   role: string;
-  description: string;
+  description?: string;
   img_src: string;
   linkedin_url?: string;
   instagram_url?: string;
@@ -33,10 +33,6 @@ const SocialIcon = ({
   </a>
 );
 
-const LinkedinIcon = () => <Linkedin className="w-6 h-6" strokeWidth={2} />;
-const InstagramIcon = () => <Instagram className="w-6 h-6" strokeWidth={2} />;
-const GroupMeIcon = () => <MessageSquare className="w-6 h-6" strokeWidth={2} />;
-
 export default function OfficersSection({ officers }: { officers: Officer[] }) {
   return (
     <motion.section
@@ -58,7 +54,7 @@ export default function OfficersSection({ officers }: { officers: Officer[] }) {
             >
               <div className="relative w-full h-96 transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 {/* Front */}
-                <div className="absolute inset-0 bg-white/50 rounded-2xl shadow-sm hover:shadow-md [backface-visibility:hidden] flex flex-col items-center justify-center p-6">
+                <div className="absolute inset-0 bg-[#f6f2ee]/80 rounded-2xl shadow-sm hover:shadow-md [backface-visibility:hidden] flex flex-col items-center justify-center p-6">
                   <Image
                     src={officer.img_src}
                     alt={officer.name}
@@ -72,25 +68,28 @@ export default function OfficersSection({ officers }: { officers: Officer[] }) {
                   </h3>
                   <p className="text-[#b46b35] font-medium">{officer.role}</p>
                 </div>
+
                 {/* Back */}
-                <div className="absolute inset-0 bg-white/50 rounded-2xl [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between p-6">
-                  <p className="text-sm text-[#463f3a] mb-6">
-                    {officer.description}
-                  </p>
+                <div className="absolute inset-0 bg-[#f6f2ee]/90 rounded-2xl [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between p-6">
+                  {officer.description && (
+                    <p className="text-sm text-[#463f3a] mb-6">
+                      {officer.description}
+                    </p>
+                  )}
                   <div className="flex justify-center items-center gap-6 mt-auto">
                     {officer.linkedin_url && (
                       <SocialIcon href={officer.linkedin_url}>
-                        <LinkedinIcon />
+                        <Linkedin className="w-6 h-6" strokeWidth={2} />
                       </SocialIcon>
                     )}
                     {officer.instagram_url && (
                       <SocialIcon href={officer.instagram_url}>
-                        <InstagramIcon />
+                        <Instagram className="w-6 h-6" strokeWidth={2} />
                       </SocialIcon>
                     )}
                     {officer.groupme_url && (
                       <SocialIcon href={officer.groupme_url}>
-                        <GroupMeIcon />
+                        <MessageSquare className="w-6 h-6" strokeWidth={2} />
                       </SocialIcon>
                     )}
                   </div>
