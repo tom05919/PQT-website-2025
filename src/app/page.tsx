@@ -34,6 +34,7 @@ export default function Home() {
       name: 'Club Socials',
       role: 'Follow us on Instagram and join our GroupMe to stay updated on club events and opportunities!',
       img_src: '/images/logo-no-text.png',
+      description: 'Feel free to reach out with any questions or join our group me to connect with likeminded peers!',
       groupme_url: 'https://groupme.com/join_group/111159295/jL93cFqW',
       instagram_url: 'https://www.instagram.com/princetonquanttraders/',
     },
@@ -49,7 +50,7 @@ export default function Home() {
     {
       name: "Loc Tran",
       role: "Vice President",
-      description: "Sophomore, ORFE major",
+      description: "Sophomore, ORFE major \n\n Interested in the intersection between finance and technology ",
       img_src:
         "https://media.licdn.com/dms/image/v2/D5603AQEZ14nZMIivVA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727748824296?e=1763596800&v=beta&t=gWP4eyIWHrloguSh76qZRI6QnwD3YBDcXAGYWOWKACs",
       linkedin_url: "https://www.linkedin.com/in/loctran0323/",
