@@ -1,6 +1,9 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
-import { Linkedin, Instagram, MessageSquare} from "lucide-react";
+import { motion } from "framer-motion";
+import { Linkedin, Instagram, MessageSquare } from "lucide-react";
+import OfficersSection from "@/components/OfficerSection";
 
 // Helper: social icon wrapper
 const SocialIcon = ({
@@ -102,7 +105,7 @@ export default function Home() {
       role: "Outreach",
       description: "Sophomore, ORFE major",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
+        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
       linkedin_url: "https://www.linkedin.com/in/jaime-nunez8031/",
       instagram_url: "https://www.instagram.com/jaimen8031/",
     },
@@ -110,80 +113,35 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
-      {/* Hero Section */}
-      <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-            Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
-          </h1>
-          <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
-            Official Princeton University Quantitative Trading Club
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/join"
-              className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
-            >
-              Join Our Club
-            </Link>
-            <Link
-              href="/about"
-              className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
-            >
-              Learn More
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Officers Section */}
-      <section className="py-24 px-6 sm:px-10 lg:px-16 bg-[#cbb6a6] border-b border-[#bda89a]/40">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-serif font-semibold mb-12">
-            Meet Our Officers
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
-            {officers.map((officer, index) => (
-              <div
-                key={index}
-                className="text-center group bg-white/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
+              Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
+            </h1>
+            <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
+              Official Princeton University Quantitative Trading Club
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/join"
+                className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
               >
-                <Image
-                  src={officer.img_src}
-                  alt={officer.name}
-                  width={120}
-                  height={120}
-                  className="rounded-full mx-auto mb-4 object-cover"
-                />
-                <h3 className="text-lg font-serif font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
-                  {officer.name}
-                </h3>
-                <p className="text-[#b46b35] font-medium">{officer.role}</p>
-                <p className="text-sm text-[#463f3a] leading-relaxed mt-2">
-                  {officer.description}
-                </p>
-                <div className="flex justify-center gap-4 mt-3">
-                  {officer.linkedin_url && (
-                    <SocialIcon href={officer.linkedin_url}>
-                      <LinkedinIcon />
-                    </SocialIcon>
-                  )}
-                  {officer.instagram_url && (
-                    <SocialIcon href={officer.instagram_url}>
-                      <InstagramIcon />
-                    </SocialIcon>
-                  )}
-                  {officer.groupme_url && (
-                    <SocialIcon href={officer.groupme_url}>
-                      <GroupMeIcon />
-                    </SocialIcon>
-                  ) }
-                </div>
-              </div>
-            ))}
+                Join Our Club
+              </Link>
+              <Link
+                href="/about"
+                className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
+              >
+                Learn More
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+
+      <OfficersSection officers={officers} />
 
       {/* Research Section */}
       <section className="px-6 sm:px-10 lg:px-16 py-24 border-b border-[#e2dcd6]">
@@ -194,7 +152,7 @@ export default function Home() {
             </h2>
             <p className="text-[#4c4742] text-lg mb-4 leading-relaxed">
               From theoretical models to practical trading systems, our members explore different
-              layers of quantitative structure. Collaberation and mentorship drive our learning.
+              layers of quantitative structure. Collaboration and mentorship drive our learning.
             </p>
             <ul className="space-y-2 text-[#4c4742] mb-8">
               {[
@@ -229,25 +187,25 @@ export default function Home() {
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt>Weekly Interview Preperation Sessions</dt>
+                <dt>Weekly Interview Preparation Sessions</dt>
                 <dd className="font-medium text-[#d26b2c]">
                   Thursdays 8:00pm
                 </dd>
-                </div>
-  
+              </div>
               <div className="flex justify-between">
                 <dt>COSCONxPQT</dt>
                 <dd className="font-medium text-[#d26b2c]">
                   November 16th
                 </dd>
               </div>
-              <div className = "flex justify-between">
-                <Link href = "https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
-                      className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
+              <div className="flex justify-between">
+                <Link
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
+                  className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
                 >
                   Sign Up for COSCON
                 </Link>
-                </div>
+              </div>
               <div className="flex justify-between">
                 <dt>Fall Trading Competition</dt>
                 <dd className="font-medium text-[#d26b2c]">
