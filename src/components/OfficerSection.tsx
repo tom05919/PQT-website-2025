@@ -4,6 +4,17 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Linkedin, Instagram, MessageSquare } from "lucide-react";
 
+// Define the Officer type
+interface Officer {
+  name: string;
+  role: string;
+  description: string;
+  img_src: string;
+  linkedin_url?: string;
+  instagram_url?: string;
+  groupme_url?: string;
+}
+
 // Social icon wrapper
 const SocialIcon = ({
   href,
@@ -26,7 +37,7 @@ const LinkedinIcon = () => <Linkedin className="w-6 h-6" strokeWidth={2} />;
 const InstagramIcon = () => <Instagram className="w-6 h-6" strokeWidth={2} />;
 const GroupMeIcon = () => <MessageSquare className="w-6 h-6" strokeWidth={2} />;
 
-export default function OfficersSection({ officers }: { officers: any[] }) {
+export default function OfficersSection({ officers }: { officers: Officer[] }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
