@@ -7,6 +7,7 @@ import OfficersSection from "@/components/OfficerSection";
 import LiveTicker from "@/components/LiveTicker";
 
 
+
 // Helper: social icon wrapper
 const SocialIcon = ({
   href,
@@ -88,7 +89,7 @@ export default function Home() {
     {
       name: "Joshua Lin",
       role: "Tournament Events Officer",
-      description: "Junior, Math major",
+      description: "Junior, Math major \n\n Interested in optimization, probability, and analysis",
       img_src:
         "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1763596800&v=beta&t=1c4hVnKYd4VHrieoEC_kq0uMiy5InWw6Rsk1vk3kMFY",
       linkedin_url: "https://www.linkedin.com/in/lintropic-joshua/",
