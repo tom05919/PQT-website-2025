@@ -4,6 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Linkedin, Instagram, MessageSquare } from "lucide-react";
 import OfficersSection from "@/components/OfficerSection";
+import LiveTicker from "@/components/LiveTicker";
+
 
 // Helper: social icon wrapper
 const SocialIcon = ({
@@ -114,7 +116,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
-      <div className="relative z-10">
+    <div className="relative z-10">
+    <LiveTicker />
+      {/* rest of your page... */}
         {/* Hero Section */}
         <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
           <div className="max-w-5xl mx-auto">
@@ -124,6 +128,7 @@ export default function Home() {
             <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
               Official Princeton University Quantitative Trading Club
             </p>
+            
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/join"
