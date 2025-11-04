@@ -105,7 +105,7 @@ export default function Home() {
       role: "Outreach",
       description: "Sophomore, ORFE major",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
+        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
       linkedin_url: "https://www.linkedin.com/in/jaime-nunez8031/",
       instagram_url: "https://www.instagram.com/jaimen8031/",
     },
