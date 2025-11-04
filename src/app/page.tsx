@@ -67,7 +67,7 @@ export default function Home() {
     {
       name: "Jerry Han",
       role: "President-Emeritus",
-      description: "Junior, Math major",
+      description: "Junior, Math major \n\n Interested in trading, researching state space models",
       img_src:
         "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1763596800&v=beta&t=_jACbD-dTwU4o0wNkTmwv-zeGVXh1NMcj5DXHeWC40w",
       linkedin_url: "https://www.linkedin.com/in/jerry-han/",
