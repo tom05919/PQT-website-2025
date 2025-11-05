@@ -124,7 +124,7 @@ export default function Home() {
         <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
           <div className="max-w-5xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-              Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
+              Princeton <span className="text-[#d3624e]">Quantitative Traders</span>
             </h1>
             <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
               Official Princeton University Quantitative Trading Club

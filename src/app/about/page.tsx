@@ -5,7 +5,7 @@ export default function AboutPage() {
       <section className="py-28 px-6 sm:px-10 lg:px-16 border-b border-[#c0ae9f]/50">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-            About <span className="text-[#d26b2c]">Princeton Quantitative Traders</span>
+            About <span className="text-[#d3624e]">Princeton Quantitative Traders</span>
           </h1>
           <p className="text-lg md:text-xl text-[#463f3a] max-w-3xl mx-auto leading-relaxed">
             We’re a community of Princeton students exploring quantitative finance, data, and applied mathematics - 

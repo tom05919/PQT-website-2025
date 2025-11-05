@@ -56,7 +56,7 @@ export default function PastEvents() {
       {/* Hero Section */}
       <section className="py-24 px-6 text-center">
         <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-          Past <span className="text-[#d26b2c]">Events</span>
+          Past <span className="text-[#d3624e]">Events</span>
         </h1>
         <p className="text-lg text-[#5c5045] max-w-2xl mx-auto leading-relaxed">
           A look back at the sessions, projects, and discussions of our club.
@@ -70,7 +70,7 @@ export default function PastEvents() {
             key={event.id}
             className="relative bg-[#a36843] rounded-3xl shadow-sm border border-[#3c2e26] px-8 py-12 hover:shadow-md transition-shadow duration-300"
           >
-            <div className="absolute -top-5 left-8 bg-[#d26b2c] text-[#fff7f0] text-sm px-4 py-1 rounded-full font-serif font-medium tracking-wide">
+            <div className="absolute -top-5 left-8 bg-[#d3624e] text-[#fff7f0] text-sm px-4 py-1 rounded-full font-serif font-medium tracking-wide">
               {event.date}
             </div>
 

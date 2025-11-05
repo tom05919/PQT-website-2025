@@ -4,7 +4,7 @@ export default function JoinPage() {
       {/* Hero Section */}
       <section className="py-24 px-6 text-center">
       <h1 className="md:text-5xl font-serif font-bold tracking-tight mb-5">
-            Join <span className="text-[#d26b2c]">Princeton Quantitative Traders</span>
+            Join <span className="text-[#d3624e]">Princeton Quantitative Traders</span>
           </h1>
         <p className="text-lg text-[#5c5045] max-w-2xl mx-auto leading-relaxed mb-10">
           Become part of a community of Princeton students who share curiosity, rigor, and collaboration.
