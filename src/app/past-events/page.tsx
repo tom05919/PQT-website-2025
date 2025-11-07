@@ -15,6 +15,19 @@ interface Event {
 
 const events: Event[] = [
   {
+    id: "4",
+    title: 'Mock interview Prep Sheets',
+    date: 'November 6, 2025',
+    description:'Mock interview prep for quantitative trading roles',
+    materials: [
+      {
+        name: 'Interview Prep Folder',
+        url: 'https://drive.google.com/drive/folders/1_ifBkErkxHFHMaHBC4jUSghe4U5IOAIa?usp=drive_link',
+      },
+    ],
+
+  },
+  {
     id: '3',
     title: 'PQT Project Series',
     date: 'October 22, 2025',
