@@ -46,8 +46,10 @@ export async function GET(_req: NextRequest) {
         'Cache-Control': 'no-store',
       },
     });
-  } catch (err: any) {
-    const message = `CSV generation failed: ${err?.message || String(err)}`;
+  } catch (err: unknown) {
+    const message = `CSV generation failed: ${
+      err instanceof Error ? err.message : String(err)
+    }`;
     return new Response(message, { status: 500 });
   }
 }
