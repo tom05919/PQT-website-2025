@@ -6,7 +6,7 @@ export default function SponsorsPage() {
       {/* Hero */}
       <section className="py-28 px-6 sm:px-10 lg:px-16 text-center">
         <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-6 tracking-tight">
-          Our <span className="text-[#d98c45]">Sponsors</span>
+          Our <span className="text-[#d3714e]">Sponsors</span>
         </h1>
         <p className="text-lg md:text-xl text-[#d5c7b8] max-w-3xl mx-auto leading-relaxed">
           We’re deeply grateful to the organizations that fuel our mission.

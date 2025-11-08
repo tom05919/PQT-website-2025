@@ -1,108 +1,154 @@
+"use client"
+import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Linkedin, Instagram, MessageSquare } from "lucide-react";
+import OfficersSection from "@/components/OfficerSection";
+import LiveTicker from "@/components/LiveTicker";
+
+
+
+// Helper: social icon wrapper
+const SocialIcon = ({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-gray-500 hover:text-[#d26b2c] transition-colors duration-300"
+  >
+    {children}
+  </a>
+);
+
+// Icon components
+const LinkedinIcon = () => <Linkedin className="w-5 h-5" strokeWidth={2} />;
+const InstagramIcon = () => <Instagram className="w-5 h-5" strokeWidth={2} />;
+const GroupMeIcon = () => <MessageSquare className="w-5 h-5" strokeWidth={2} />;
 
 export default function Home() {
+  const officers = [
+    {
+      name: 'Club Socials',
+      role: 'Follow us on Instagram and join our GroupMe to stay updated on club events and opportunities!',
+      img_src: '/images/logo-no-text.png',
+      description: 'Feel free to reach out with any questions or join our group me to connect with likeminded peers!',
+      groupme_url: 'https://groupme.com/join_group/111159295/jL93cFqW',
+      instagram_url: 'https://www.instagram.com/princetonquanttraders/',
+    },
+    {
+      name: "Charles Muehlberger",
+      role: "President",
+      description: "Sophomore, ECE major \n\nInterested in AI, stochastic modeling, and reliable autonomy research.",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D5603AQEiL4nYie2M0w/profile-displayphoto-scale_400_400/B56ZosMDtcJQAg-/0/1761677951076?e=1762992000&v=beta&t=PVSCfriKs3Ao9lg2Y1ka0XrTscDyqlXjEYbEX5HqdDE",
+      linkedin_url: "https://www.linkedin.com/in/charlesmuehl/",
+      instagram_url: "https://www.instagram.com/charles.muehlberger/",
+    },
+    {
+      name: "Loc Tran",
+      role: "Vice President",
+      description: "Sophomore, ORFE major \n\n Interested in the intersection between finance and technology ",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D5603AQEZ14nZMIivVA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727748824296?e=1763596800&v=beta&t=gWP4eyIWHrloguSh76qZRI6QnwD3YBDcXAGYWOWKACs",
+      linkedin_url: "https://www.linkedin.com/in/loctran0323/",
+      instagram_url: "https://www.instagram.com/loctran136/",
+    },
+    {
+      name: "Rodrigo Porto",
+      role: "Treasurer",
+      description: "Junior, Math major",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D4E03AQGQKk4HvDzzQw/profile-displayphoto-shrink_400_400/B4EZNwWL7aH0A8-/0/1732756685091?e=1763596800&v=beta&t=F-UjpRISvT7sB365n_OrD3mIpfyu6YjD_BulH1eS7a0",
+      linkedin_url: "https://www.linkedin.com/in/rodrigo-porto-760150169/",
+      instagram_url: "https://www.instagram.com/rodrigo_sdp/",
+    },
+    {
+      name: "Jerry Han",
+      role: "President-Emeritus",
+      description: "Junior, Math major \n\n Interested in trading, researching state space models",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1763596800&v=beta&t=_jACbD-dTwU4o0wNkTmwv-zeGVXh1NMcj5DXHeWC40w",
+      linkedin_url: "https://www.linkedin.com/in/jerry-han/",
+      instagram_url: "https://www.instagram.com/j.erry.han/",
+    },
+    {
+      name: "Tom Wang",
+      role: "Web Development Lead",
+      description: "Sophomore, ECE major \n\n Interested in generalist robots, machine learning, and embedded systems",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1763596800&v=beta&t=eh3wSvKyQBI4oqdff4hELLzXmRrGpgu-yfzcok0Wk_U",
+      linkedin_url: "https://www.linkedin.com/in/tom-wang-105a6722b/",
+      instagram_url: "https://www.instagram.com/tom_wang_05/",
+    },
+    {
+      name: "Joshua Lin",
+      role: "Tournament Events Officer",
+      description: "Junior, Math major \n\n Interested in optimization, probability, and analysis",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1763596800&v=beta&t=1c4hVnKYd4VHrieoEC_kq0uMiy5InWw6Rsk1vk3kMFY",
+      linkedin_url: "https://www.linkedin.com/in/lintropic-joshua/",
+      instagram_url: "https://www.instagram.com/perplexed._.panda/",
+    },
+    {
+      name: "Andrew Chen",
+      role: "Tournament Director",
+      description: "Grad Student, ChemE major",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D5603AQGUGLyXDiAQyA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692736493041?e=1763596800&v=beta&t=4l3eYxt_4PISD2NEDr94Ua71ekD9QT8FxJntXveDJbA",
+      linkedin_url: "https://www.linkedin.com/in/andrewchen0201/",
+      instagram_url: "https://www.instagram.com/an6rew_chen/",
+    },
+    {
+      name: "Jaime Nunez",
+      role: "Outreach",
+      description: "Sophomore, ORFE major",
+      img_src:
+        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
+      linkedin_url: "https://www.linkedin.com/in/jaime-nunez8031/",
+      instagram_url: "https://www.instagram.com/jaimen8031/",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
-      {/* Hero Section */}
-      <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6]">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-            Princeton <span className="text-[#d26b2c]">Quantitative Traders</span>
-          </h1>
-          <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
-          Official Princeton University Quantitative Trading Club
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/join"
-              className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
-            >
-              Join Our Club
-            </Link>
-            <Link
-              href="/about"
-              className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
-            >
-              Learn More
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* What We Do */}
-      <section className="px-6 sm:px-10 lg:px-16 py-24 border-b border-[#e2dcd6]">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-12">
-            <h2 className="text-3xl font-serif font-semibold mb-3">
-              What We Do
-            </h2>
-            <p className="text-[#4c4742] max-w-2xl">
-              Our goal is to bridge theory in classes with practical projects, 
-              advice, and real world settings to simulate pressure and force real
-              world decision making processes.
-              
+    <div className="relative z-10">
+    <LiveTicker />
+      {/* rest of your page... */}
+        {/* Hero Section */}
+        <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
+              Princeton <span className="text-[#d3624e]">Quantitative Traders</span>
+            </h1>
+            <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
+              Official Princeton University Quantitative Trading Club
             </p>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/join"
+                className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
+              >
+                Join Our Club
+              </Link>
+              <Link
+                href="/about"
+                className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
+              >
+                Learn More
+              </Link>
+            </div>
           </div>
+        </section>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {[
-              {
-                title: "Interview Preparation",
-                description:
-                  "Hands on problem solving sessions, mock interviews, and guidance from alumni working at leading firms.",
-              },
-              {
-                title: "Research & Projects",
-                description:
-                  "Collaberate on trading strategies and build your own models through weekly projecting sessions.",
-              },
-              {
-                title: "Competitions",
-                description:
-                  "Team up with peers to compete in national trading competitions.",
-              },
-            ].map((item, i) => (
-              <div key={i} className="space-y-3">
-                <h3 className="text-xl font-semibold font-serif text-[#2e2b28]">
-                  {item.title}
-                </h3>
-                <p className="text-[#4c4742] leading-relaxed text-[15px]">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Officers Section */}
-      <section className="py-24 px-6 sm:px-10 lg:px-16 bg-[#cbb6a6] border-b border-[#bda89a]/40">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-serif font-semibold mb-3">Meet Our Officers</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
-            {[
-              { name: "Charles Muehlberger", role: "President", description: "Sophomore, ECE major" },
-              { name: "Loc Tran", role: "Vice President", description: "Sophomore, ORFE major" },
-              { name: "Rodrigo Porto", role: "Treasurer", description: "Junior, Math major" },
-              { name: "Jerry Han", role: "President-Emeritus", description: "Junior, Math major" },
-              { name: "Tom Wang", role: "Web Development Lead", description: "Sophomore, ECE major" },
-              { name: "Joshua Lin", role: "Tournament Events Officer", description: "Junior, Math major" },
-              { name: "Andrew Chen", role: "Tournament Director", description: "Grad Student, ChemE major" },
-              { name: "Jaime Nunez", role: "Outreach", description: "Sophomore, ORFE major" },
-            ].map((officer, index) => (
-              <div key={index} className="text-left group">
-                <div className="mb-3">
-                  <h3 className="text-lg font-serif font-semibold text-[#2e2b28] group-hover:text-[#b46b35] transition-colors">
-                    {officer.name}
-                  </h3>
-                  <p className="text-[#b46b35] font-medium">{officer.role}</p>
-                </div>
-                <p className="text-sm text-[#463f3a] leading-relaxed">{officer.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <OfficersSection officers={officers} />
 
       {/* Research Section */}
       <section className="px-6 sm:px-10 lg:px-16 py-24 border-b border-[#e2dcd6]">
@@ -113,7 +159,7 @@ export default function Home() {
             </h2>
             <p className="text-[#4c4742] text-lg mb-4 leading-relaxed">
               From theoretical models to practical trading systems, our members explore different
-              layers of quantitative structure. Collaberation and mentorship drive our learning.
+              layers of quantitative structure. Collaboration and mentorship drive our learning.
             </p>
             <ul className="space-y-2 text-[#4c4742] mb-8">
               {[
@@ -148,25 +194,25 @@ export default function Home() {
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt>Weekly Interview Preperation Sessions</dt>
+                <dt>Weekly Interview Preparation Sessions</dt>
                 <dd className="font-medium text-[#d26b2c]">
                   Thursdays 8:00pm
                 </dd>
-                </div>
-  
+              </div>
               <div className="flex justify-between">
                 <dt>COSCONxPQT</dt>
                 <dd className="font-medium text-[#d26b2c]">
                   November 16th
                 </dd>
               </div>
-              <div className = "flex justify-between">
-                <Link href = "https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
-                      className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
+              <div className="flex justify-between">
+                <Link
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
+                  className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
                 >
                   Sign Up for COSCON
                 </Link>
-                </div>
+              </div>
               <div className="flex justify-between">
                 <dt>Fall Trading Competition</dt>
                 <dd className="font-medium text-[#d26b2c]">
@@ -178,16 +224,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA Section */}
       <section className="px-6 sm:px-10 lg:px-16 py-24 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-serif font-semibold mb-4">
-            Want to join?
-          </h2>
+          <h2 className="text-3xl font-serif font-semibold mb-4">Want to join?</h2>
           <p className="text-[#4c4742] text-lg mb-8 leading-relaxed">
-            Interested in Joining a Community of Like Minded Peers, Applying theory 
-            to Practice Through Real World Projects, or Competing in National Trading 
-            competitions?
+            Interested in joining a community of like-minded peers, applying
+            theory to practice through real-world projects, or competing in
+            national trading competitions?
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
