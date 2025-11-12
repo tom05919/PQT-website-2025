@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import ChallengeUpload from '@/components/ChallengeUpload';
+import TournamentBracket from '@/components/TournamentBracket';
 
 export default function ChallengePage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'calculate'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'calculate' | 'bracket'>('overview');
 
   return (
     <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
@@ -24,14 +25,6 @@ export default function ChallengePage() {
             >
               Download Latest Dataset (CSV)
             </a>
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSdTuEi3kXaYaedsIz4khmFrBH-P4i2BQFw5_fVaUhL60H7mwA/viewform"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border border-[#d26b2c] text-[#d26b2c] px-8 py-4 rounded-full text-lg font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
-            >
-              Submit Your Solutions
-            </a>
           </div>
         </div>
       </section>
@@ -49,6 +42,16 @@ export default function ChallengePage() {
               }`}
             >
               Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('bracket')}
+              className={`py-4 px-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'bracket'
+                  ? 'border-[#d26b2c] text-[#d26b2c]'
+                  : 'border-transparent text-[#463f3a] hover:text-[#d26b2c]'
+              }`}
+            >
+              Tournament Bracket
             </button>
             <button
               onClick={() => setActiveTab('calculate')}
@@ -108,6 +111,10 @@ export default function ChallengePage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === 'bracket' && (
+            <TournamentBracket />
           )}
 
           {activeTab === 'calculate' && (
