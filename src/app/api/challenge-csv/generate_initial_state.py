@@ -99,10 +99,13 @@ def compute_tournament_prices(teams):
                 trials_mc=800
             )
             total_prob += prob
+
         avg_p = total_prob / (len(teams) - 1)
-        # simple approximation of tournament win probability
         tournament_prob = avg_p ** rounds_to_win
-        team["tournament_price"] = round(tournament_prob * 100, 2)
+
+        # Add Gaussian noise (~3%) and clamp to [0.005, 0.995]
+        noisy_prob = max(0.01* (1 + random.gauss(0, 0.06)), min(0.995, tournament_prob * (1 + random.gauss(0, 0.09))))
+        team["tournament_price"] = round(noisy_prob * 100, 2)
     return teams
 
 # -------------------
@@ -122,7 +125,14 @@ def compute_round_matchups(teams):
             {'name': B["dist_name"], 'params': B["dist_params"]},
             trials_mc=1200
         )
-        pB = 1.0 - pA
+
+        # Add symmetric noise (~3%) to both sides, clamp, then renormalize
+        pA_noisy = max(0.005, min(0.995, pA * (1 + random.gauss(0, 0.03))))
+        pB_noisy = 1.0 - pA_noisy
+        total = pA_noisy + pB_noisy
+        pA_final = pA_noisy / total
+        pB_final = pB_noisy / total
+
         matchups.append({
             "match_id": len(matchups) + 1,
             "round": 1,
@@ -130,8 +140,8 @@ def compute_round_matchups(teams):
             "team_B_id": B["team_id"],
             "team_A": A["team_name"],
             "team_B": B["team_name"],
-            "team_A_price": round(pA * 100, 2),
-            "team_B_price": round(pB * 100, 2)
+            "team_A_price": round(pA_final * 100, 2),
+            "team_B_price": round(pB_final * 100, 2)
         })
     return matchups
 
