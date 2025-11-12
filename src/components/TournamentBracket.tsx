@@ -34,10 +34,10 @@ export default function TournamentBracket() {
         Papa.parse(csvText, {
           header: true,
           skipEmptyLines: true,
-          complete: (results) => {
+          complete: (results: { data: Record<string, string>[] }) => {
             const parsedMatches: Match[] = results.data
-              .filter((row: any) => row.round && row.teamA)
-              .map((row: any) => ({
+              .filter((row) => row.round && row.teamA)
+              .map((row) => ({
                 round: parseInt(row.round),
                 match_id: parseInt(row.match_id),
                 teamA_id: parseInt(row.teamA_id),
@@ -50,7 +50,7 @@ export default function TournamentBracket() {
 
             setMatches(parsedMatches);
           },
-          error: (error) => {
+          error: (error: { message: string }) => {
             setError(`CSV parsing error: ${error.message}`);
           },
         });
