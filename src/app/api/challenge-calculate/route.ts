@@ -9,6 +9,21 @@ export const runtime = 'nodejs';
 
 const execFileAsync = promisify(execFile);
 
+interface PortfolioState {
+  cumulative_pnl: number;
+  liquid_balance: number;
+  total_invested: number;
+}
+
+interface PriceResult {
+  team_id: string;
+  old_price: number;
+  new_price: number;
+  buys: number;
+  sells: number;
+  slip: number;
+}
+
 export async function POST(req: NextRequest) {
   const projectRoot = process.cwd();
   const scriptDir = path.join(projectRoot, 'src', 'app', 'api', 'challenge-csv');
@@ -40,11 +55,11 @@ export async function POST(req: NextRequest) {
     const portfolioPath = path.join(tmpDir, 'portfolio_state.csv');
     if (portfolioJson) {
       try {
-        const portfolioData = JSON.parse(portfolioJson);
+        const portfolioData = JSON.parse(portfolioJson) as Record<string, PortfolioState>;
         const csv = ['player_id,cumulative_pnl,liquid_balance,total_invested'];
         for (const [playerId, state] of Object.entries(portfolioData)) {
           csv.push(
-            `${playerId},${(state as any).cumulative_pnl},${(state as any).liquid_balance},${(state as any).total_invested}`
+            `${playerId},${state.cumulative_pnl},${state.liquid_balance},${state.total_invested}`
           );
         }
         fs.writeFileSync(portfolioPath, csv.join('\n'));
@@ -177,7 +192,7 @@ export async function POST(req: NextRequest) {
 
     // Prices are now static (from round_N_prices.csv), so just return empty array
     // The frontend will still display the structure
-    const prices: any[] = [];
+    const prices: PriceResult[] = [];
 
     // Clean up temporary directory
     fs.rmSync(tmpDir, { recursive: true, force: true });
