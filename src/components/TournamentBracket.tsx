@@ -14,11 +14,24 @@ interface Match {
   loser: string;
 }
 
+// Password mapping for each round
+const ROUND_PASSWORDS: Record<number, string> = {
+  1: 'round1',
+  2: 'round2',
+  3: 'round3',
+  4: 'round4',
+  5: 'round5',
+  6: 'champion',
+};
+
 export default function TournamentBracket() {
   const [round, setRound] = useState<number>(1);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [unlockedRounds, setUnlockedRounds] = useState<Set<number>>(new Set([1]));
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [selectedRoundForPassword, setSelectedRoundForPassword] = useState<number | null>(null);
 
   useEffect(() => {
     const loadResults = async () => {
@@ -81,21 +94,85 @@ export default function TournamentBracket() {
     );
   }
 
+  const handleRoundChange = (newRound: number) => {
+    if (!unlockedRounds.has(newRound)) {
+      setSelectedRoundForPassword(newRound);
+      setPasswordInput('');
+      return;
+    }
+    setRound(newRound);
+  };
+
+  const handlePasswordSubmit = () => {
+    if (!selectedRoundForPassword) return;
+    
+    if (passwordInput === ROUND_PASSWORDS[selectedRoundForPassword]) {
+      const newUnlocked = new Set(unlockedRounds);
+      newUnlocked.add(selectedRoundForPassword);
+      setUnlockedRounds(newUnlocked);
+      setRound(selectedRoundForPassword);
+      setSelectedRoundForPassword(null);
+      setPasswordInput('');
+    } else {
+      alert('Incorrect password');
+    }
+  };
+
+  // Password modal
+  if (selectedRoundForPassword !== null) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 border border-[#c0ae9f]">
+          <h2 className="text-2xl font-serif font-semibold text-[#463f3a] mb-4">
+            Enter Password
+          </h2>
+          <p className="text-[#5b514c] mb-4">This round is password protected.</p>
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+            className="w-full px-4 py-2 border border-[#c0ae9f] rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#d26b2c]"
+            autoFocus
+          />
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setSelectedRoundForPassword(null);
+                setPasswordInput('');
+              }}
+              className="flex-1 px-4 py-2 border border-[#c0ae9f] rounded-lg text-[#463f3a] hover:bg-[#f5f1eb] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handlePasswordSubmit}
+              className="flex-1 px-4 py-2 bg-[#d26b2c] text-white rounded-lg hover:bg-[#bb5e27] transition-colors"
+            >
+              Unlock
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-center gap-4">
         <label className="text-lg font-medium text-[#463f3a]">View Round:</label>
         <select
           value={round}
-          onChange={(e) => setRound(parseInt(e.target.value))}
+          onChange={(e) => handleRoundChange(parseInt(e.target.value))}
           className="px-6 py-2 border border-[#c0ae9f] rounded-lg bg-white text-[#2e2b28] focus:outline-none focus:ring-2 focus:ring-[#d26b2c] focus:border-transparent"
         >
-          <option value={1}>Round of 16</option>
-          <option value={2}>Round of 8</option>
-          <option value={3}>Quarterfinals</option>
-          <option value={4}>Semifinals</option>
-          <option value={5}>Finals</option>
-          <option value={6}>Champion</option>
+          <option value={1} >Round of 16 {unlockedRounds.has(1) ? '🔓' : '🔒'}</option>
+          <option value={2} >Round of 8 {unlockedRounds.has(2) ? '🔓' : '🔒'}</option>
+          <option value={3} >Quarterfinals {unlockedRounds.has(3) ? '🔓' : '🔒'}</option>
+          <option value={4} >Semifinals {unlockedRounds.has(4) ? '🔓' : '🔒'}</option>
+          <option value={5} >Finals {unlockedRounds.has(5) ? '🔓' : '🔒'}</option>
+          <option value={6} >Champion {unlockedRounds.has(6) ? '🔓' : '🔒'}</option>
         </select>
       </div>
 

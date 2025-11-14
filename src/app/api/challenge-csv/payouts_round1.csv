@@ -1,5 +1,2 @@
-player_id,total_payout
-p025,-226.02
-p004,-198.39
-p040,-7.08
-p026,187.32
+player_id,asset1_realized,asset2_pnl,total_payout
+p025,43.71,0.0,43.71

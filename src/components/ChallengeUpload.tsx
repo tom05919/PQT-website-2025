@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface PayoutResult {
   player_id: string;
+  asset1_realized: number;
+  asset2_pnl: number;
   total_payout: number;
 }
 
@@ -16,14 +18,66 @@ interface PriceResult {
   slip: number;
 }
 
+// Password mapping for each round
+const ROUND_PASSWORDS: Record<number, string> = {
+  1: 'round1',
+  2: 'round2',
+  3: 'round3',
+  4: 'round4',
+  5: 'round5',
+};
+
+interface PortfolioState {
+  [playerId: string]: {
+    cumulative_pnl: number;
+    liquid_balance: number;
+    total_invested: number;
+  };
+}
+
+// Session storage helpers
+const PORTFOLIO_STORAGE_KEY = 'challenge_portfolio_state';
+
+function loadPortfolioFromSession(): PortfolioState {
+  if (typeof window === 'undefined') return {};
+  try {
+    const stored = sessionStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch (err) {
+    console.error('Failed to load portfolio from session:', err);
+    return {};
+  }
+}
+
+function savePortfolioToSession(portfolio: PortfolioState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(portfolio));
+  } catch (err) {
+    console.error('Failed to save portfolio to session:', err);
+  }
+}
+
 export default function ChallengeUpload() {
-  const [round, setRound] = useState<string>('1');
+  const [round, setRound] = useState<number>(1);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [payouts, setPayouts] = useState<PayoutResult[] | null>(null);
   const [prices, setPrices] = useState<PriceResult[] | null>(null);
+  const [portfolio, setPortfolio] = useState<PortfolioState | null>(null);
+  const [unlockedRounds, setUnlockedRounds] = useState<Set<number>>(new Set([1]));
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [selectedRoundForPassword, setSelectedRoundForPassword] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load portfolio from session on mount
+  useEffect(() => {
+    const portfolioData = loadPortfolioFromSession();
+    if (Object.keys(portfolioData).length > 0) {
+      setPortfolio(portfolioData);
+    }
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -35,6 +89,30 @@ export default function ChallengeUpload() {
       }
       setFile(selectedFile);
       setError(null);
+    }
+  };
+
+  const handleRoundChange = (newRound: number) => {
+    if (!unlockedRounds.has(newRound)) {
+      setSelectedRoundForPassword(newRound);
+      setPasswordInput('');
+      return;
+    }
+    setRound(newRound);
+  };
+
+  const handlePasswordSubmit = () => {
+    if (!selectedRoundForPassword) return;
+    
+    if (passwordInput === ROUND_PASSWORDS[selectedRoundForPassword]) {
+      const newUnlocked = new Set(unlockedRounds);
+      newUnlocked.add(selectedRoundForPassword);
+      setUnlockedRounds(newUnlocked);
+      setRound(selectedRoundForPassword);
+      setSelectedRoundForPassword(null);
+      setPasswordInput('');
+    } else {
+      alert('Incorrect password');
     }
   };
 
@@ -57,7 +135,11 @@ export default function ChallengeUpload() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('round', round);
+      formData.append('round', round.toString());
+      // Pass current portfolio from session storage
+      if (portfolio) {
+        formData.append('portfolio', JSON.stringify(portfolio));
+      }
 
       const response = await fetch('/api/challenge-calculate', {
         method: 'POST',
@@ -77,6 +159,13 @@ export default function ChallengeUpload() {
 
       setPayouts(result.payouts || []);
       setPrices(result.prices || []);
+
+      // Save portfolio state to session storage
+      if (result.portfolio) {
+        const updatedPortfolio = { ...portfolio, ...result.portfolio };
+        setPortfolio(updatedPortfolio);
+        savePortfolioToSession(updatedPortfolio);
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
@@ -88,8 +177,13 @@ export default function ChallengeUpload() {
   const downloadPayouts = () => {
     if (!payouts) return;
 
-    const headers = ['player_id', 'total_payout'];
-    const rows = payouts.map((p) => [p.player_id, p.total_payout.toFixed(2)]);
+    const headers = ['player_id', 'asset1_realized', 'asset2_pnl', 'total_payout'];
+    const rows = payouts.map((p) => [
+      p.player_id,
+      p.asset1_realized.toFixed(2),
+      p.asset2_pnl.toFixed(2),
+      p.total_payout.toFixed(2),
+    ]);
 
     const csv = [headers, ...rows].map((row) => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -124,8 +218,74 @@ export default function ChallengeUpload() {
     URL.revokeObjectURL(url);
   };
 
+  // Password modal
+  if (selectedRoundForPassword !== null) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 border border-[#c0ae9f]">
+          <h2 className="text-2xl font-serif font-semibold text-[#463f3a] mb-4">
+            Enter Password
+          </h2>
+          <p className="text-[#5b514c] mb-4">This round is password protected.</p>
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+            className="w-full px-4 py-2 border border-[#c0ae9f] rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#d26b2c]"
+            autoFocus
+          />
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setSelectedRoundForPassword(null);
+                setPasswordInput('');
+              }}
+              className="flex-1 px-4 py-2 border border-[#c0ae9f] rounded-lg text-[#463f3a] hover:bg-[#f5f1eb] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handlePasswordSubmit}
+              className="flex-1 px-4 py-2 bg-[#d26b2c] text-white rounded-lg hover:bg-[#bb5e27] transition-colors"
+            >
+              Unlock
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
+      {/* Portfolio Status */}
+      {portfolio && Object.keys(portfolio).length > 0 && (
+        <div className="bg-gradient-to-r from-[#d26b2c] to-[#bb5e27] rounded-2xl p-8 shadow-sm text-white">
+          <h2 className="text-2xl font-serif font-semibold mb-4">Portfolio Summary</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {Object.entries(portfolio).map(([playerId, state]) => (
+              <div key={playerId} className="bg-white/20 rounded-lg p-4">
+                <div className="text-sm opacity-90 mb-1">Player: {playerId}</div>
+                <div className="mb-2">
+                  <div className="text-xs opacity-75">Cumulative P&L</div>
+                  <div className="text-xl font-bold">{state.cumulative_pnl.toFixed(2)}</div>
+                </div>
+                <div className="mb-2">
+                  <div className="text-xs opacity-75">Liquid Balance</div>
+                  <div className="text-xl font-bold">${state.liquid_balance.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-xs opacity-75">In Assets</div>
+                  <div className="text-xl font-bold">${state.total_invested.toFixed(2)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Upload Section */}
       <div className="bg-[#e9e1d9] rounded-2xl p-8 shadow-sm">
         <h2 className="text-3xl font-serif font-semibold mb-6">Calculate Your Payouts</h2>
@@ -137,15 +297,15 @@ export default function ChallengeUpload() {
           </label>
           <select
             value={round}
-            onChange={(e) => setRound(e.target.value)}
+            onChange={(e) => handleRoundChange(parseInt(e.target.value))}
             className="w-full px-4 py-3 border border-[#c0ae9f] rounded-lg bg-white text-[#2e2b28] focus:outline-none focus:ring-2 focus:ring-[#d26b2c] focus:border-transparent"
           >
             <option value="">-- Select a Round --</option>
-            <option value="1">Round 1</option>
-            <option value="2">Round 2</option>
-            <option value="3">Round 3</option>
-            <option value="4">Round 4</option>
-            <option value="5">Round 5</option>
+            <option value={1}>Round of 16 {unlockedRounds.has(1) ? '🔓' : '🔒'}</option>
+            <option value={2}>Round of 8 {unlockedRounds.has(2) ? '🔓' : '🔒'}</option>
+            <option value={3}>Quarterfinals {unlockedRounds.has(3) ? '🔓' : '🔒'}</option>
+            <option value={4}>Semifinals {unlockedRounds.has(4) ? '🔓' : '🔒'}</option>
+            <option value={5}>Finals {unlockedRounds.has(5) ? '🔓' : '🔒'}</option>
           </select>
         </div>
 
@@ -218,6 +378,12 @@ export default function ChallengeUpload() {
                       Player ID
                     </th>
                     <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
+                      Asset 1 (Realized)
+                    </th>
+                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
+                      Asset 2 P&L
+                    </th>
+                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
                       Total Payout
                     </th>
                   </tr>
@@ -230,6 +396,26 @@ export default function ChallengeUpload() {
                     >
                       <td className="py-3 px-4 text-[#2e2b28]">{payout.player_id}</td>
                       <td className="text-right py-3 px-4 text-[#2e2b28] font-medium">
+                        <span
+                          className={
+                            payout.asset1_realized >= 0 ? 'text-green-600' : 'text-red-600'
+                          }
+                        >
+                          {payout.asset1_realized >= 0 ? '+' : ''}
+                          {payout.asset1_realized.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="text-right py-3 px-4 text-[#2e2b28] font-medium">
+                        <span
+                          className={
+                            payout.asset2_pnl >= 0 ? 'text-green-600' : 'text-red-600'
+                          }
+                        >
+                          {payout.asset2_pnl >= 0 ? '+' : ''}
+                          {payout.asset2_pnl.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="text-right py-3 px-4 text-[#2e2b28] font-bold">
                         <span
                           className={
                             payout.total_payout >= 0 ? 'text-green-600' : 'text-red-600'
@@ -320,4 +506,3 @@ export default function ChallengeUpload() {
     </div>
   );
 }
-

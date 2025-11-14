@@ -99,14 +99,16 @@ export default function ChallengePage() {
                   Your trades CSV should have the following columns:
                 </p>
                 <div className="bg-[#f5f1eb] rounded p-4 text-sm font-mono text-[#463f3a] overflow-x-auto">
-                  <div>player_id,team_id,round,action,quantity,price</div>
+                  <div>player_id,team_id,action,quantity,asset</div>
                   <div className="mt-2 text-xs text-[#5b514c]">
                     <div>• player_id: Your unique player identifier</div>
                     <div>• team_id: Team identifier (e.g., Team_1)</div>
-                    <div>• round: Round number (1-5)</div>
                     <div>• action: BUY or SELL</div>
                     <div>• quantity: Number of contracts</div>
-                    <div>• price: Price per contract (0-100)</div>
+                    <div>• asset: 1 (matchup outcome) or 2 (tournament winner)</div>
+                  </div>
+                  <div className="mt-2 text-xs text-[#5b514c] italic">
+                    <div>Prices are automatically looked up from the current round prices.</div>
                   </div>
                 </div>
               </div>
