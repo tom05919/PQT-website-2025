@@ -25,19 +25,14 @@ interface PriceResult {
   slip: number;
 }
 
-// Ensure portfolio directory exists
-const projectRoot = process.cwd();
-const portfolioDir = path.join(projectRoot, 'data', 'portfolios');
-const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
-
-// Create portfolio directory if it doesn't exist
-if (!fs.existsSync(portfolioDir)) {
-  fs.mkdirSync(portfolioDir, { recursive: true });
-}
-
 // Save portfolio state
-function savePortfolioState(state: Record<string, PortfolioState>): void {
+function savePortfolioState(state: Record<string, PortfolioState>, portfolioPath: string): void {
   try {
+    // Ensure directory exists before writing
+    const portfolioDir = path.dirname(portfolioPath);
+    if (!fs.existsSync(portfolioDir)) {
+      fs.mkdirSync(portfolioDir, { recursive: true });
+    }
     fs.writeFileSync(portfolioPath, JSON.stringify(state, null, 2));
   } catch (error) {
     console.error('Error saving portfolio state:', error);
@@ -47,8 +42,17 @@ function savePortfolioState(state: Record<string, PortfolioState>): void {
 export async function POST(req: NextRequest) {
   // API endpoint for calculating tournament round payouts and updating portfolio state.
   // Handles file uploads, portfolio state management, and communicates with Python script.
+  const projectRoot = process.cwd();
   const scriptDir = path.join(projectRoot, 'src', 'app', 'api', 'challenge-csv');
   const scriptPath = path.join(scriptDir, 'calculate_payout_price.py');
+  
+  // Use /tmp for portfolio storage on Vercel (read-only filesystem except /tmp)
+  // For local development, use data/portfolios
+  const isVercel = process.env.VERCEL === '1';
+  const portfolioDir = isVercel 
+    ? path.join(os.tmpdir(), 'portfolios')
+    : path.join(projectRoot, 'data', 'portfolios');
+  const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
 
   try {
     // Parse form data from the request
@@ -65,16 +69,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create a persistent portfolio directory if it doesn't exist
-    const portfolioDir = path.join(projectRoot, 'data', 'portfolios');
-    if (!fs.existsSync(portfolioDir)) {
-      fs.mkdirSync(portfolioDir, { recursive: true });
-    }
-
     // Create a temporary directory for processing
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'challenge-'));
     const uploadedFile = path.join(tmpDir, 'mock_trades.csv');
-    const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
 
     // Save the uploaded trades file
     const buffer = await file.arrayBuffer();
@@ -243,8 +240,8 @@ export async function POST(req: NextRequest) {
     fs.rmSync(tmpDir, { recursive: true, force: true });
     
     // Save the updated portfolio state
-    if (portfolioData) {
-      savePortfolioState(portfolioData);
+    if (portfolioData && Object.keys(portfolioData).length > 0) {
+      savePortfolioState(portfolioData, portfolioPath);
     }
 
     return new Response(

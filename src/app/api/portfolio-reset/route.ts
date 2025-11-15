@@ -1,12 +1,20 @@
 import { NextRequest } from 'next/server';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 
 export const runtime = 'nodejs';
 
-const projectRoot = process.cwd();
-const portfolioDir = path.join(projectRoot, 'data', 'portfolios');
-const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
+// Use /tmp for portfolio storage on Vercel (read-only filesystem except /tmp)
+// For local development, use data/portfolios
+function getPortfolioPath(): string {
+  const projectRoot = process.cwd();
+  const isVercel = process.env.VERCEL === '1';
+  const portfolioDir = isVercel 
+    ? path.join(os.tmpdir(), 'portfolios')
+    : path.join(projectRoot, 'data', 'portfolios');
+  return path.join(portfolioDir, 'portfolio_state.json');
+}
 
 /**
  * DELETE /api/portfolio-reset
@@ -15,6 +23,7 @@ const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
  */
 export async function DELETE(_req: NextRequest) {
   try {
+    const portfolioPath = getPortfolioPath();
     // Check if portfolio file exists
     if (fs.existsSync(portfolioPath)) {
       fs.unlinkSync(portfolioPath);
