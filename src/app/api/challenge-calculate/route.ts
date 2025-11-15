@@ -79,13 +79,17 @@ export async function POST(req: NextRequest) {
 
     // Load portfolio state from disk (from previous round) - JSON format
     let currentPortfolio: Record<string, PortfolioState> = {};
-    if (fs.existsSync(portfolioPath)) {
-      try {
+    try {
+      if (fs.existsSync(portfolioPath)) {
         const diskData = fs.readFileSync(portfolioPath, 'utf-8');
-        currentPortfolio = JSON.parse(diskData);
-      } catch (e) {
-        console.error('Failed to load portfolio from disk:', e);
+        if (diskData.trim()) {
+          currentPortfolio = JSON.parse(diskData);
+        }
       }
+    } catch (e) {
+      console.error('Failed to load portfolio from disk:', e);
+      // Continue with empty portfolio if file doesn't exist or is invalid
+      currentPortfolio = {};
     }
 
     // If no portfolio on disk, use the one from frontend (first round scenario)
@@ -97,8 +101,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Save portfolio state to JSON file for Python script
-    fs.writeFileSync(portfolioPath, JSON.stringify(currentPortfolio, null, 2));
+    // Ensure portfolio directory exists before writing
+    try {
+      if (!fs.existsSync(portfolioDir)) {
+        fs.mkdirSync(portfolioDir, { recursive: true });
+      }
+      // Save portfolio state to JSON file for Python script (create empty file if no data)
+      fs.writeFileSync(portfolioPath, JSON.stringify(currentPortfolio, null, 2));
+    } catch (e) {
+      console.error('Failed to save portfolio state before Python script:', e);
+      // Continue anyway - Python script will create its own portfolio file
+    }
 
     // Ensure required CSV files exist (generate if missing)
     const initialPricesPath = path.join(scriptDir, 'initial_prices.csv');
