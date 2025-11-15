@@ -50,35 +50,41 @@ def load_round_prices(prices_file, round_num):
     return prices
 
 def load_portfolio_state(portfolio_file):
-    """Load portfolio state for all players"""
+    """Load portfolio state from JSON file"""
     portfolio = {}  # player_id -> {cumulative_pnl, liquid_balance, total_invested}
     try:
-        with open(portfolio_file, newline='') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                player_id = row.get("player_id", "").strip()
-                if player_id:
-                    portfolio[player_id] = {
-                        "cumulative_pnl": float(row.get("cumulative_pnl", 0)),
-                        "liquid_balance": float(row.get("liquid_balance", 500)),  # Start with $500
-                        "total_invested": float(row.get("total_invested", 0))
-                    }
-    except FileNotFoundError:
-        pass
+        with open(portfolio_file, 'r') as f:
+            data = json.load(f)
+            # Convert to expected format (for backwards compatibility)
+            for player_id, state in data.items():
+                portfolio[player_id] = {
+                    "cumulative_pnl": float(state.get("cumulative_pnl", 0)),
+                    "liquid_balance": float(state.get("liquid_balance", 500)),
+                    "total_invested": float(state.get("total_invested", 0))
+                }
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Try CSV format for backwards compatibility
+        try:
+            with open(portfolio_file, newline='') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    player_id = row.get("player_id", "").strip()
+                    if player_id:
+                        portfolio[player_id] = {
+                            "cumulative_pnl": float(row.get("cumulative_pnl", 0)),
+                            "liquid_balance": float(row.get("liquid_balance", 500)),
+                            "total_invested": float(row.get("total_invested", 0))
+                        }
+        except FileNotFoundError:
+            pass
     return portfolio
 
 def save_portfolio_state(portfolio, portfolio_file):
-    """Save updated portfolio state"""
-    with open(portfolio_file, "w", newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["player_id", "cumulative_pnl", "liquid_balance", "total_invested"])
-        for player_id, state in sorted(portfolio.items()):
-            writer.writerow([
-                player_id,
-                round(state.get("cumulative_pnl", 0), 2),
-                round(state.get("liquid_balance", 0), 2),
-                round(state.get("total_invested", 0), 2)
-            ])
+    """Save updated portfolio state to JSON file"""
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(portfolio_file), exist_ok=True)
+    with open(portfolio_file, 'w') as f:
+        json.dump(portfolio, f, indent=2)
 
 def load_trades(trades_file, round_prices):
     """Load trades, supporting both asset 1 and asset 2. Prices are looked up from round_prices."""
@@ -291,7 +297,7 @@ def main():
     parser.add_argument("--outcomes", type=str, default="tournament_outcomes.csv", help="Path to tournament outcomes CSV")
     parser.add_argument("--round-prices", type=str, help="Path to round_N_prices.csv for asset prices")
     parser.add_argument("--password", type=str, required=False, help="Password for this round (optional)")
-    parser.add_argument("--portfolio", type=str, default="portfolio_state.csv", help="Path to portfolio state CSV")
+    parser.add_argument("--portfolio", type=str, default="portfolio_state.json", help="Path to portfolio state JSON file")
     args = parser.parse_args()
 
     teams = load_teams(args.prices)
@@ -309,27 +315,30 @@ def main():
     # Load portfolio state
     portfolio = load_portfolio_state(args.portfolio)
     
-    # Check spending limits before processing trades
-    total_buy_cost = 0
+    # Initialize all players first
+    for trade in trades:
+        player_id = trade["player_id"]
+        if player_id not in portfolio:
+            portfolio[player_id] = {
+                "cumulative_pnl": 0,
+                "liquid_balance": 500,
+                "total_invested": 0
+            }
+    
+    # Check spending limits before processing trades (accumulate costs per player)
+    player_costs = {}  # player_id -> total buy cost
     for trade in trades:
         player_id = trade["player_id"]
         if trade["action"] == "buy":
             cost = trade["quantity"] * trade["price"]
-            total_buy_cost += cost
-            
-            # Initialize player if not in portfolio
-            if player_id not in portfolio:
-                portfolio[player_id] = {
-                    "cumulative_pnl": 0,
-                    "liquid_balance": 500,
-                    "total_invested": 0
-                }
-            
-            # Check if player has enough liquid balance
-            available = portfolio[player_id]["liquid_balance"]
-            if cost > available:
-                print(f"SPENDING_LIMIT_ERROR")
-                return
+            player_costs[player_id] = player_costs.get(player_id, 0) + cost
+    
+    # Check each player's total costs against their balance
+    for player_id, total_cost in player_costs.items():
+        available = portfolio[player_id]["liquid_balance"]
+        if total_cost > available:
+            print(f"SPENDING_LIMIT_ERROR")
+            return
     
     player_payouts = calculate_round(teams, outcomes, trades, round_prices)
     

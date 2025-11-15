@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# portfolio data (generated at runtime)
+data/portfolios/
+
+# test files (optional - can be removed or kept)
+test_round*.csv
+TEST_PORTFOLIO_PERSISTENCE.md
