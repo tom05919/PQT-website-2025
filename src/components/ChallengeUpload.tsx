@@ -32,6 +32,7 @@ interface PortfolioState {
     cumulative_pnl: number;
     liquid_balance: number;
     total_invested: number;
+    positions: Record<string, number>;
   };
 }
 
@@ -69,6 +70,7 @@ export default function ChallengeUpload() {
   const [unlockedRounds, setUnlockedRounds] = useState<Set<number>>(new Set([1]));
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [selectedRoundForPassword, setSelectedRoundForPassword] = useState<number | null>(null);
+  const [completedRounds, setCompletedRounds] = useState<Set<number>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load portfolio from session on mount
@@ -89,6 +91,8 @@ export default function ChallengeUpload() {
       }
       setFile(selectedFile);
       setError(null);
+      setPayouts(null); // Clear previous results when new file selected
+      setPrices(null);
     }
   };
 
@@ -127,6 +131,12 @@ export default function ChallengeUpload() {
       return;
     }
 
+    // Check if this round has already been calculated
+    if (completedRounds.has(round)) {
+      setError(`Round ${round} has already been calculated. You can only calculate each round once.`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setPayouts(null);
@@ -138,7 +148,10 @@ export default function ChallengeUpload() {
       formData.append('round', round.toString());
       // Pass current portfolio from session storage
       if (portfolio) {
+        console.log('SENDING PORTFOLIO TO API:', JSON.stringify(portfolio, null, 2));
         formData.append('portfolio', JSON.stringify(portfolio));
+      } else {
+        console.log('NO PORTFOLIO TO SEND (starting fresh)');
       }
 
       const response = await fetch('/api/challenge-calculate', {
@@ -146,15 +159,10 @@ export default function ChallengeUpload() {
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to calculate payouts');
-      }
-
       const result = await response.json();
       
-      if (result.error) {
-        throw new Error(result.error);
+      if (!response.ok || result.error) {
+        throw new Error(result.error || 'Failed to calculate payouts');
       }
 
       setPayouts(result.payouts || []);
@@ -164,13 +172,21 @@ export default function ChallengeUpload() {
       if (result.portfolio) {
         // Merge with existing portfolio, ensuring result.portfolio takes precedence
         const updatedPortfolio = { ...(portfolio || {}), ...result.portfolio };
+        console.log('RECEIVED PORTFOLIO FROM API:', JSON.stringify(result.portfolio, null, 2));
+        console.log('SAVING UPDATED PORTFOLIO:', JSON.stringify(updatedPortfolio, null, 2));
         setPortfolio(updatedPortfolio);
         savePortfolioToSession(updatedPortfolio);
       } else if (portfolio) {
         // Keep existing portfolio if no new one returned
+        console.log('NO PORTFOLIO RETURNED, keeping existing');
         setPortfolio(portfolio);
         savePortfolioToSession(portfolio);
       }
+
+      // Mark this round as completed
+      const newCompletedRounds = new Set(completedRounds);
+      newCompletedRounds.add(round);
+      setCompletedRounds(newCompletedRounds);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
@@ -281,10 +297,6 @@ export default function ChallengeUpload() {
                   <div className="text-xs opacity-75">Liquid Balance</div>
                   <div className="text-xl font-bold">${state.liquid_balance.toFixed(2)}</div>
                 </div>
-                <div>
-                  <div className="text-xs opacity-75">In Assets</div>
-                  <div className="text-xl font-bold">${state.total_invested.toFixed(2)}</div>
-                </div>
               </div>
             ))}
           </div>
@@ -306,11 +318,11 @@ export default function ChallengeUpload() {
             className="w-full px-4 py-3 border border-[#c0ae9f] rounded-lg bg-white text-[#2e2b28] focus:outline-none focus:ring-2 focus:ring-[#d26b2c] focus:border-transparent"
           >
             <option value="">-- Select a Round --</option>
-            <option value={1}>Round of 16 {unlockedRounds.has(1) ? '🔓' : '🔒'}</option>
-            <option value={2}>Round of 8 {unlockedRounds.has(2) ? '🔓' : '🔒'}</option>
-            <option value={3}>Quarterfinals {unlockedRounds.has(3) ? '🔓' : '🔒'}</option>
-            <option value={4}>Semifinals {unlockedRounds.has(4) ? '🔓' : '🔒'}</option>
-            <option value={5}>Finals {unlockedRounds.has(5) ? '🔓' : '🔒'}</option>
+            <option value={1}>Round of 16 {unlockedRounds.has(1) ? '🔓' : '🔒'} {completedRounds.has(1) ? '✓' : ''}</option>
+            <option value={2}>Round of 8 {unlockedRounds.has(2) ? '🔓' : '🔒'} {completedRounds.has(2) ? '✓' : ''}</option>
+            <option value={3}>Quarterfinals {unlockedRounds.has(3) ? '🔓' : '🔒'} {completedRounds.has(3) ? '✓' : ''}</option>
+            <option value={4}>Semifinals {unlockedRounds.has(4) ? '🔓' : '🔒'} {completedRounds.has(4) ? '✓' : ''}</option>
+            <option value={5}>Finals {unlockedRounds.has(5) ? '🔓' : '🔒'} {completedRounds.has(5) ? '✓' : ''}</option>
           </select>
         </div>
 
@@ -351,10 +363,10 @@ export default function ChallengeUpload() {
         {/* Calculate Button */}
         <button
           onClick={handleUpload}
-          disabled={loading || !file || !round}
+          disabled={loading || !file || !round || completedRounds.has(round)}
           className="w-full px-6 py-3 bg-[#d26b2c] text-white rounded-lg font-medium hover:bg-[#bb5e27] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Calculating...' : 'Calculate Payouts'}
+          {loading ? 'Calculating...' : completedRounds.has(round) ? `Round ${round} Already Calculated ✓` : 'Calculate Payouts'}
         </button>
       </div>
 

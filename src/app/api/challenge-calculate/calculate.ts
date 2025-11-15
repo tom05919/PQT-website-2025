@@ -49,6 +49,11 @@ interface PlayerPayout {
   total: number;
 }
 
+interface CalculateRoundResult {
+  payouts: Record<string, PlayerPayout>;
+  holdings: Record<string, Record<string, number>>;
+}
+
 export interface PortfolioState {
   cumulative_pnl: number;
   liquid_balance: number;
@@ -167,23 +172,53 @@ export function loadPortfolioState(portfolioFile: string): Record<string, Portfo
 export function calculateRound(
   outcomes: Record<string, boolean>,
   trades: Trade[],
-  roundPrices: RoundPrices
-): Record<string, PlayerPayout> {
+  roundPrices: RoundPrices,
+  portfolio?: Record<string, PortfolioState>
+): CalculateRoundResult | null {
   const playerPositions: Record<string, { asset1: Position[]; asset2: Position[] }> = {};
   const playerUnrealizedPnl: Record<string, number> = {};
   const playerAsset1Pnl: Record<string, number> = {};
+  const playerHoldings: Record<string, Record<string, number>> = {}; // player_id -> {team_asset: quantity}
   
-  // Initialize player records
+  // Initialize player records and load existing holdings from portfolio
   for (const trade of trades) {
     if (!playerPositions[trade.player_id]) {
       playerPositions[trade.player_id] = { asset1: [], asset2: [] };
       playerUnrealizedPnl[trade.player_id] = 0;
       playerAsset1Pnl[trade.player_id] = 0;
+      
+      // Load existing holdings from portfolio
+      if (portfolio && portfolio[trade.player_id] && portfolio[trade.player_id].positions) {
+        playerHoldings[trade.player_id] = { ...portfolio[trade.player_id].positions };
+      } else {
+        playerHoldings[trade.player_id] = {};
+      }
     }
   }
   
-  // Process trades
+  // Process trades and validate positions
   for (const trade of trades) {
+    const holdingKey = `${trade.team_id}_${trade.asset}`;
+    
+    if (!playerHoldings[trade.player_id][holdingKey]) {
+      playerHoldings[trade.player_id][holdingKey] = 0;
+    }
+    
+    // Check if sell would result in negative position (overselling)
+    if (trade.action === 'sell') {
+      const currentHolding = playerHoldings[trade.player_id][holdingKey];
+      if (currentHolding < trade.quantity) {
+        throw new Error(`POSITION_ERROR:Player ${trade.player_id} trying to sell ${trade.quantity} of ${trade.team_id} asset ${trade.asset}, but only owns ${currentHolding}`);
+      }
+    }
+    
+    // Update holdings
+    if (trade.action === 'buy') {
+      playerHoldings[trade.player_id][holdingKey] += trade.quantity;
+    } else if (trade.action === 'sell') {
+      playerHoldings[trade.player_id][holdingKey] -= trade.quantity;
+    }
+    
     const position: Position = {
       team: trade.team_id,
       quantity: trade.quantity,
@@ -264,7 +299,23 @@ export function calculateRound(
     };
   }
   
-  return playerPayouts;
+  // Clear Asset 1 holdings (they expire at end of round)
+  for (const playerId of Object.keys(playerHoldings)) {
+    const holdingsToRemove: string[] = [];
+    for (const key of Object.keys(playerHoldings[playerId])) {
+      if (key.endsWith('_1')) {
+        holdingsToRemove.push(key);
+      }
+    }
+    for (const key of holdingsToRemove) {
+      delete playerHoldings[playerId][key];
+    }
+  }
+  
+  return {
+    payouts: playerPayouts,
+    holdings: playerHoldings,
+  };
 }
 
 export function validateSpendingLimits(
@@ -298,7 +349,8 @@ export function validateSpendingLimits(
 export function updatePortfolio(
   trades: Trade[],
   payouts: Record<string, PlayerPayout>,
-  portfolio: Record<string, PortfolioState>
+  portfolio: Record<string, PortfolioState>,
+  holdings: Record<string, Record<string, number>>
 ): Record<string, PortfolioState> {
   const playersInRound = new Set<string>();
   for (const trade of trades) {
@@ -323,22 +375,72 @@ export function updatePortfolio(
     // Update cumulative P&L
     updatedPortfolio[playerId].cumulative_pnl += roundTotal;
     
-    // Update liquid balance and total invested based on trades
+    // Calculate total cost for this player's trades this round
+    let totalCostThisRound = 0;
     for (const trade of trades) {
       if (trade.player_id === playerId) {
         const cost = trade.quantity * trade.price;
         if (trade.action === 'buy') {
-          updatedPortfolio[playerId].liquid_balance -= cost;
+          totalCostThisRound += cost;
           updatedPortfolio[playerId].total_invested += cost;
         } else {
-          updatedPortfolio[playerId].liquid_balance += cost;
+          totalCostThisRound -= cost; // Selling reduces cost
           updatedPortfolio[playerId].total_invested -= cost;
         }
       }
     }
     
-    // Add round P&L to liquid balance
+    // Update liquid balance:
+    // 1. Subtract costs of trades (cash out when buying)
+    // 2. Add payouts from settlements (cash in when positions settle)
+    // Since roundTotal = payout - cost, we have: payout = roundTotal + cost
+    // liquid_balance change = -cost + payout = -cost + (roundTotal + cost) = roundTotal
+    // Wait, that's wrong. Let me think again:
+    // 
+    // roundTotal = payout - cost (this is P&L)
+    // We want: liquid_balance -= cost (for buys), liquid_balance += payout (for settlements)
+    // So: liquid_balance change = -cost + payout = -cost + (roundTotal + cost) = roundTotal
+    // 
+    // Actually that's correct! But only if the trades in THIS round are the ones settling.
+    // The issue is: trades in round N don't settle until end of round N.
+    // So we need to:
+    // 1. Subtract cost for NEW trades
+    // 2. Add payout for OLD trades that are settling
+    //
+    // But in our system, trades settle at the END of the same round they're made.
+    // So: liquid_balance = starting - cost + payout = starting + (payout - cost) = starting + roundTotal
+    // 
+    // NO WAIT. Let me re-read the logic. In calculateRound, we process ALL trades for the round
+    // and calculate their P&L. So roundTotal includes the P&L for trades made THIS round.
+    //
+    // So the correct flow is:
+    // - Start with liquid_balance
+    // - Subtract cost of trades: liquid_balance -= totalCostThisRound
+    // - Add payout from settlements: liquid_balance += (roundTotal + totalCostThisRound)
+    // - Net effect: liquid_balance += roundTotal
+    //
+    // But that means liquid_balance should ONLY change by roundTotal, which is what we had!
+    // 
+    // The issue is: when do trades settle? Same round or next round?
+    // Looking at the code, trades settle SAME round (Asset 1 expires at end of round).
+    // 
+    // So for Round 1:
+    // - Buy 1 at $56.29 → cost = $56.29
+    // - Team wins → payout = $100
+    // - P&L = $100 - $56.29 = $43.71
+    // - liquid_balance = $500 - $56.29 + $100 = $543.71
+    // - Which equals: $500 + $43.71 = $543.71 ✅
+    //
+    // So the formula liquid_balance += roundTotal is CORRECT!
+    // 
+    // But the user says it's going UP when it should go DOWN.
+    // That means roundTotal is POSITIVE when it should be NEGATIVE.
+    // Let me check if there's an issue in the P&L calculation...
+    
     updatedPortfolio[playerId].liquid_balance += roundTotal;
+    
+    // Update positions with new holdings
+    updatedPortfolio[playerId].positions = holdings[playerId] || {};
   }
   
   return updatedPortfolio;

@@ -32,22 +32,3 @@ team_id,team_name,offense,defense,chemistry,injury_risk,variance,strength,tourna
 30,Team_30,0.612,0.634,0.765,0.404,0.197,0.647,0.98
 31,Team_31,0.43,0.764,0.8,0.066,0.046,0.68,13.77
 32,Team_32,0.47,0.492,0.631,0.525,0.024,0.51,1.02
-
---- ROUND 1 MATCHUPS ---
-match_id,round,team_A,team_B,team_A_price,team_B_price
-1,1,Team_13,Team_31,55.36,44.64
-2,1,Team_8,Team_5,80.4,19.6
-3,1,Team_10,Team_24,23.63,76.37
-4,1,Team_16,Team_12,44.06,55.94
-5,1,Team_9,Team_18,1.02,98.98
-6,1,Team_27,Team_1,85.84,14.16
-7,1,Team_11,Team_29,98.41,1.59
-8,1,Team_17,Team_20,94.11,5.89
-9,1,Team_15,Team_6,55.81,44.19
-10,1,Team_30,Team_14,4.19,95.81
-11,1,Team_21,Team_32,56.56,43.44
-12,1,Team_28,Team_26,71.95,28.05
-13,1,Team_25,Team_7,27.7,72.3
-14,1,Team_19,Team_22,89.53,10.47
-15,1,Team_4,Team_23,85.99,14.01
-16,1,Team_2,Team_3,3.68,96.32

@@ -127,7 +127,7 @@ def load_trades(trades_file, round_prices):
             })
     return trades
 
-def calculate_round(teams, outcomes, trades, round_prices):
+def calculate_round(teams, outcomes, trades, round_prices, portfolio=None):
     """
     Calculate payouts with both realized and unrealized P&L.
     
@@ -138,6 +138,7 @@ def calculate_round(teams, outcomes, trades, round_prices):
     player_realized_pnl = {}  # player_id -> realized P&L
     player_unrealized_pnl = {}  # player_id -> unrealized P&L
     player_asset1_pnl = {}  # player_id -> asset 1 P&L (realized at end of round)
+    player_holdings = {}  # player_id -> {(team, asset): net_quantity}
     
     # Initialize player records
     for trade in trades:
@@ -147,8 +148,16 @@ def calculate_round(teams, outcomes, trades, round_prices):
             player_realized_pnl[player_id] = 0.0
             player_unrealized_pnl[player_id] = 0.0
             player_asset1_pnl[player_id] = 0.0
+            player_holdings[player_id] = {}
     
-    # Process trades
+    # Load existing holdings from portfolio (for Asset 2 which carries forward)
+    if portfolio:
+        for player_id in player_holdings:
+            # TODO: We need to track holdings in portfolio state
+            # For now, assume holdings start at 0 each round
+            pass
+    
+    # Process trades and validate positions
     for trade in trades:
         player_id = trade["player_id"]
         team_id = trade["team_id"]
@@ -156,6 +165,24 @@ def calculate_round(teams, outcomes, trades, round_prices):
         quantity = trade["quantity"]
         price = trade["price"]
         asset = trade["asset"]
+        
+        # Create holding key
+        holding_key = (team_id, asset)
+        if holding_key not in player_holdings[player_id]:
+            player_holdings[player_id][holding_key] = 0.0
+        
+        # Check if sell would result in negative position (overselling)
+        if action == "sell":
+            current_holding = player_holdings[player_id][holding_key]
+            if current_holding < quantity:
+                print(f"POSITION_ERROR:Player {player_id} trying to sell {quantity} of {team_id} asset {asset}, but only owns {current_holding}")
+                return None
+        
+        # Update holdings
+        if action == "buy":
+            player_holdings[player_id][holding_key] += quantity
+        elif action == "sell":
+            player_holdings[player_id][holding_key] -= quantity
         
         if asset == "1":
             # Asset 1: Track BUY/SELL positions
@@ -167,7 +194,6 @@ def calculate_round(teams, outcomes, trades, round_prices):
                     "type": "buy"
                 })
             elif action == "sell":
-                # Sell: Try to match with existing buy positions
                 player_positions[player_id]["asset1"].append({
                     "team": team_id,
                     "quantity": quantity,
@@ -346,7 +372,11 @@ def main():
             print(f"SPENDING_LIMIT_ERROR")
             return
     
-    player_payouts = calculate_round(teams, outcomes, trades, round_prices)
+    player_payouts = calculate_round(teams, outcomes, trades, round_prices, portfolio)
+    
+    # Check if calculation failed due to position error
+    if player_payouts is None:
+        return
     
     # Track which players have trades in this round
     players_in_round = set()

@@ -118,6 +118,29 @@ export default function TournamentBracket() {
     }
   };
 
+  const handleDownloadPrices = async () => {
+    try {
+      const response = await fetch(`/api/challenge-csv/round_${round}_prices.csv`);
+      
+      if (!response.ok) {
+        alert(`Prices for round ${round} are not available yet.`);
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `round_${round}_prices.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      alert('Failed to download prices file');
+    }
+  };
+
   // Password modal
   if (selectedRoundForPassword !== null) {
     return (
@@ -160,7 +183,7 @@ export default function TournamentBracket() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 flex-wrap">
         <label className="text-lg font-medium text-[#463f3a]">View Round:</label>
         <select
           value={round}
@@ -174,6 +197,12 @@ export default function TournamentBracket() {
           <option value={5} >Finals {unlockedRounds.has(5) ? '🔓' : '🔒'}</option>
           <option value={6} >Champion {unlockedRounds.has(6) ? '🔓' : '🔒'}</option>
         </select>
+        <button
+          onClick={handleDownloadPrices}
+          className="px-6 py-2 bg-[#d26b2c] text-white rounded-lg hover:bg-[#bb5e27] transition-colors font-medium"
+        >
+          Download Round {round} Prices
+        </button>
       </div>
 
       <div className="bg-white rounded-2xl p-8 border border-[#c0ae9f]/60 overflow-x-auto">

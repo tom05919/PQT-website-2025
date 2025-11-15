@@ -23,7 +23,7 @@ export default function ChallengePage() {
               href="/api/challenge-csv"
               className="inline-block bg-[#d26b2c] text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-[#bb5e27] transition-colors"
             >
-              Download Latest Dataset (CSV)
+              Download Team Stats (CSV)
             </a>
           </div>
         </div>

@@ -33,7 +33,10 @@ function savePortfolioState(state: Record<string, PortfolioState>, portfolioPath
     if (!fs.existsSync(portfolioDir)) {
       fs.mkdirSync(portfolioDir, { recursive: true });
     }
+    console.log('SAVING PORTFOLIO to', portfolioPath);
+    console.log('PORTFOLIO CONTENT:', JSON.stringify(state, null, 2));
     fs.writeFileSync(portfolioPath, JSON.stringify(state, null, 2));
+    console.log('PORTFOLIO SAVED SUCCESSFULLY');
   } catch (error) {
     console.error('Error saving portfolio state:', error);
   }
@@ -76,39 +79,24 @@ export async function POST(req: NextRequest) {
     const buffer = await file.arrayBuffer();
     fs.writeFileSync(uploadedFile, Buffer.from(buffer));
 
-    // Load portfolio state from disk (from previous round) - JSON format
-    let currentPortfolio: Record<string, PortfolioState> = {};
-    try {
-      if (fs.existsSync(portfolioPath)) {
-        const diskData = fs.readFileSync(portfolioPath, 'utf-8');
-        if (diskData.trim()) {
-          currentPortfolio = JSON.parse(diskData);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load portfolio from disk:', e);
-      // Continue with empty portfolio if file doesn't exist or is invalid
-      currentPortfolio = {};
-    }
-
-    // If no portfolio on disk, use the one from frontend (first round scenario)
-    if (Object.keys(currentPortfolio).length === 0 && portfolioJson) {
+    // Use portfolio from frontend (sessionStorage is source of truth)
+    let portfolio: Record<string, PortfolioState> = {};
+    
+    if (portfolioJson) {
       try {
-        currentPortfolio = JSON.parse(portfolioJson) as Record<string, PortfolioState>;
+        portfolio = JSON.parse(portfolioJson) as Record<string, PortfolioState>;
+        console.log('LOADING PORTFOLIO FROM FRONTEND:', JSON.stringify(portfolio, null, 2));
       } catch (e) {
         console.error('Failed to parse portfolio from frontend:', e);
+        portfolio = {};
       }
+    } else {
+      console.log('NO PORTFOLIO PROVIDED FROM FRONTEND, starting fresh');
     }
 
     // Ensure portfolio directory exists before writing
     if (!fs.existsSync(portfolioDir)) {
       fs.mkdirSync(portfolioDir, { recursive: true });
-    }
-
-    // Load portfolio state from disk (or use currentPortfolio from frontend)
-    let portfolio = loadPortfolioState(portfolioPath);
-    if (Object.keys(portfolio).length === 0) {
-      portfolio = currentPortfolio;
     }
 
     // Load required CSV files
@@ -141,10 +129,13 @@ export async function POST(req: NextRequest) {
 
     // Load outcomes and round prices
     const outcomes = loadOutcomes(tournamentOutcomesPath, parseInt(round));
+    console.log('LOADED OUTCOMES FOR ROUND', round, ':', JSON.stringify(outcomes, null, 2));
     const roundPrices = loadRoundPrices(roundPricesPath);
+    console.log('LOADED ROUND PRICES:', JSON.stringify(roundPrices, null, 2));
 
     // Load trades
     const trades = loadTrades(uploadedFile, roundPrices);
+    console.log('LOADED TRADES:', JSON.stringify(trades, null, 2));
 
     // Initialize players in portfolio if needed
     for (const trade of trades) {
@@ -172,10 +163,36 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate payouts
-    const playerPayouts = calculateRound(outcomes, trades, roundPrices);
+    let result;
+    try {
+      result = calculateRound(outcomes, trades, roundPrices, portfolio);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('POSITION_ERROR:')) {
+        const errorMessage = error.message.replace('POSITION_ERROR:', '');
+        return new Response(
+          JSON.stringify({ error: `Position error: ${errorMessage}` }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      throw error;
+    }
+    
+    if (!result) {
+      return new Response(
+        JSON.stringify({ error: 'Failed to calculate payouts due to position error' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const playerPayouts = result.payouts;
+    const updatedHoldings = result.holdings;
+    
+    console.log('PLAYER PAYOUTS:', JSON.stringify(playerPayouts, null, 2));
+    console.log('UPDATED HOLDINGS:', JSON.stringify(updatedHoldings, null, 2));
 
     // Update portfolio
-    const updatedPortfolio = updatePortfolio(trades, playerPayouts, portfolio);
+    const updatedPortfolio = updatePortfolio(trades, playerPayouts, portfolio, updatedHoldings);
+    console.log('UPDATED PORTFOLIO:', JSON.stringify(updatedPortfolio, null, 2));
 
     // Save payouts CSV
     const payoutsOutputPath = path.join(portfolioDir, `payouts_round${round}.csv`);
