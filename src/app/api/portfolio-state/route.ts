@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getPortfolio } from '@/app/api/store';
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const portfolio = getPortfolio();
     return new Response(JSON.stringify({ portfolio }), {

@@ -35,19 +35,6 @@ if (!fs.existsSync(portfolioDir)) {
   fs.mkdirSync(portfolioDir, { recursive: true });
 }
 
-// Load portfolio state
-function loadPortfolioState(): Record<string, PortfolioState> {
-  try {
-    if (fs.existsSync(portfolioPath)) {
-      const data = fs.readFileSync(portfolioPath, 'utf-8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error loading portfolio state:', error);
-  }
-  return {};
-}
-
 // Save portfolio state
 function savePortfolioState(state: Record<string, PortfolioState>): void {
   try {
@@ -62,9 +49,6 @@ export async function POST(req: NextRequest) {
   // Handles file uploads, portfolio state management, and communicates with Python script.
   const scriptDir = path.join(projectRoot, 'src', 'app', 'api', 'challenge-csv');
   const scriptPath = path.join(scriptDir, 'calculate_payout_price.py');
-
-  // Load current portfolio state
-  const portfolioState = loadPortfolioState();
 
   try {
     // Parse form data from the request
@@ -236,7 +220,7 @@ export async function POST(req: NextRequest) {
         
         // Transform the data to ensure it matches the PortfolioState interface
         portfolioData = Object.fromEntries(
-          Object.entries(rawData).map(([playerId, data]: [string, any]) => [
+          Object.entries(rawData as Record<string, Partial<PortfolioState>>).map(([playerId, data]) => [
             playerId,
             {
               cumulative_pnl: data.cumulative_pnl || 0,

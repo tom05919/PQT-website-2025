@@ -13,7 +13,7 @@ const portfolioPath = path.join(portfolioDir, 'portfolio_state.json');
  * Resets the portfolio state by deleting the portfolio_state.json file
  * This allows starting fresh for a new tournament
  */
-export async function DELETE(req: NextRequest) {
+export async function DELETE(_req: NextRequest) {
   try {
     // Check if portfolio file exists
     if (fs.existsSync(portfolioPath)) {
