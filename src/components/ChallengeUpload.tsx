@@ -162,9 +162,14 @@ export default function ChallengeUpload() {
 
       // Save portfolio state to session storage
       if (result.portfolio) {
-        const updatedPortfolio = { ...portfolio, ...result.portfolio };
+        // Merge with existing portfolio, ensuring result.portfolio takes precedence
+        const updatedPortfolio = { ...(portfolio || {}), ...result.portfolio };
         setPortfolio(updatedPortfolio);
         savePortfolioToSession(updatedPortfolio);
+      } else if (portfolio) {
+        // Keep existing portfolio if no new one returned
+        setPortfolio(portfolio);
+        savePortfolioToSession(portfolio);
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';

@@ -151,6 +151,10 @@ export async function POST(req: NextRequest) {
     // Run the Python script with password
     let pythonOutput = '';
     const roundPricesPath = path.join(scriptDir, `round_${round}_prices.csv`);
+    // Use absolute path for payouts output directory (same as portfolio directory)
+    const payoutsOutputDir = portfolioDir;
+    const payoutsOutputPath = path.join(payoutsOutputDir, `payouts_round${round}.csv`);
+    
     try {
       const result = await execFileAsync('python3', [
         scriptPath,
@@ -158,7 +162,8 @@ export async function POST(req: NextRequest) {
         '--trades', uploadedFile,
         '--password', password,
         '--round-prices', roundPricesPath,
-        '--portfolio', portfolioPath
+        '--portfolio', portfolioPath,
+        '--payouts-output', payoutsOutputPath
       ], {
         cwd: scriptDir,
         env: process.env,
@@ -187,8 +192,8 @@ export async function POST(req: NextRequest) {
       console.error('Python script error:', execErr);
     }
 
-    // Read output files
-    const payoutsPath = path.join(scriptDir, `payouts_round${round}.csv`);
+    // Read output files - use the same directory as portfolio
+    const payoutsPath = payoutsOutputPath;
 
     if (!fs.existsSync(payoutsPath)) {
       throw new Error(`Output file not generated: ${payoutsPath}`);

@@ -298,6 +298,7 @@ def main():
     parser.add_argument("--round-prices", type=str, help="Path to round_N_prices.csv for asset prices")
     parser.add_argument("--password", type=str, required=False, help="Password for this round (optional)")
     parser.add_argument("--portfolio", type=str, default="portfolio_state.json", help="Path to portfolio state JSON file")
+    parser.add_argument("--payouts-output", type=str, help="Path where payouts CSV should be saved (optional)")
     args = parser.parse_args()
 
     teams = load_teams(args.prices)
@@ -377,8 +378,14 @@ def main():
         # Add round P&L to liquid balance (realized gains/losses)
         portfolio[player_id]["liquid_balance"] += round_total
     
-    # Save outputs
-    save_player_payouts(player_payouts, f"payouts_round{args.round}.csv")
+    # Save outputs - use provided payouts output path or default to script directory
+    if args.payouts_output:
+        payouts_output_path = args.payouts_output
+    else:
+        # Fallback to script directory
+        payouts_output_path = os.path.join(os.path.dirname(args.portfolio) if args.portfolio and os.path.dirname(args.portfolio) else ".", f"payouts_round{args.round}.csv")
+    
+    save_player_payouts(player_payouts, payouts_output_path)
     save_portfolio_state(portfolio, args.portfolio)
     
     # Output portfolio state as JSON for API consumption
