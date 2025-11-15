@@ -19,8 +19,10 @@ export default function ChallengePage() {
             Download the latest dataset as a CSV, trade stocks, and calculate your payouts.
           </p>
           <div className="mt-10 flex gap-4 justify-center flex-wrap">
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/challenge-csv"
+              download
               className="inline-block bg-[#d26b2c] text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-[#bb5e27] transition-colors"
             >
               Download Team Stats (CSV)
