@@ -155,6 +155,11 @@ export async function POST(req: NextRequest) {
     const payoutsOutputDir = portfolioDir;
     const payoutsOutputPath = path.join(payoutsOutputDir, `payouts_round${round}.csv`);
     
+    // Ensure payouts output directory exists BEFORE running Python
+    if (!fs.existsSync(payoutsOutputDir)) {
+      fs.mkdirSync(payoutsOutputDir, { recursive: true });
+    }
+    
     try {
       const result = await execFileAsync('python3', [
         scriptPath,
@@ -171,6 +176,10 @@ export async function POST(req: NextRequest) {
         maxBuffer: 10 * 1024 * 1024,
       });
       pythonOutput = result.stdout || '';
+      const pythonStderr = result.stderr || '';
+      if (pythonStderr) {
+        console.error('Python stderr:', pythonStderr);
+      }
     } catch (execErr: unknown) {
       // Check if it's a password error or spending limit error
       if (execErr instanceof Error) {
@@ -190,6 +199,8 @@ export async function POST(req: NextRequest) {
         }
       }
       console.error('Python script error:', execErr);
+      // If Python script failed, throw error instead of continuing
+      throw new Error(`Python script execution failed: ${execErr instanceof Error ? execErr.message : String(execErr)}`);
     }
 
     // Read output files - use the same directory as portfolio

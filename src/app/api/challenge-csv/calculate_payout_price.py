@@ -278,6 +278,11 @@ def calculate_round(teams, outcomes, trades, round_prices):
     return player_payouts
 
 def save_player_payouts(player_payouts, output_file):
+    # Ensure directory exists before writing
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+    
     with open(output_file, "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerow(["player_id", "asset1_realized", "asset2_pnl", "total_payout"])
