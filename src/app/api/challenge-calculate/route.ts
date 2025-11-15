@@ -149,7 +149,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Run the Python script with password
-    let pythonOutput = '';
     const roundPricesPath = path.join(scriptDir, `round_${round}_prices.csv`);
     // Use absolute path for payouts output directory (same as portfolio directory)
     const payoutsOutputDir = portfolioDir;
@@ -159,6 +158,9 @@ export async function POST(req: NextRequest) {
     if (!fs.existsSync(payoutsOutputDir)) {
       fs.mkdirSync(payoutsOutputDir, { recursive: true });
     }
+    
+    // Try python3 first, fallback to python if not found
+    let pythonOutput = '';
     
     try {
       const result = await execFileAsync('python3', [
@@ -181,26 +183,55 @@ export async function POST(req: NextRequest) {
         console.error('Python stderr:', pythonStderr);
       }
     } catch (execErr: unknown) {
-      // Check if it's a password error or spending limit error
-      if (execErr instanceof Error) {
-        const errorMessage = execErr.message || '';
-        console.error('Python script execution error:', errorMessage);
-        if (errorMessage.includes('PASSWORD_ERROR')) {
-          return new Response(
-            JSON.stringify({ error: 'Incorrect password for this round' }),
-            { status: 401, headers: { 'Content-Type': 'application/json' } }
-          );
+      // If python3 failed with ENOENT (not found), try 'python' as fallback
+      if (execErr instanceof Error && execErr.message.includes('ENOENT')) {
+        try {
+          console.log('python3 not found, trying python...');
+          const result = await execFileAsync('python', [
+            scriptPath,
+            '--round', round,
+            '--trades', uploadedFile,
+            '--password', password,
+            '--round-prices', roundPricesPath,
+            '--portfolio', portfolioPath,
+            '--payouts-output', payoutsOutputPath
+          ], {
+            cwd: scriptDir,
+            env: process.env,
+            timeout: 30_000,
+            maxBuffer: 10 * 1024 * 1024,
+          });
+          pythonOutput = result.stdout || '';
+          const pythonStderr = result.stderr || '';
+          if (pythonStderr) {
+            console.error('Python stderr:', pythonStderr);
+          }
+        } catch (_fallbackErr: unknown) {
+          // Both failed, throw original error
+          throw execErr;
         }
-        if (errorMessage.includes('SPENDING_LIMIT_ERROR')) {
-          return new Response(
-            JSON.stringify({ error: 'Insufficient funds. You cannot exceed $500 in spending unless you have made profits.' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } }
-          );
+      } else {
+        // Check if it's a password error or spending limit error
+        if (execErr instanceof Error) {
+          const errorMessage = execErr.message || '';
+          console.error('Python script execution error:', errorMessage);
+          if (errorMessage.includes('PASSWORD_ERROR')) {
+            return new Response(
+              JSON.stringify({ error: 'Incorrect password for this round' }),
+              { status: 401, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
+          if (errorMessage.includes('SPENDING_LIMIT_ERROR')) {
+            return new Response(
+              JSON.stringify({ error: 'Insufficient funds. You cannot exceed $500 in spending unless you have made profits.' }),
+              { status: 400, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
         }
+        console.error('Python script error:', execErr);
+        // If Python script failed, throw error instead of continuing
+        throw new Error(`Python script execution failed: ${execErr instanceof Error ? execErr.message : String(execErr)}`);
       }
-      console.error('Python script error:', execErr);
-      // If Python script failed, throw error instead of continuing
-      throw new Error(`Python script execution failed: ${execErr instanceof Error ? execErr.message : String(execErr)}`);
     }
 
     // Read output files - use the same directory as portfolio
