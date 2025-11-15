@@ -1,20 +1,20 @@
 import { NextRequest } from 'next/server';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
+import {
+  loadOutcomes,
+  loadRoundPrices,
+  loadTrades,
+  loadPortfolioState,
+  calculateRound,
+  validateSpendingLimits,
+  updatePortfolio,
+  savePlayerPayouts,
+  type PortfolioState,
+} from './calculate';
 
 export const runtime = 'nodejs';
-
-const execFileAsync = promisify(execFile);
-
-interface PortfolioState {
-  cumulative_pnl: number;
-  liquid_balance: number;
-  total_invested: number;
-  positions: Record<string, number>;
-}
 
 interface PriceResult {
   team_id: string;
@@ -41,10 +41,9 @@ function savePortfolioState(state: Record<string, PortfolioState>, portfolioPath
 
 export async function POST(req: NextRequest) {
   // API endpoint for calculating tournament round payouts and updating portfolio state.
-  // Handles file uploads, portfolio state management, and communicates with Python script.
+  // Handles file uploads, portfolio state management, and performs calculations in TypeScript.
   const projectRoot = process.cwd();
   const scriptDir = path.join(projectRoot, 'src', 'app', 'api', 'challenge-csv');
-  const scriptPath = path.join(scriptDir, 'calculate_payout_price.py');
   
   // Use /tmp for portfolio storage on Vercel (read-only filesystem except /tmp)
   // For local development, use data/portfolios
@@ -102,36 +101,28 @@ export async function POST(req: NextRequest) {
     }
 
     // Ensure portfolio directory exists before writing
-    try {
-      if (!fs.existsSync(portfolioDir)) {
-        fs.mkdirSync(portfolioDir, { recursive: true });
-      }
-      // Save portfolio state to JSON file for Python script (create empty file if no data)
-      fs.writeFileSync(portfolioPath, JSON.stringify(currentPortfolio, null, 2));
-    } catch (e) {
-      console.error('Failed to save portfolio state before Python script:', e);
-      // Continue anyway - Python script will create its own portfolio file
+    if (!fs.existsSync(portfolioDir)) {
+      fs.mkdirSync(portfolioDir, { recursive: true });
     }
 
-    // Ensure required CSV files exist (generate if missing)
-    const initialPricesPath = path.join(scriptDir, 'initial_prices.csv');
+    // Load portfolio state from disk (or use currentPortfolio from frontend)
+    let portfolio = loadPortfolioState(portfolioPath);
+    if (Object.keys(portfolio).length === 0) {
+      portfolio = currentPortfolio;
+    }
+
+    // Load required CSV files
     const tournamentOutcomesPath = path.join(scriptDir, 'tournament_outcomes.csv');
+    const roundPricesPath = path.join(scriptDir, `round_${round}_prices.csv`);
 
-    if (!fs.existsSync(initialPricesPath) || !fs.existsSync(tournamentOutcomesPath)) {
-      // Generate missing CSV files
-      await execFileAsync('python3', [
-        path.join(scriptDir, 'generate_initial_state.py')
-      ], {
-        cwd: scriptDir,
-        env: process.env,
-        timeout: 10_000,
-        maxBuffer: 5 * 1024 * 1024,
-      }).catch(() => {
-        // If script doesn't exist, continue anyway
-      });
+    if (!fs.existsSync(tournamentOutcomesPath)) {
+      throw new Error(`Tournament outcomes file not found: ${tournamentOutcomesPath}`);
+    }
+    if (!fs.existsSync(roundPricesPath)) {
+      throw new Error(`Round prices file not found: ${roundPricesPath}`);
     }
 
-    // Password mapping (must match frontend and Python script)
+    // Password mapping (must match frontend)
     const roundPasswords: Record<string, string> = {
       '1': 'round1',
       '2': 'round2',
@@ -148,152 +139,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Run the Python script with password
-    const roundPricesPath = path.join(scriptDir, `round_${round}_prices.csv`);
-    // Use absolute path for payouts output directory (same as portfolio directory)
-    const payoutsOutputDir = portfolioDir;
-    const payoutsOutputPath = path.join(payoutsOutputDir, `payouts_round${round}.csv`);
-    
-    // Ensure payouts output directory exists BEFORE running Python
-    if (!fs.existsSync(payoutsOutputDir)) {
-      fs.mkdirSync(payoutsOutputDir, { recursive: true });
+    // Load outcomes and round prices
+    const outcomes = loadOutcomes(tournamentOutcomesPath, parseInt(round));
+    const roundPrices = loadRoundPrices(roundPricesPath);
+
+    // Load trades
+    const trades = loadTrades(uploadedFile, roundPrices);
+
+    // Initialize players in portfolio if needed
+    for (const trade of trades) {
+      if (!portfolio[trade.player_id]) {
+        portfolio[trade.player_id] = {
+          cumulative_pnl: 0,
+          liquid_balance: 500,
+          total_invested: 0,
+          positions: {},
+        };
+      }
     }
-    
-    // Try python3 first, fallback to python if not found
-    let pythonOutput = '';
-    
+
+    // Validate spending limits
     try {
-      const result = await execFileAsync('python3', [
-        scriptPath,
-        '--round', round,
-        '--trades', uploadedFile,
-        '--password', password,
-        '--round-prices', roundPricesPath,
-        '--portfolio', portfolioPath,
-        '--payouts-output', payoutsOutputPath
-      ], {
-        cwd: scriptDir,
-        env: process.env,
-        timeout: 30_000,
-        maxBuffer: 10 * 1024 * 1024,
-      });
-      pythonOutput = result.stdout || '';
-      const pythonStderr = result.stderr || '';
-      if (pythonStderr) {
-        console.error('Python stderr:', pythonStderr);
-      }
-    } catch (execErr: unknown) {
-      // If python3 failed with ENOENT (not found), try 'python' as fallback
-      if (execErr instanceof Error && execErr.message.includes('ENOENT')) {
-        try {
-          console.log('python3 not found, trying python...');
-          const result = await execFileAsync('python', [
-            scriptPath,
-            '--round', round,
-            '--trades', uploadedFile,
-            '--password', password,
-            '--round-prices', roundPricesPath,
-            '--portfolio', portfolioPath,
-            '--payouts-output', payoutsOutputPath
-          ], {
-            cwd: scriptDir,
-            env: process.env,
-            timeout: 30_000,
-            maxBuffer: 10 * 1024 * 1024,
-          });
-          pythonOutput = result.stdout || '';
-          const pythonStderr = result.stderr || '';
-          if (pythonStderr) {
-            console.error('Python stderr:', pythonStderr);
-          }
-        } catch (_fallbackErr: unknown) {
-          // Both failed, throw original error
-          throw execErr;
-        }
-      } else {
-        // Check if it's a password error or spending limit error
-        if (execErr instanceof Error) {
-          const errorMessage = execErr.message || '';
-          console.error('Python script execution error:', errorMessage);
-          if (errorMessage.includes('PASSWORD_ERROR')) {
-            return new Response(
-              JSON.stringify({ error: 'Incorrect password for this round' }),
-              { status: 401, headers: { 'Content-Type': 'application/json' } }
-            );
-          }
-          if (errorMessage.includes('SPENDING_LIMIT_ERROR')) {
-            return new Response(
-              JSON.stringify({ error: 'Insufficient funds. You cannot exceed $500 in spending unless you have made profits.' }),
-              { status: 400, headers: { 'Content-Type': 'application/json' } }
-            );
-          }
-        }
-        console.error('Python script error:', execErr);
-        // If Python script failed, throw error instead of continuing
-        throw new Error(`Python script execution failed: ${execErr instanceof Error ? execErr.message : String(execErr)}`);
-      }
-    }
-
-    // Read output files - use the same directory as portfolio
-    const payoutsPath = payoutsOutputPath;
-
-    if (!fs.existsSync(payoutsPath)) {
-      throw new Error(`Output file not generated: ${payoutsPath}`);
-    }
-
-    const payoutsCsv = fs.readFileSync(payoutsPath, 'utf-8');
-
-    // Parse payouts CSV - new format: player_id, asset1_realized, asset2_pnl, total_payout
-    const payoutLines = payoutsCsv.trim().split('\n');
-    const payouts = payoutLines.slice(1).map((line) => {
-      const parts = line.split(',');
-      return {
-        player_id: parts[0],
-        asset1_realized: parseFloat(parts[1]) || 0, // asset1_realized is 2nd column
-        asset2_pnl: parseFloat(parts[2]) || 0, // asset2_pnl is 3rd column
-        total_payout: parseFloat(parts[3]) || 0, // total_payout is 4th column
-      };
-    });
-
-    // Extract portfolio state from Python output
-    let portfolioData: Record<string, PortfolioState> = {};
-    const portfolioStart = pythonOutput.indexOf('PORTFOLIO_JSON:{');
-    if (portfolioStart !== -1) {
-      try {
-        // Find the JSON object end
-        let braceCount = 0;
-        let jsonEnd = portfolioStart + 'PORTFOLIO_JSON:'.length;
-        for (let i = jsonEnd; i < pythonOutput.length; i++) {
-          if (pythonOutput[i] === '{') braceCount++;
-          else if (pythonOutput[i] === '}') braceCount--;
-          if (braceCount === 0) {
-            jsonEnd = i + 1;
-            break;
-          }
-        }
-        
-        const jsonStr = pythonOutput.substring(portfolioStart + 'PORTFOLIO_JSON:'.length, jsonEnd);
-        const rawData = JSON.parse(jsonStr);
-        
-        // Transform the data to ensure it matches the PortfolioState interface
-        portfolioData = Object.fromEntries(
-          Object.entries(rawData as Record<string, Partial<PortfolioState>>).map(([playerId, data]) => [
-            playerId,
-            {
-              cumulative_pnl: data.cumulative_pnl || 0,
-              liquid_balance: data.liquid_balance || 0,
-              total_invested: data.total_invested || 0,
-              positions: data.positions || {}
-            }
-          ])
+      validateSpendingLimits(trades, portfolio);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'SPENDING_LIMIT_ERROR') {
+        return new Response(
+          JSON.stringify({ error: 'Insufficient funds. You cannot exceed $500 in spending unless you have made profits.' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
-      } catch (e) {
-        console.error('Failed to parse portfolio JSON:', e);
       }
+      throw error;
+    }
+
+    // Calculate payouts
+    const playerPayouts = calculateRound(outcomes, trades, roundPrices);
+
+    // Update portfolio
+    const updatedPortfolio = updatePortfolio(trades, playerPayouts, portfolio);
+
+    // Save payouts CSV
+    const payoutsOutputPath = path.join(portfolioDir, `payouts_round${round}.csv`);
+    savePlayerPayouts(playerPayouts, payoutsOutputPath);
+
+    // Save updated portfolio state
+    savePortfolioState(updatedPortfolio, portfolioPath);
+
+    // Convert payouts to response format
+    const payouts = Object.entries(playerPayouts).map(([playerId, payout]) => ({
+      player_id: playerId,
+      asset1_realized: payout.asset1_realized,
+      asset2_pnl: payout.asset2_pnl,
+      total_payout: payout.total,
+    }));
+
+    // Convert portfolio to response format
+    const portfolioData: Record<string, PortfolioState> = {};
+    for (const [playerId, state] of Object.entries(updatedPortfolio)) {
+      portfolioData[playerId] = {
+        cumulative_pnl: state.cumulative_pnl,
+        liquid_balance: state.liquid_balance,
+        total_invested: state.total_invested,
+        positions: state.positions || {},
+      };
     }
 
     // Prices are now static (from round_N_prices.csv), so just return empty array
-    // The frontend will still display the structure
     const prices: PriceResult[] = [];
 
     // Clean up temporary directory
