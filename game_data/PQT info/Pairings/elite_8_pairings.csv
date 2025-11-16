@@ -1,0 +1,5 @@
+game_id,round,home_team,away_team,prob_home_wins,home_wins,winner
+9,Elite 8,Mathy,Whitman,0.49709678245775213,True,Mathy
+10,Elite 8,Friend,Yeh,0.4682302336339161,False,Yeh
+11,Elite 8,Charter,Quad,0.4142881855894218,True,Charter
+12,Elite 8,Colo,Tower,0.4983692238116266,False,Tower

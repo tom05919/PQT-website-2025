@@ -1,0 +1,9 @@
+game_id,round,home_team,away_team,prob_home_wins,home_wins,winner
+1,Sweet 16,Rocky,Mathy,0.5184782414628157,False,Mathy
+2,Sweet 16,Whitman,Forbes,0.45250625959456336,True,Whitman
+3,Sweet 16,Yeh,NCW,0.8235011607894976,True,Yeh
+4,Sweet 16,Friend,Hobson,0.6861590445472135,True,Friend
+5,Sweet 16,Cottage,Charter,0.7239435159149671,False,Charter
+6,Sweet 16,Quad,TI,0.7890837487570387,True,Quad
+7,Sweet 16,Tower,Ivy,0.8252708867192355,True,Tower
+8,Sweet 16,Terrace,Colo,0.5871046326135386,False,Colo
