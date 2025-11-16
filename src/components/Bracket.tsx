@@ -29,7 +29,6 @@ interface BracketProps {
 }
 
 export default function Bracket({ games, roundName }: BracketProps) {
-  const [hoveredGame, setHoveredGame] = useState<number | null>(null);
   const [teamStats, setTeamStats] = useState<{ [key: string]: Team }>({});
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
 
@@ -50,23 +49,14 @@ export default function Bracket({ games, roundName }: BracketProps) {
     return parseFloat(value) * 100;
   };
 
-  const getTeamStrength = (teamName: string): number => {
-    const team = teamStats[teamName];
-    if (!team) return 0;
-    const offense = formatStat(team.offense);
-    const defense = formatStat(team.defense);
-    const chemistry = formatStat(team.chemistry);
-    return (offense + defense + chemistry) / 3;
-  };
-
-  // Calculate round statistics based on prices
+  // Calculate round statistics based on prices (multiply by 100 for display)
   const avgPrice = games.length > 0 
-    ? games.reduce((sum, g) => sum + (g.home_team_cost_prob || 0), 0) / games.length
+    ? games.reduce((sum, g) => sum + (g.home_team_cost_prob || 0) * 100, 0) / games.length
     : 0;
   const priceRange = games.length > 0
     ? {
-        min: Math.min(...games.map(g => g.home_team_cost_prob || 0)),
-        max: Math.max(...games.map(g => g.home_team_cost_prob || 0))
+        min: Math.min(...games.map(g => (g.home_team_cost_prob || 0) * 100)),
+        max: Math.max(...games.map(g => (g.home_team_cost_prob || 0) * 100))
       }
     : { min: 0, max: 0 };
 
@@ -103,13 +93,13 @@ export default function Bracket({ games, roundName }: BracketProps) {
             </div>
             <div className="bg-[#c0ae9f] rounded-lg p-4">
               <div className="text-sm text-[#463f3a] mb-1">Avg Price</div>
-              <div className="text-2xl font-bold text-[#2e2b28]">{avgPrice.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-[#2e2b28]">{avgPrice.toFixed(0)}</div>
               <div className="text-xs text-[#5b514c] mt-1">Home team cost</div>
             </div>
             <div className="bg-[#c0ae9f] rounded-lg p-4">
               <div className="text-sm text-[#463f3a] mb-1">Price Range</div>
               <div className="text-lg font-bold text-[#2e2b28]">
-                {priceRange.min.toFixed(2)} - {priceRange.max.toFixed(2)}
+                {priceRange.min.toFixed(0)} - {priceRange.max.toFixed(0)}
               </div>
               <div className="text-xs text-[#5b514c] mt-1">Low to high</div>
             </div>
@@ -119,11 +109,9 @@ export default function Bracket({ games, roundName }: BracketProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {games.map((game, index) => {
-          // Use actual prices from CSV data
-          const homePrice = game.home_team_cost_prob || 0;
-          const awayPrice = 1 - homePrice;
-          const homeStrength = getTeamStrength(game.home_team);
-          const awayStrength = getTeamStrength(game.away_team);
+          // Use actual prices from CSV data, multiply by 100 for display
+          const homePrice = (game.home_team_cost_prob || 0) * 100;
+          const awayPrice = (1 - (game.home_team_cost_prob || 0)) * 100;
           const isSelected = selectedGame === game.game_id;
 
           return (
@@ -132,8 +120,6 @@ export default function Bracket({ games, roundName }: BracketProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              onMouseEnter={() => setHoveredGame(game.game_id)}
-              onMouseLeave={() => setHoveredGame(null)}
               onClick={() => setSelectedGame(isSelected ? null : game.game_id)}
               className="bg-[#d8c6b8] rounded-xl p-6 border-2 border-[#c0ae9f] hover:border-[#b46b35] transition-all duration-300 relative overflow-hidden group cursor-pointer"
             >
@@ -177,25 +163,21 @@ export default function Bracket({ games, roundName }: BracketProps) {
                         <div className="text-xs text-[#463f3a] flex items-center space-x-2">
                           <span>Home</span>
                           {teamStats[game.home_team] && (
-                            <>
-                              <span>•</span>
-                              <span className="font-medium">Strength: {homeStrength.toFixed(0)}%</span>
-                              <a
-                                href="/tournament/info"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-[#b46b35] hover:underline ml-1"
-                                title="View team details"
-                              >
-                                Details
-                              </a>
-                            </>
+                            <a
+                              href="/tournament/info"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[#b46b35] hover:underline ml-1"
+                              title="View team details"
+                            >
+                              Details
+                            </a>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-[#b46b35]">
-                        {homePrice.toFixed(2)}
+                        {homePrice.toFixed(0)}
                       </div>
                       <div className="text-xs text-[#463f3a]">Price</div>
                     </div>
@@ -226,25 +208,21 @@ export default function Bracket({ games, roundName }: BracketProps) {
                         <div className="text-xs text-[#463f3a] flex items-center space-x-2">
                           <span>Away</span>
                           {teamStats[game.away_team] && (
-                            <>
-                              <span>•</span>
-                              <span className="font-medium">Strength: {awayStrength.toFixed(0)}%</span>
-                              <a
-                                href="/tournament/info"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-[#b46b35] hover:underline ml-1"
-                                title="View team details"
-                              >
-                                Details
-                              </a>
-                            </>
+                            <a
+                              href="/tournament/info"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[#b46b35] hover:underline ml-1"
+                              title="View team details"
+                            >
+                              Details
+                            </a>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-[#8b5638]">
-                        {awayPrice.toFixed(2)}
+                        {awayPrice.toFixed(0)}
                       </div>
                       <div className="text-xs text-[#463f3a]">Price</div>
                     </div>
@@ -319,36 +297,6 @@ export default function Bracket({ games, roundName }: BracketProps) {
                   )}
                 </AnimatePresence>
 
-                {/* Hover Analysis */}
-                {hoveredGame === game.game_id && !isSelected && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 pt-4 border-t border-[#c0ae9f]"
-                  >
-                    <div className="grid grid-cols-2 gap-4 text-xs">
-                      <div>
-                        <div className="text-[#463f3a] font-medium mb-1">Price Analysis</div>
-                        <div className="text-[#5b514c]">
-                          <div>Home: {homePrice.toFixed(2)}</div>
-                          <div>Away: {awayPrice.toFixed(2)}</div>
-                          <div className="mt-1 text-[#463f3a]">
-                            {Math.abs(homePrice - awayPrice) < 0.1 ? 'Close prices' : homePrice > awayPrice ? `${game.home_team} higher` : `${game.away_team} higher`}
-                          </div>
-                        </div>
-                      </div>
-                      {teamStats[game.home_team] && teamStats[game.away_team] && (
-                        <div>
-                          <div className="text-[#463f3a] font-medium mb-1">Quick Stats</div>
-                          <div className="text-[#5b514c] space-y-0.5">
-                            <div>Offense: {formatStat(teamStats[game.home_team].offense).toFixed(0)}% vs {formatStat(teamStats[game.away_team].offense).toFixed(0)}%</div>
-                            <div>Defense: {formatStat(teamStats[game.home_team].defense).toFixed(0)}% vs {formatStat(teamStats[game.away_team].defense).toFixed(0)}%</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
               </div>
             </motion.div>
           );
