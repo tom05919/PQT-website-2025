@@ -12,6 +12,8 @@ interface Game {
   home_wins: boolean;
   winner: string;
   home_team_cost_prob: number;
+  home_team_tournament_bet: number;
+  away_team_tournament_bet: number;
 }
 
 interface Team {
@@ -175,11 +177,19 @@ export default function Bracket({ games, roundName }: BracketProps) {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-[#b46b35]">
-                        {homePrice.toFixed(0)}
+                    <div className="text-right space-y-1">
+                      <div>
+                        <div className="text-2xl font-bold text-[#b46b35]">
+                          {homePrice.toFixed(0)}
+                        </div>
+                        <div className="text-xs text-[#463f3a]">Match Bet</div>
                       </div>
-                      <div className="text-xs text-[#463f3a]">Price</div>
+                      <div className="pt-1 border-t border-[#bda89a]">
+                        <div className="text-lg font-semibold text-[#8b5638]">
+                          {game.home_team_tournament_bet}
+                        </div>
+                        <div className="text-xs text-[#463f3a]">Tournament Bet</div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -220,11 +230,19 @@ export default function Bracket({ games, roundName }: BracketProps) {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-[#8b5638]">
-                        {awayPrice.toFixed(0)}
+                    <div className="text-right space-y-1">
+                      <div>
+                        <div className="text-2xl font-bold text-[#8b5638]">
+                          {awayPrice.toFixed(0)}
+                        </div>
+                        <div className="text-xs text-[#463f3a]">Match Bet</div>
                       </div>
-                      <div className="text-xs text-[#463f3a]">Price</div>
+                      <div className="pt-1 border-t border-[#bda89a]">
+                        <div className="text-lg font-semibold text-[#8b5638]">
+                          {game.away_team_tournament_bet}
+                        </div>
+                        <div className="text-xs text-[#463f3a]">Tournament Bet</div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

@@ -13,6 +13,8 @@ interface Game {
   home_wins: boolean;
   winner: string;
   home_team_cost_prob: number;
+  home_team_tournament_bet: number;
+  away_team_tournament_bet: number;
 }
 
 export default function Round4Page() {

@@ -24,7 +24,8 @@ export async function GET(
       );
     }
 
-    const filePath = path.join(
+    // Read match bet prices from all_games.csv
+    const matchBetPath = path.join(
       process.cwd(),
       'game_data',
       'PQT info',
@@ -32,14 +33,14 @@ export async function GET(
       'all_games.csv'
     );
 
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const lines = fileContent.trim().split('\n');
-    const allHeaders = lines[0].split(',');
+    const matchBetContent = fs.readFileSync(matchBetPath, 'utf-8');
+    const matchBetLines = matchBetContent.trim().split('\n');
+    const allHeaders = matchBetLines[0].split(',');
     // Skip the first empty header, get the rest
     const headers = allHeaders.slice(1).map(h => h.trim());
 
     // Filter games by round and parse
-    const games = lines.slice(1)
+    const games = matchBetLines.slice(1)
       .map((line) => {
         const values = line.split(',');
         // Skip the first value (index column), get the rest
@@ -65,6 +66,43 @@ export async function GET(
         return game;
       })
       .filter((game) => game.round === roundName);
+
+    // Read tournament bet prices from bet_team_wins_cost[26].csv
+    const tournamentBetPath = path.join(
+      process.cwd(),
+      'game_data',
+      'PQT info',
+      'Pairings',
+      'bet_team_wins_cost[26].csv'
+    );
+
+    const tournamentBetContent = fs.readFileSync(tournamentBetPath, 'utf-8');
+    const tournamentBetLines = tournamentBetContent.trim().split('\n');
+    const tournamentHeaders = tournamentBetLines[0].split(',').map(h => h.trim());
+    
+    // Create a map of team -> round -> price
+    const tournamentPrices: { [team: string]: { [round: string]: number } } = {};
+    
+    tournamentBetLines.slice(1).forEach((line) => {
+      const values = line.split(',');
+      const teamName = values[0]?.trim();
+      if (!teamName) return;
+      
+      tournamentPrices[teamName] = {};
+      tournamentHeaders.slice(1).forEach((round, index) => {
+        const price = parseFloat(values[index + 1]) || 0;
+        tournamentPrices[teamName][round] = price;
+      });
+    });
+
+    // Merge tournament bet prices into games
+    games.forEach((game) => {
+      const homeTeam = game.home_team as string;
+      const awayTeam = game.away_team as string;
+      
+      game.home_team_tournament_bet = tournamentPrices[homeTeam]?.[roundName] || 0;
+      game.away_team_tournament_bet = tournamentPrices[awayTeam]?.[roundName] || 0;
+    });
 
     return NextResponse.json({ games });
   } catch (error) {
