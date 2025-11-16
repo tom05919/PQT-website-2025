@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     // Calculate payouts
     let result;
     try {
-      result = calculateRound(outcomes, trades, roundPrices, portfolio);
+      result = calculateRound(outcomes, trades, roundPrices, portfolio, parseInt(round));
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('POSITION_ERROR:')) {
         const errorMessage = error.message.replace('POSITION_ERROR:', '');
@@ -186,12 +186,14 @@ export async function POST(req: NextRequest) {
     
     const playerPayouts = result.payouts;
     const updatedHoldings = result.holdings;
+    const updatedCostBasis = result.costBasis;
     
     console.log('PLAYER PAYOUTS:', JSON.stringify(playerPayouts, null, 2));
     console.log('UPDATED HOLDINGS:', JSON.stringify(updatedHoldings, null, 2));
+    console.log('UPDATED COST BASIS:', JSON.stringify(updatedCostBasis, null, 2));
 
     // Update portfolio
-    const updatedPortfolio = updatePortfolio(trades, playerPayouts, portfolio, updatedHoldings);
+    const updatedPortfolio = updatePortfolio(trades, playerPayouts, portfolio, updatedHoldings, updatedCostBasis);
     console.log('UPDATED PORTFOLIO:', JSON.stringify(updatedPortfolio, null, 2));
 
     // Save payouts CSV
@@ -217,6 +219,8 @@ export async function POST(req: NextRequest) {
         liquid_balance: state.liquid_balance,
         total_invested: state.total_invested,
         positions: state.positions || {},
+        cost_basis: state.cost_basis || {},
+        unrealized_pnl: state.unrealized_pnl || 0,
       };
     }
 

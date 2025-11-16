@@ -52,13 +52,16 @@ interface PlayerPayout {
 interface CalculateRoundResult {
   payouts: Record<string, PlayerPayout>;
   holdings: Record<string, Record<string, number>>;
+  costBasis: Record<string, Record<string, number>>;
 }
 
 export interface PortfolioState {
   cumulative_pnl: number;
   liquid_balance: number;
   total_invested: number;
-  positions: Record<string, number>;
+  positions: Record<string, number>; // team_asset -> quantity
+  cost_basis?: Record<string, number>; // team_asset -> average entry price
+  unrealized_pnl?: number; // Current unrealized P&L from Asset 2 mark-to-market
 }
 
 export function loadOutcomes(outcomesFile: string, roundNum: number): Record<string, boolean> {
@@ -173,12 +176,17 @@ export function calculateRound(
   outcomes: Record<string, boolean>,
   trades: Trade[],
   roundPrices: RoundPrices,
-  portfolio?: Record<string, PortfolioState>
+  portfolio?: Record<string, PortfolioState>,
+  roundNum?: number
 ): CalculateRoundResult | null {
   const playerPositions: Record<string, { asset1: Position[]; asset2: Position[] }> = {};
   const playerUnrealizedPnl: Record<string, number> = {};
   const playerAsset1Pnl: Record<string, number> = {};
   const playerHoldings: Record<string, Record<string, number>> = {}; // player_id -> {team_asset: quantity}
+  const playerCostBasis: Record<string, Record<string, number>> = {}; // player_id -> {team_asset: avg_price}
+  
+  // Check if this is the Finals round
+  const isFinals = roundNum === 5;
   
   // Initialize player records and load existing holdings from portfolio
   for (const trade of trades) {
@@ -187,11 +195,34 @@ export function calculateRound(
       playerUnrealizedPnl[trade.player_id] = 0;
       playerAsset1Pnl[trade.player_id] = 0;
       
-      // Load existing holdings from portfolio
-      if (portfolio && portfolio[trade.player_id] && portfolio[trade.player_id].positions) {
-        playerHoldings[trade.player_id] = { ...portfolio[trade.player_id].positions };
+      // Load existing holdings and cost basis from portfolio
+      if (portfolio && portfolio[trade.player_id]) {
+        if (portfolio[trade.player_id].positions) {
+          playerHoldings[trade.player_id] = { ...portfolio[trade.player_id].positions };
+        } else {
+          playerHoldings[trade.player_id] = {};
+        }
+        if (portfolio[trade.player_id].cost_basis) {
+          playerCostBasis[trade.player_id] = { ...portfolio[trade.player_id].cost_basis };
+        } else {
+          playerCostBasis[trade.player_id] = {};
+        }
       } else {
         playerHoldings[trade.player_id] = {};
+        playerCostBasis[trade.player_id] = {};
+      }
+    }
+  }
+  
+  // In Finals, also initialize players who have existing Asset 2 holdings but no new trades
+  if (isFinals && portfolio) {
+    for (const [playerId, playerState] of Object.entries(portfolio)) {
+      if (!playerPositions[playerId]) {
+        playerPositions[playerId] = { asset1: [], asset2: [] };
+        playerUnrealizedPnl[playerId] = 0;
+        playerAsset1Pnl[playerId] = 0;
+        playerHoldings[playerId] = { ...playerState.positions };
+        playerCostBasis[playerId] = { ...(playerState.cost_basis || {}) };
       }
     }
   }
@@ -212,11 +243,22 @@ export function calculateRound(
       }
     }
     
-    // Update holdings
+    // Update holdings and cost basis
     if (trade.action === 'buy') {
-      playerHoldings[trade.player_id][holdingKey] += trade.quantity;
+      const oldQty = playerHoldings[trade.player_id][holdingKey] || 0;
+      const oldCost = playerCostBasis[trade.player_id][holdingKey] || 0;
+      const newQty = oldQty + trade.quantity;
+      
+      // Calculate weighted average cost basis
+      if (newQty > 0) {
+        const totalCost = (oldQty * oldCost) + (trade.quantity * trade.price);
+        playerCostBasis[trade.player_id][holdingKey] = totalCost / newQty;
+      }
+      
+      playerHoldings[trade.player_id][holdingKey] = newQty;
     } else if (trade.action === 'sell') {
       playerHoldings[trade.player_id][holdingKey] -= trade.quantity;
+      // Cost basis stays the same when selling (FIFO/average cost)
     }
     
     const position: Position = {
@@ -250,36 +292,73 @@ export function calculateRound(
     }
   }
   
-  // Calculate Asset 2 P&L (realized if team lost, unrealized if team still alive)
-  for (const [playerId, positions] of Object.entries(playerPositions)) {
-    const teamPositions: Record<string, Position[]> = {};
-    
-    for (const position of positions.asset2) {
-      if (!teamPositions[position.team]) {
-        teamPositions[position.team] = [];
-      }
-      teamPositions[position.team].push(position);
-    }
-    
-    for (const [team, teamPosList] of Object.entries(teamPositions)) {
-      const teamLost = !outcomes[team];
-      const settlementPrice = teamLost ? 0.0 : (roundPrices[team]?.asset2 || 0);
+  // Calculate Asset 2 P&L
+  if (isFinals) {
+    // In Finals: Use cost basis method to settle ALL Asset 2 holdings
+    // This avoids double-counting and uses the original purchase price
+    for (const [playerId, holdings] of Object.entries(playerHoldings)) {
+      const costBasis = playerCostBasis[playerId] || {};
       
-      for (const position of teamPosList) {
-        let pnl: number;
-        if (position.type === 'buy') {
-          pnl = position.quantity * (settlementPrice - position.price);
-        } else {
-          pnl = position.quantity * (position.price - settlementPrice);
+      for (const [key, quantity] of Object.entries(holdings)) {
+        // Only process Asset 2 holdings
+        if (!key.endsWith('_2') || quantity === 0) continue;
+        
+        const teamId = key.replace('_2', '');
+        const teamWon = outcomes[teamId];
+        const settlementPrice = teamWon ? 100.0 : 0.0;
+        const entryPrice = costBasis[key] || 0;
+        
+        // Calculate P&L using cost basis (original purchase price)
+        const pnl = quantity * (settlementPrice - entryPrice);
+        
+        // Add to realized P&L
+        if (!playerAsset1Pnl[playerId]) {
+          playerAsset1Pnl[playerId] = 0;
         }
+        playerAsset1Pnl[playerId] += pnl;
+      }
+    }
+  } else {
+    // Regular rounds: Calculate Asset 2 P&L based on ALL holdings (not just current trades)
+    // Use cost basis to mark-to-market
+    for (const [playerId, holdings] of Object.entries(playerHoldings)) {
+      const costBasis = playerCostBasis[playerId] || {};
+      
+      for (const [key, quantity] of Object.entries(holdings)) {
+        // Only process Asset 2 holdings
+        if (!key.endsWith('_2') || quantity === 0) continue;
+        
+        const teamId = key.replace('_2', '');
+        const teamLost = !outcomes[teamId];
+        const entryPrice = costBasis[key] || 0;
+        
+        let currentPrice: number;
+        let isRealized: boolean;
         
         if (teamLost) {
-          // Realized loss - add to asset1 bucket for realized losses (though it's really asset2 realized)
-          // This matches Python logic where player_asset1_pnl includes realized asset2 losses
-          playerAsset1Pnl[playerId] = (playerAsset1Pnl[playerId] || 0) + pnl;
+          // Team lost - realize at $0
+          currentPrice = 0.0;
+          isRealized = true;
+          console.log(`Current price: $${currentPrice} (team lost, realized at $0)`);
         } else {
-          // Unrealized P&L for asset2
+          // Team still alive - mark to market at current round price
+          currentPrice = roundPrices[teamId]?.asset2 || 0;
+          isRealized = false;
+          console.log(`Current price from roundPrices[${teamId}].asset2: $${currentPrice}`);
+        }
+        
+        // Calculate P&L using cost basis
+        const pnl = quantity * (currentPrice - entryPrice);
+        console.log(`P&L = ${quantity} × ($${currentPrice} - $${entryPrice}) = $${pnl}`);
+        
+        if (isRealized) {
+          // Realized P&L (team lost)
+          playerAsset1Pnl[playerId] = (playerAsset1Pnl[playerId] || 0) + pnl;
+          console.log(`Added to REALIZED P&L`);
+        } else {
+          // Unrealized P&L (mark-to-market)
           playerUnrealizedPnl[playerId] = (playerUnrealizedPnl[playerId] || 0) + pnl;
+          console.log(`Added to UNREALIZED P&L`);
         }
       }
     }
@@ -287,9 +366,25 @@ export function calculateRound(
   
   // Combine payouts
   const playerPayouts: Record<string, PlayerPayout> = {};
+  
+  // Get all players (from trades or from holdings in Finals)
+  const allPlayers = new Set<string>();
   for (const playerId of Object.keys(playerPositions)) {
-    const asset1Realized = playerAsset1Pnl[playerId] || 0;
-    const asset2Pnl = playerUnrealizedPnl[playerId] || 0;
+    allPlayers.add(playerId);
+  }
+  if (isFinals) {
+    for (const playerId of Object.keys(playerHoldings)) {
+      allPlayers.add(playerId);
+    }
+  }
+  
+  for (const playerId of allPlayers) {
+    let asset1Realized = playerAsset1Pnl[playerId] || 0;
+    let asset2Pnl = playerUnrealizedPnl[playerId] || 0;
+    
+    // In Finals, all Asset 2 P&L is already realized (handled above)
+    // No need to convert here
+    
     const totalPayout = asset1Realized + asset2Pnl;
     
     playerPayouts[playerId] = {
@@ -300,10 +395,15 @@ export function calculateRound(
   }
   
   // Clear Asset 1 holdings (they expire at end of round)
+  // Also clear Asset 2 holdings if it's Finals (all positions settled)
   for (const playerId of Object.keys(playerHoldings)) {
     const holdingsToRemove: string[] = [];
     for (const key of Object.keys(playerHoldings[playerId])) {
       if (key.endsWith('_1')) {
+        holdingsToRemove.push(key);
+      }
+      // Clear Asset 2 holdings in Finals
+      if (isFinals && key.endsWith('_2')) {
         holdingsToRemove.push(key);
       }
     }
@@ -315,6 +415,7 @@ export function calculateRound(
   return {
     payouts: playerPayouts,
     holdings: playerHoldings,
+    costBasis: playerCostBasis,
   };
 }
 
@@ -350,11 +451,16 @@ export function updatePortfolio(
   trades: Trade[],
   payouts: Record<string, PlayerPayout>,
   portfolio: Record<string, PortfolioState>,
-  holdings: Record<string, Record<string, number>>
+  holdings: Record<string, Record<string, number>>,
+  costBasis: Record<string, Record<string, number>>
 ): Record<string, PortfolioState> {
+  // Include all players who either have trades OR have payouts (from existing positions)
   const playersInRound = new Set<string>();
   for (const trade of trades) {
     playersInRound.add(trade.player_id);
+  }
+  for (const playerId of Object.keys(payouts)) {
+    playersInRound.add(playerId);
   }
   
   const updatedPortfolio = { ...portfolio };
@@ -370,10 +476,9 @@ export function updatePortfolio(
     }
     
     const payoutData = payouts[playerId] || { asset1_realized: 0, asset2_pnl: 0, total: 0 };
-    const roundTotal = payoutData.total;
-    
-    // Update cumulative P&L
-    updatedPortfolio[playerId].cumulative_pnl += roundTotal;
+    const realizedThisRound = payoutData.asset1_realized; // Realized P&L this round
+    const unrealizedThisRound = payoutData.asset2_pnl; // Current unrealized P&L (mark-to-market)
+    const previousUnrealized = updatedPortfolio[playerId].unrealized_pnl || 0; // Previous round's unrealized
     
     // Calculate total cost for this player's trades this round
     let totalCostThisRound = 0;
@@ -390,57 +495,12 @@ export function updatePortfolio(
       }
     }
     
-    // Update liquid balance:
-    // 1. Subtract costs of trades (cash out when buying)
-    // 2. Add payouts from settlements (cash in when positions settle)
-    // Since roundTotal = payout - cost, we have: payout = roundTotal + cost
-    // liquid_balance change = -cost + payout = -cost + (roundTotal + cost) = roundTotal
-    // Wait, that's wrong. Let me think again:
-    // 
-    // roundTotal = payout - cost (this is P&L)
-    // We want: liquid_balance -= cost (for buys), liquid_balance += payout (for settlements)
-    // So: liquid_balance change = -cost + payout = -cost + (roundTotal + cost) = roundTotal
-    // 
-    // Actually that's correct! But only if the trades in THIS round are the ones settling.
-    // The issue is: trades in round N don't settle until end of round N.
-    // So we need to:
-    // 1. Subtract cost for NEW trades
-    // 2. Add payout for OLD trades that are settling
-    //
-    // But in our system, trades settle at the END of the same round they're made.
-    // So: liquid_balance = starting - cost + payout = starting + (payout - cost) = starting + roundTotal
-    // 
-    // NO WAIT. Let me re-read the logic. In calculateRound, we process ALL trades for the round
-    // and calculate their P&L. So roundTotal includes the P&L for trades made THIS round.
-    //
-    // So the correct flow is:
-    // - Start with liquid_balance
-    // - Subtract cost of trades: liquid_balance -= totalCostThisRound
-    // - Add payout from settlements: liquid_balance += (roundTotal + totalCostThisRound)
-    // - Net effect: liquid_balance += roundTotal
-    //
-    // But that means liquid_balance should ONLY change by roundTotal, which is what we had!
-    // 
-    // The issue is: when do trades settle? Same round or next round?
-    // Looking at the code, trades settle SAME round (Asset 1 expires at end of round).
-    // 
-    // So for Round 1:
-    // - Buy 1 at $56.29 → cost = $56.29
-    // - Team wins → payout = $100
-    // - P&L = $100 - $56.29 = $43.71
-    // - liquid_balance = $500 - $56.29 + $100 = $543.71
-    // - Which equals: $500 + $43.71 = $543.71 ✅
-    //
-    // So the formula liquid_balance += roundTotal is CORRECT!
-    // 
-    // But the user says it's going UP when it should go DOWN.
-    // That means roundTotal is POSITIVE when it should be NEGATIVE.
-    // Let me check if there's an issue in the P&L calculation...
-    
+    // Update liquid balance with total P&L (includes unrealized gains)
     updatedPortfolio[playerId].liquid_balance += roundTotal;
     
-    // Update positions with new holdings
+    // Update positions and cost basis with new holdings
     updatedPortfolio[playerId].positions = holdings[playerId] || {};
+    updatedPortfolio[playerId].cost_basis = costBasis[playerId] || {};
   }
   
   return updatedPortfolio;

@@ -33,6 +33,8 @@ interface PortfolioState {
     liquid_balance: number;
     total_invested: number;
     positions: Record<string, number>;
+    cost_basis?: Record<string, number>;
+    unrealized_pnl?: number; // Track current unrealized P&L to avoid double-counting
   };
 }
 
@@ -121,11 +123,6 @@ export default function ChallengeUpload() {
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      setError('Please select a file');
-      return;
-    }
-
     if (!round) {
       setError('Please select a round');
       return;
@@ -144,7 +141,17 @@ export default function ChallengeUpload() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      
+      // If no file is selected, create an empty CSV (no trades)
+      if (file) {
+        formData.append('file', file);
+      } else {
+        // Create empty CSV with just headers
+        const emptyCSV = 'player_id,team_id,action,quantity,asset\n';
+        const blob = new Blob([emptyCSV], { type: 'text/csv' });
+        formData.append('file', blob, 'empty_trades.csv');
+      }
+      
       formData.append('round', round.toString());
       // Pass current portfolio from session storage
       if (portfolio) {
@@ -187,6 +194,12 @@ export default function ChallengeUpload() {
       const newCompletedRounds = new Set(completedRounds);
       newCompletedRounds.add(round);
       setCompletedRounds(newCompletedRounds);
+      
+      // Clear the file input after successful calculation
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
@@ -294,8 +307,12 @@ export default function ChallengeUpload() {
                   <div className="text-xl font-bold">{state.cumulative_pnl.toFixed(2)}</div>
                 </div>
                 <div className="mb-2">
-                  <div className="text-xs opacity-75">Liquid Balance</div>
+                  <div className="text-xs opacity-75">Total Balance</div>
                   <div className="text-xl font-bold">${state.liquid_balance.toFixed(2)}</div>
+                </div>
+                <div className="mb-2">
+                  <div className="text-xs opacity-75">Total Invested</div>
+                  <div className="text-xl font-bold">${state.total_invested.toFixed(2)}</div>
                 </div>
               </div>
             ))}
@@ -329,8 +346,11 @@ export default function ChallengeUpload() {
         {/* File Upload */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-[#463f3a] mb-2">
-            Upload Trade File (CSV)
+            Upload Trade File (CSV) - Optional
           </label>
+          <p className="text-xs text-[#5b514c] mb-2">
+            Leave empty if you don&apos;t want to make any trades this round
+          </p>
           <div className="flex gap-3">
             <input
               ref={fileInputRef}
@@ -440,76 +460,6 @@ export default function ChallengeUpload() {
                         >
                           {payout.total_payout >= 0 ? '+' : ''}
                           {payout.total_payout.toFixed(2)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Updated Prices Results */}
-          <div className="bg-white rounded-2xl p-8 border border-[#c0ae9f]/60 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-serif font-semibold text-[#2e2b28]">
-                Updated Team Prices - Round {round}
-              </h3>
-              <button
-                onClick={downloadPrices}
-                className="px-4 py-2 bg-[#d26b2c] text-white rounded-lg text-sm font-medium hover:bg-[#bb5e27] transition-colors"
-              >
-                Download CSV
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#c0ae9f]">
-                    <th className="text-left py-3 px-4 font-semibold text-[#463f3a]">
-                      Team
-                    </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
-                      Old Price
-                    </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
-                      New Price
-                    </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
-                      Buys
-                    </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
-                      Sells
-                    </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#463f3a]">
-                      Slippage
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {prices.map((price, idx) => (
-                    <tr
-                      key={idx}
-                      className={idx % 2 === 0 ? 'bg-[#f5f1eb]' : 'bg-white'}
-                    >
-                      <td className="py-3 px-4 text-[#2e2b28] font-medium">{price.team_id}</td>
-                      <td className="text-right py-3 px-4 text-[#2e2b28]">
-                        {price.old_price.toFixed(2)}
-                      </td>
-                      <td className="text-right py-3 px-4 text-[#2e2b28] font-medium">
-                        {price.new_price.toFixed(2)}
-                      </td>
-                      <td className="text-right py-3 px-4 text-[#2e2b28]">{price.buys}</td>
-                      <td className="text-right py-3 px-4 text-[#2e2b28]">{price.sells}</td>
-                      <td className="text-right py-3 px-4 text-[#2e2b28]">
-                        <span
-                          className={
-                            price.slip >= 0 ? 'text-green-600' : 'text-red-600'
-                          }
-                        >
-                          {price.slip >= 0 ? '+' : ''}
-                          {price.slip.toFixed(4)}
                         </span>
                       </td>
                     </tr>
