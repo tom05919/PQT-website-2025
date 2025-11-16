@@ -495,8 +495,28 @@ export function updatePortfolio(
       }
     }
     
-    // Update liquid balance with total P&L (includes unrealized gains)
-    updatedPortfolio[playerId].liquid_balance += roundTotal;
+    // Remove previous unrealized P&L, add realized P&L, then add new unrealized P&L
+    console.log(`\n=== P&L UPDATE for ${playerId} ===`);
+    console.log(`Previous unrealized: ${previousUnrealized}`);
+    console.log(`Realized this round: ${realizedThisRound}`);
+    console.log(`New unrealized: ${unrealizedThisRound}`);
+    console.log(`Cumulative P&L before: ${updatedPortfolio[playerId].cumulative_pnl}`);
+    
+    updatedPortfolio[playerId].cumulative_pnl -= previousUnrealized; // Remove old unrealized
+    updatedPortfolio[playerId].cumulative_pnl += realizedThisRound; // Add realized
+    updatedPortfolio[playerId].cumulative_pnl += unrealizedThisRound; // Add new unrealized
+    
+    console.log(`Cumulative P&L after: ${updatedPortfolio[playerId].cumulative_pnl}`);
+    
+    // Same for liquid balance
+    updatedPortfolio[playerId].liquid_balance -= previousUnrealized; // Remove old unrealized
+    updatedPortfolio[playerId].liquid_balance += realizedThisRound; // Add realized
+    updatedPortfolio[playerId].liquid_balance += unrealizedThisRound; // Add new unrealized
+    
+    console.log(`Liquid balance: ${updatedPortfolio[playerId].liquid_balance}`);
+    
+    // Store current unrealized for next round
+    updatedPortfolio[playerId].unrealized_pnl = unrealizedThisRound;
     
     // Update positions and cost basis with new holdings
     updatedPortfolio[playerId].positions = holdings[playerId] || {};
