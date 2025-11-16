@@ -11,10 +11,10 @@ const roundFileMap: { [key: string]: string } = {
 
 export async function GET(
   request: Request,
-  { params }: { params: { round: string } }
+  { params }: { params: Promise<{ round: string }> }
 ) {
   try {
-    const round = params.round;
+    const { round } = await params;
     const fileName = roundFileMap[round];
 
     if (!fileName) {
