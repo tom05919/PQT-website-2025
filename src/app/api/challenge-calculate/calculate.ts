@@ -379,8 +379,8 @@ export function calculateRound(
   }
   
   for (const playerId of allPlayers) {
-    let asset1Realized = playerAsset1Pnl[playerId] || 0;
-    let asset2Pnl = playerUnrealizedPnl[playerId] || 0;
+    const asset1Realized = playerAsset1Pnl[playerId] || 0;
+    const asset2Pnl = playerUnrealizedPnl[playerId] || 0;
     
     // In Finals, all Asset 2 P&L is already realized (handled above)
     // No need to convert here
