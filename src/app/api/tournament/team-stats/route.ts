@@ -15,14 +15,22 @@ export async function GET() {
     const lines = fileContent.trim().split('\n');
     const headers = lines[0].split(',');
 
-    const teams = lines.slice(1).map((line) => {
+    const teamsMap = new Map<string, { [key: string]: string }>();
+    
+    lines.slice(1).forEach((line) => {
       const values = line.split(',');
       const team: { [key: string]: string } = {};
       headers.forEach((header, index) => {
         team[header.trim()] = values[index]?.trim() || '';
       });
-      return team;
+      const teamName = team.team?.trim();
+      // Only add if team name exists and we haven't seen it before
+      if (teamName && !teamsMap.has(teamName)) {
+        teamsMap.set(teamName, team);
+      }
     });
+
+    const teams = Array.from(teamsMap.values());
 
     return NextResponse.json({ teams });
   } catch (error) {

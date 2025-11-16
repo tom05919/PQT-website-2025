@@ -32,8 +32,18 @@ export default function TournamentInfoPage() {
       .then((res) => res.json())
       .then((data) => {
         const teamsData = data.teams || [];
-        setTeams(teamsData);
-        setFilteredTeams(teamsData);
+        // Remove duplicates based on team name (case-insensitive, trimmed)
+        const seen = new Set<string>();
+        const uniqueTeams = teamsData.filter((team: Team) => {
+          const teamName = team.team.trim().toLowerCase();
+          if (seen.has(teamName)) {
+            return false;
+          }
+          seen.add(teamName);
+          return true;
+        });
+        setTeams(uniqueTeams);
+        setFilteredTeams(uniqueTeams);
         setLoading(false);
       })
       .catch((error) => {
@@ -440,13 +450,12 @@ export default function TournamentInfoPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTeams.map((team, index) => {
               const overallScore = getOverallScore(team);
-              const category = getTeamCategory(team);
               const isSelected = selectedTeam === team.team;
               const isComparing = compareTeams.includes(team.team);
 
               return (
                 <motion.div
-                  key={team.team}
+                  key={`${team.team}-${index}`}
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
@@ -471,9 +480,6 @@ export default function TournamentInfoPage() {
                           <h2 className="text-2xl font-serif font-bold text-[#b46b35]">
                             {team.team}
                           </h2>
-                          <span className={`text-xs px-2 py-1 rounded-full border ${getCategoryColor(category)}`}>
-                            {category}
-                          </span>
                         </div>
                         <div className="flex items-center space-x-4 text-xs text-[#463f3a]">
                           <span>Overall: <span className="text-[#b46b35] font-bold">{overallScore.toFixed(1)}%</span></span>
@@ -571,12 +577,6 @@ export default function TournamentInfoPage() {
                               <span className="text-[#463f3a]">Injury Risk</span>
                               <div className="text-[#2e2b28] font-semibold">
                                 {formatStat(team.injury_risk).toFixed(1)}%
-                              </div>
-                            </div>
-                            <div>
-                              <span className="text-[#463f3a]">Category</span>
-                              <div className="font-semibold text-[#b46b35]">
-                                {category}
                               </div>
                             </div>
                           </div>

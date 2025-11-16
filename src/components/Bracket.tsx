@@ -11,6 +11,7 @@ interface Game {
   prob_home_wins: number;
   home_wins: boolean;
   winner: string;
+  home_team_cost_prob: number;
 }
 
 interface Team {
@@ -45,18 +46,6 @@ export default function Bracket({ games, roundName }: BracketProps) {
       .catch((error) => console.error('Error fetching team stats:', error));
   }, []);
 
-  const getProbabilityColor = (prob: number) => {
-    if (prob > 0.6) return 'text-[#8b5638]';
-    if (prob < 0.4) return 'text-[#9d6b4a]';
-    return 'text-[#a06133]';
-  };
-
-  const getProbabilityBgColor = (prob: number) => {
-    if (prob > 0.6) return 'bg-[#8b5638]';
-    if (prob < 0.4) return 'bg-[#9d6b4a]';
-    return 'bg-[#a06133]';
-  };
-
   const formatStat = (value: string): number => {
     return parseFloat(value) * 100;
   };
@@ -70,17 +59,16 @@ export default function Bracket({ games, roundName }: BracketProps) {
     return (offense + defense + chemistry) / 3;
   };
 
-  // Calculate round statistics
-  const closeGames = games.filter(g => Math.abs(g.prob_home_wins - 0.5) < 0.1).length;
-  const avgProbSpread = games.length > 0 
-    ? games.reduce((sum, g) => sum + Math.abs(g.prob_home_wins - 0.5), 0) / games.length * 100
+  // Calculate round statistics based on prices
+  const avgPrice = games.length > 0 
+    ? games.reduce((sum, g) => sum + (g.home_team_cost_prob || 0), 0) / games.length
     : 0;
-  const mostCompetitive = games.length > 0
-    ? games.reduce((closest, g) => {
-        const spread = Math.abs(g.prob_home_wins - 0.5);
-        return spread < closest.spread ? { game: g, spread } : closest;
-      }, { game: games[0], spread: 1 })
-    : null;
+  const priceRange = games.length > 0
+    ? {
+        min: Math.min(...games.map(g => g.home_team_cost_prob || 0)),
+        max: Math.max(...games.map(g => g.home_team_cost_prob || 0))
+      }
+    : { min: 0, max: 0 };
 
   return (
     <div className="w-full max-w-7xl mx-auto py-8 px-4">
@@ -95,7 +83,7 @@ export default function Bracket({ games, roundName }: BracketProps) {
         </h1>
         <div className="w-24 h-1 bg-[#b46b35] mx-auto mb-4"></div>
         <p className="text-[#463f3a] mt-4 max-w-2xl mx-auto">
-          Matchups and win probabilities from tournament data. Results will be revealed after games are played.
+          Matchups and prices from tournament data. Results will be revealed after games are played.
         </p>
       </motion.div>
 
@@ -114,33 +102,28 @@ export default function Bracket({ games, roundName }: BracketProps) {
               <div className="text-2xl font-bold text-[#2e2b28]">{games.length}</div>
             </div>
             <div className="bg-[#c0ae9f] rounded-lg p-4">
-              <div className="text-sm text-[#463f3a] mb-1">Close Matchups</div>
-              <div className="text-2xl font-bold text-[#2e2b28]">{closeGames}</div>
-              <div className="text-xs text-[#5b514c] mt-1">Within 10% spread</div>
+              <div className="text-sm text-[#463f3a] mb-1">Avg Price</div>
+              <div className="text-2xl font-bold text-[#2e2b28]">{avgPrice.toFixed(2)}</div>
+              <div className="text-xs text-[#5b514c] mt-1">Home team cost</div>
             </div>
-            {mostCompetitive && (
-              <div className="bg-[#c0ae9f] rounded-lg p-4">
-                <div className="text-sm text-[#463f3a] mb-1">Most Competitive</div>
-                <div className="text-lg font-bold text-[#2e2b28]">
-                  {mostCompetitive.game.home_team} vs {mostCompetitive.game.away_team}
-                </div>
-                <div className="text-xs text-[#5b514c] mt-1">
-                  {Math.abs(mostCompetitive.game.prob_home_wins - 0.5) * 100 < 1 ? 'Toss-up' : `${(Math.abs(mostCompetitive.game.prob_home_wins - 0.5) * 100).toFixed(1)}% spread`}
-                </div>
+            <div className="bg-[#c0ae9f] rounded-lg p-4">
+              <div className="text-sm text-[#463f3a] mb-1">Price Range</div>
+              <div className="text-lg font-bold text-[#2e2b28]">
+                {priceRange.min.toFixed(2)} - {priceRange.max.toFixed(2)}
               </div>
-            )}
+              <div className="text-xs text-[#5b514c] mt-1">Low to high</div>
+            </div>
           </div>
         </motion.div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {games.map((game, index) => {
-          // Use actual probability from CSV data
-          const homeProb = Math.round(game.prob_home_wins * 100);
-          const awayProb = 100 - homeProb;
+          // Use actual prices from CSV data
+          const homePrice = game.home_team_cost_prob || 0;
+          const awayPrice = 1 - homePrice;
           const homeStrength = getTeamStrength(game.home_team);
           const awayStrength = getTeamStrength(game.away_team);
-          const isClose = Math.abs(homeProb - awayProb) < 10;
           const isSelected = selectedGame === game.game_id;
 
           return (
@@ -177,31 +160,16 @@ export default function Bracket({ games, roundName }: BracketProps) {
                     </motion.div>
                   </div>
                   
-                  {isClose && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-center mb-2"
-                    >
-                      <span className="text-xs bg-[#a06133]/20 text-[#8b5638] px-3 py-1 rounded-full font-medium">
-                        Toss-Up Game
-                      </span>
-                    </motion.div>
-                  )}
                 </div>
 
                 {/* Home Team Card */}
                 <motion.div
                   whileHover={{ scale: 1.02, x: 5 }}
-                  className={`relative p-5 rounded-xl mb-4 transition-all ${
-                    homeProb > awayProb
-                      ? 'bg-gradient-to-r from-[#b46b35]/20 to-[#b46b35]/5 border-2 border-[#b46b35]/50'
-                      : 'bg-[#c0ae9f] border-2 border-transparent'
-                  }`}
+                  className="relative p-5 rounded-xl mb-4 transition-all bg-[#c0ae9f] border-2 border-transparent"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1">
-                      <div className={`w-5 h-5 rounded-full ${getProbabilityBgColor(game.prob_home_wins)} flex-shrink-0 shadow-lg`}></div>
+                      <div className="w-5 h-5 rounded-full bg-[#b46b35] flex-shrink-0 shadow-lg"></div>
                       <div>
                         <div className="font-serif font-bold text-xl text-[#2e2b28]">
                           {game.home_team}
@@ -226,21 +194,11 @@ export default function Bracket({ games, roundName }: BracketProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-2xl font-bold ${getProbabilityColor(game.prob_home_wins)}`}>
-                        {homeProb}%
+                      <div className="text-2xl font-bold text-[#b46b35]">
+                        {homePrice.toFixed(2)}
                       </div>
-                      <div className="text-xs text-[#463f3a]">Win Prob</div>
+                      <div className="text-xs text-[#463f3a]">Price</div>
                     </div>
-                  </div>
-                  
-                  {/* Probability Bar */}
-                  <div className="mt-3 w-full bg-[#bda89a] rounded-full h-3 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${homeProb}%` }}
-                      transition={{ duration: 1, delay: index * 0.1 }}
-                      className={`h-full ${getProbabilityBgColor(game.prob_home_wins)} rounded-full shadow-lg`}
-                    ></motion.div>
                   </div>
                 </motion.div>
 
@@ -256,15 +214,11 @@ export default function Bracket({ games, roundName }: BracketProps) {
                 {/* Away Team Card */}
                 <motion.div
                   whileHover={{ scale: 1.02, x: -5 }}
-                  className={`relative p-5 rounded-xl transition-all ${
-                    awayProb > homeProb
-                      ? 'bg-gradient-to-r from-[#8b5638]/20 to-[#8b5638]/5 border-2 border-[#8b5638]/50'
-                      : 'bg-[#c0ae9f] border-2 border-transparent'
-                  }`}
+                  className="relative p-5 rounded-xl transition-all bg-[#c0ae9f] border-2 border-transparent"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1">
-                      <div className={`w-5 h-5 rounded-full ${getProbabilityBgColor(1 - game.prob_home_wins)} flex-shrink-0 shadow-lg`}></div>
+                      <div className="w-5 h-5 rounded-full bg-[#8b5638] flex-shrink-0 shadow-lg"></div>
                       <div>
                         <div className="font-serif font-bold text-xl text-[#2e2b28]">
                           {game.away_team}
@@ -289,21 +243,11 @@ export default function Bracket({ games, roundName }: BracketProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-2xl font-bold ${getProbabilityColor(1 - game.prob_home_wins)}`}>
-                        {awayProb}%
+                      <div className="text-2xl font-bold text-[#8b5638]">
+                        {awayPrice.toFixed(2)}
                       </div>
-                      <div className="text-xs text-[#463f3a]">Win Prob</div>
+                      <div className="text-xs text-[#463f3a]">Price</div>
                     </div>
-                  </div>
-                  
-                  {/* Probability Bar */}
-                  <div className="mt-3 w-full bg-[#bda89a] rounded-full h-3 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${awayProb}%` }}
-                      transition={{ duration: 1, delay: index * 0.1 + 0.2 }}
-                      className={`h-full ${getProbabilityBgColor(1 - game.prob_home_wins)} rounded-full shadow-lg`}
-                    ></motion.div>
                   </div>
                 </motion.div>
 
@@ -384,15 +328,13 @@ export default function Bracket({ games, roundName }: BracketProps) {
                   >
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div>
-                        <div className="text-[#463f3a] font-medium mb-1">Matchup Analysis</div>
+                        <div className="text-[#463f3a] font-medium mb-1">Price Analysis</div>
                         <div className="text-[#5b514c]">
-                          {homeProb > awayProb ? (
-                            <span>{game.home_team} is favored by {Math.abs(homeProb - awayProb)}%</span>
-                          ) : awayProb > homeProb ? (
-                            <span>{game.away_team} is favored by {Math.abs(homeProb - awayProb)}%</span>
-                          ) : (
-                            <span>Evenly matched game</span>
-                          )}
+                          <div>Home: {homePrice.toFixed(2)}</div>
+                          <div>Away: {awayPrice.toFixed(2)}</div>
+                          <div className="mt-1 text-[#463f3a]">
+                            {Math.abs(homePrice - awayPrice) < 0.1 ? 'Close prices' : homePrice > awayPrice ? `${game.home_team} higher` : `${game.away_team} higher`}
+                          </div>
                         </div>
                       </div>
                       {teamStats[game.home_team] && teamStats[game.away_team] && (

@@ -11,6 +11,7 @@ interface Game {
   prob_home_wins: number;
   home_wins: boolean;
   winner: string;
+  home_team_cost_prob: number;
 }
 
 export default function Round1Page() {
