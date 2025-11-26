@@ -46,7 +46,7 @@ export default function Home() {
       role: "President",
       description: "Sophomore, ECE major \n\nInterested in AI, stochastic modeling, and reliable autonomy research.",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQEiL4nYie2M0w/profile-displayphoto-scale_400_400/B56ZosMDtcJQAg-/0/1761677951076?e=1762992000&v=beta&t=PVSCfriKs3Ao9lg2Y1ka0XrTscDyqlXjEYbEX5HqdDE",
+        "https://media.licdn.com/dms/image/v2/D5603AQEiL4nYie2M0w/profile-displayphoto-scale_400_400/B56ZosMDtcJQAg-/0/1761677951076?e=1766016000&v=beta&t=T6G1XhR4F9KtSApre6Ngd3kI2jnepAVdayuw5VBepDI",
       linkedin_url: "https://www.linkedin.com/in/charlesmuehl/",
       instagram_url: "https://www.instagram.com/charles.muehlberger/",
     },
@@ -55,7 +55,7 @@ export default function Home() {
       role: "Vice President",
       description: "Sophomore, ORFE major \n\n Interested in the intersection between finance and technology ",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQEZ14nZMIivVA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727748824296?e=1763596800&v=beta&t=gWP4eyIWHrloguSh76qZRI6QnwD3YBDcXAGYWOWKACs",
+        "https://media.licdn.com/dms/image/v2/D5603AQEZ14nZMIivVA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727748824296?e=1766016000&v=beta&t=K9dHPVy3pqdUOhCYiI0h8bB25LbKCJgF7ozHr5ozEkQ",
       linkedin_url: "https://www.linkedin.com/in/loctran0323/",
       instagram_url: "https://www.instagram.com/loctran136/",
     },
@@ -64,7 +64,7 @@ export default function Home() {
       role: "Treasurer",
       description: "Junior, Math major",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQGQKk4HvDzzQw/profile-displayphoto-shrink_400_400/B4EZNwWL7aH0A8-/0/1732756685091?e=1763596800&v=beta&t=F-UjpRISvT7sB365n_OrD3mIpfyu6YjD_BulH1eS7a0",
+        "https://media.licdn.com/dms/image/v2/D4E03AQGQKk4HvDzzQw/profile-displayphoto-shrink_400_400/B4EZNwWL7aH0A8-/0/1732756685091?e=1766016000&v=beta&t=diK-UVniI_B8_F7ufnAdiK-FlaB7zK9oc94Tp0c627s",
       linkedin_url: "https://www.linkedin.com/in/rodrigo-porto-760150169/",
       instagram_url: "https://www.instagram.com/rodrigo_sdp/",
     },
@@ -73,7 +73,7 @@ export default function Home() {
       role: "President-Emeritus",
       description: "Junior, Math major \n\n Interested in trading, researching state space models",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1763596800&v=beta&t=_jACbD-dTwU4o0wNkTmwv-zeGVXh1NMcj5DXHeWC40w",
+        "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1766016000&v=beta&t=qpXi-aeLgCVC5ePN0u3kc6WU506fz_DtpEE04m4JHm8",
       linkedin_url: "https://www.linkedin.com/in/jerry-han/",
       instagram_url: "https://www.instagram.com/j.erry.han/",
     },
@@ -82,7 +82,7 @@ export default function Home() {
       role: "Web Development Lead",
       description: "Sophomore, ECE major \n\n Interested in generalist robots, machine learning, and embedded systems",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1763596800&v=beta&t=eh3wSvKyQBI4oqdff4hELLzXmRrGpgu-yfzcok0Wk_U",
+        "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1766016000&v=beta&t=qhimTR4tPIsNR3X-Jkd0VTuPS_dVpSfSMPfyErzDEeQ",
       linkedin_url: "https://www.linkedin.com/in/tom-wang-105a6722b/",
       instagram_url: "https://www.instagram.com/tom_wang_05/",
     },
@@ -91,7 +91,7 @@ export default function Home() {
       role: "Tournament Events Officer",
       description: "Junior, Math major \n\n Interested in optimization, probability, and analysis",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1763596800&v=beta&t=1c4hVnKYd4VHrieoEC_kq0uMiy5InWw6Rsk1vk3kMFY",
+        "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1766016000&v=beta&t=MuPVQXyrIfk2GZbTrJbOdkh6LgEGTsay76Y_S-cr7nk",
       linkedin_url: "https://www.linkedin.com/in/lintropic-joshua/",
       instagram_url: "https://www.instagram.com/perplexed._.panda/",
     },
@@ -100,7 +100,7 @@ export default function Home() {
       role: "Tournament Director",
       description: "Grad Student, ChemE major",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQGUGLyXDiAQyA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692736493041?e=1763596800&v=beta&t=4l3eYxt_4PISD2NEDr94Ua71ekD9QT8FxJntXveDJbA",
+        "https://media.licdn.com/dms/image/v2/D5603AQGUGLyXDiAQyA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692736493041?e=1766016000&v=beta&t=NTivyCZe2XxBQg_jDtyQzt9HgSWFk8V2k10CBo8Gpgg",
       linkedin_url: "https://www.linkedin.com/in/andrewchen0201/",
       instagram_url: "https://www.instagram.com/an6rew_chen/",
     },
@@ -109,7 +109,7 @@ export default function Home() {
       role: "Outreach",
       description: "Sophomore, ORFE major",
       img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
+        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1766016000&v=beta&t=UOBn53PPmzC_OMidlNYG5ovzviZvcRSlGk_NddYAwv0",
       linkedin_url: "https://www.linkedin.com/in/jaime-nunez8031/",
       instagram_url: "https://www.instagram.com/jaimen8031/",
     },
