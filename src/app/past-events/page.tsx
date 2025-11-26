@@ -15,6 +15,28 @@ interface Event {
 
 const events: Event[] = [
   {
+    id: "6",
+    title: 'PQT Fall Trading Competition 2025',
+    description: "PQT's first trading competition, students participated in 8 rounds of a trading game given a price distribution, live market updates, and forced trades given positions",
+    materials: [
+      {name: "Opening Slides", url: "https://docs.google.com/presentation/d/1RwFBHAHHFX3gDR4hwMGh7NcxoejEfTR1nqP94tbmF18/edit?usp=sharing"},
+      {name: "Rounds 1- 8 Folder", url: "https://drive.google.com/drive/folders/17p3TQaNijcdxqyxTr2MtW6nBulJAXyUT?usp=sharing"},
+    ],
+    date: 'November 22, 2025',
+  },
+  {
+    id: "5",
+    title: 'COSCON x PQT Trading Game 2025',
+    description:'Trading game hosted by COSCON and PQT, where students bet given a bracket of teams and distributions on team attributes',
+    materials: [
+      {
+      name: "Link to game statistics",
+      url: 'https://princeton-quant.com/tournament/info',
+      }
+    ],
+    date: 'November 16, 2025',
+  },
+  {
     id: "4",
     title: 'Mock interview Prep Sheets',
     date: 'November 6, 2025',
