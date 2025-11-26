@@ -1,0 +1,17 @@
+,game_id,round,home_team,away_team,prob_home_wins,home_wins,winner,home_team_cost_prob
+0,1,Sweet 16,Rocky,Mathy,0.4842998875261135,False,Mathy,0.34
+1,2,Sweet 16,Whitman,Forbes,0.8141282707832262,True,Whitman,0.71
+2,3,Sweet 16,Yeh,NCW,0.23300392491309196,False,NCW,0.31
+3,4,Sweet 16,Friend,Hobson,0.6931097091549212,True,Friend,0.63
+4,5,Sweet 16,Cottage,Charter,0.5087775869621386,False,Charter,0.39
+5,6,Sweet 16,Quad,TI,0.5159774815629432,True,Quad,0.51
+6,7,Sweet 16,Tower,Ivy,0.4037372179591597,True,Tower,0.3
+7,8,Sweet 16,Terrace,Colo,0.2098205915549757,False,Colo,0.26
+8,9,Elite 8,Mathy,Whitman,0.3989948842955335,True,Mathy,0.3
+9,10,Elite 8,Friend,NCW,0.6128867992778704,True,Friend,0.48
+10,11,Elite 8,Charter,Quad,0.5844690555015601,True,Charter,0.55
+11,12,Elite 8,Colo,Tower,0.7457238625915233,True,Colo,0.65
+12,13,Final Four,Mathy,Friend,0.49687620466973026,False,Friend,0.4
+13,14,Final Four,Colo,Charter,0.7770598390796286,True,Colo,0.66
+14,15,Championship,Friend,Colo,0.48486946911684886,False,Colo,0.50
+
