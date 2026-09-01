@@ -1,77 +1,58 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="bg-[#4a3b32] border-t border-[#3c2e26] text-[#e9e2db]">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Club Info */}
-          <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <Image
-                src="/images/logo-no-text.png"
-                alt="Princeton Quantitative Traders Logo"
-                width={40}
-                height={40}
-                className="w-10 h-10"
-              />
-              <h3 className="text-[#fff7f0] text-lg font-serif font-semibold">
-                Princeton Quantitative Traders
-              </h3>
-            </div>
-            <p className="text-[#d3c6bc] text-sm leading-relaxed">
-              Fostering a community of students passionate about quantitative
-              finance, research, and applied mathematics.
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-[#fff7f0] text-base font-serif font-semibold mb-4">
-              Quick Links
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/sponsors"
-                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
-                >
-                  Sponsors
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/join"
-                  className="text-[#d3c6bc] hover:text-[#d26b2c] transition-colors text-sm"
-                >
-                  Join Us
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-[#fff7f0] text-base font-serif font-semibold mb-4">
-              Contact
-            </h4>
-            <div className="space-y-2 text-sm text-[#d3c6bc]">
-              <p>Email: pqt@princeton.edu</p>
+    <footer className="pqt-footer">
+      <div className="pqt-container pqt-footer__grid">
+        <div className="pqt-stack-6">
+          <div className="pqt-footer__brand">
+            <Image
+              src="/images/logo-no-text.png"
+              alt="Princeton Quantitative Traders logo"
+              width={56}
+              height={56}
+            />
+            <div>
+              <h2>Princeton Quantitative Traders</h2>
+              <p>Official Princeton University Quantitative Trading Club</p>
             </div>
           </div>
+          <p className="pqt-footer__description">
+            Fostering a community of students passionate about quantitative
+            finance, research, and applied mathematics.
+          </p>
+        </div>
+
+        <div className="pqt-stack">
+          <span className="pqt-label">Quick links</span>
+          <ul className="pqt-footer__links">
+            <li><Link href="/">Home</Link></li>
+            <li><Link href="/about">About Us</Link></li>
+            <li><Link href="/past-events">Past Events</Link></li>
+            <li><Link href="/sponsors">Sponsors</Link></li>
+            <li><Link href="/join">Join Us</Link></li>
+          </ul>
+        </div>
+
+        <div className="pqt-stack">
+          <span className="pqt-label">Contact</span>
+          <ul className="pqt-footer__links">
+            <li><a href="mailto:pqt@princeton.edu">pqt@princeton.edu</a></li>
+            <li>Campus Group: Princeton Quantitative Traders</li>
+            <li>
+              <a href="https://www.instagram.com/princetonquanttraders/">
+                Instagram ↗
+              </a>
+            </li>
+            <li>
+              <a href="https://groupme.com/join_group/111159295/jL93cFqW">
+                GroupMe ↗
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

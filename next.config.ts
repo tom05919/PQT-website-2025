@@ -1,17 +1,14 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'media.licdn.com',
+        protocol: "https",
+        hostname: "media.licdn.com",
       },
     ],
   },
 };
-
-module.exports = nextConfig;
-
 
 export default nextConfig;

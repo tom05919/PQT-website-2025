@@ -1,251 +1,321 @@
-"use client"
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Linkedin, Instagram, MessageSquare } from "lucide-react";
-import OfficersSection from "@/components/OfficerSection";
-import LiveTicker from "@/components/LiveTicker";
 
-
-
-// Helper: social icon wrapper
-const SocialIcon = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-gray-500 hover:text-[#d26b2c] transition-colors duration-300"
-  >
-    {children}
-  </a>
-);
-
-// Icon components
-const LinkedinIcon = () => <Linkedin className="w-5 h-5" strokeWidth={2} />;
-const InstagramIcon = () => <Instagram className="w-5 h-5" strokeWidth={2} />;
-const GroupMeIcon = () => <MessageSquare className="w-5 h-5" strokeWidth={2} />;
+const officers = [
+  {
+    name: "Grace Im",
+    role: "President",
+    detail: "Sophomore · Philosophy",
+    interest: "AI, stochastic modeling, and reliable autonomy research",
+    image: "",
+    linkedin: "",
+    instagram: "",
+  },
+  {
+    name: "Ahbi Bansal",
+    role: "Vice President",
+    detail: "Senior · Economics",
+    interest: "The intersection of finance and technology",
+    image: "",
+    linkedin: "",
+    instagram: "",
+  },
+  {
+    name: "Brandon Wilk",
+    role: "Treasurer",
+    detail: "Junior · MAE",
+    image: "",
+    linkedin: "",
+    instagram: "",
+  },
+  {
+    name: "Jerry Han",
+    role: "President-Emeritus",
+    detail: "Junior · Mathematics",
+    interest: "Trading and state-space model research",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1763596800&v=beta&t=_jACbD-dTwU4o0wNkTmwv-zeGVXh1NMcj5DXHeWC40w",
+    linkedin: "https://www.linkedin.com/in/jerry-han/",
+    instagram: "https://www.instagram.com/j.erry.han/",
+  },
+  {
+    name: "Tom Wang",
+    role: "Tech Lead",
+    detail: "Sophomore · ECE",
+    interest: "Generalist robots, machine learning, and embedded systems",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1763596800&v=beta&t=eh3wSvKyQBI4oqdff4hELLzXmRrGpgu-yfzcok0Wk_U",
+    linkedin: "https://www.linkedin.com/in/tom-wang-105a6722b/",
+    instagram: "https://www.instagram.com/tom_wang_05/",
+  },
+  {
+    name: "Joshua Lin",
+    role: "Tournament Events Officer",
+    detail: "Junior · Mathematics",
+    interest: "Optimization, probability, and analysis",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1763596800&v=beta&t=1c4hVnKYd4VHrieoEC_kq0uMiy5InWw6Rsk1vk3kMFY",
+    linkedin: "https://www.linkedin.com/in/lintropic-joshua/",
+    instagram: "https://www.instagram.com/perplexed._.panda/",
+  },
+  {
+    name: "Andrew Chen",
+    role: "Tournament Director",
+    detail: "Graduate student · Chemical Engineering",
+    image: "https://media.licdn.com/dms/image/v2/D5603AQGUGLyXDiAQyA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692736493041?e=1763596800&v=beta&t=4l3eYxt_4PISD2NEDr94Ua71ekD9QT8FxJntXveDJbA",
+    linkedin: "https://www.linkedin.com/in/andrewchen0201/",
+    instagram: "https://www.instagram.com/an6rew_chen/",
+  },
+];
 
 export default function Home() {
-  const officers = [
-    {
-      name: 'Club Socials',
-      role: 'Follow us on Instagram and join our GroupMe to stay updated on club events and opportunities!',
-      img_src: '/images/logo-no-text.png',
-      description: 'Feel free to reach out with any questions or join our group me to connect with likeminded peers!',
-      groupme_url: 'https://groupme.com/join_group/111159295/jL93cFqW',
-      instagram_url: 'https://www.instagram.com/princetonquanttraders/',
-    },
-    {
-      name: "Charles Muehlberger",
-      role: "President",
-      description: "Sophomore, ECE major \n\nInterested in AI, stochastic modeling, and reliable autonomy research.",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQEiL4nYie2M0w/profile-displayphoto-scale_400_400/B56ZosMDtcJQAg-/0/1761677951076?e=1762992000&v=beta&t=PVSCfriKs3Ao9lg2Y1ka0XrTscDyqlXjEYbEX5HqdDE",
-      linkedin_url: "https://www.linkedin.com/in/charlesmuehl/",
-      instagram_url: "https://www.instagram.com/charles.muehlberger/",
-    },
-    {
-      name: "Loc Tran",
-      role: "Vice President",
-      description: "Sophomore, ORFE major \n\n Interested in the intersection between finance and technology ",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQEZ14nZMIivVA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1727748824296?e=1763596800&v=beta&t=gWP4eyIWHrloguSh76qZRI6QnwD3YBDcXAGYWOWKACs",
-      linkedin_url: "https://www.linkedin.com/in/loctran0323/",
-      instagram_url: "https://www.instagram.com/loctran136/",
-    },
-    {
-      name: "Rodrigo Porto",
-      role: "Treasurer",
-      description: "Junior, Math major",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQGQKk4HvDzzQw/profile-displayphoto-shrink_400_400/B4EZNwWL7aH0A8-/0/1732756685091?e=1763596800&v=beta&t=F-UjpRISvT7sB365n_OrD3mIpfyu6YjD_BulH1eS7a0",
-      linkedin_url: "https://www.linkedin.com/in/rodrigo-porto-760150169/",
-      instagram_url: "https://www.instagram.com/rodrigo_sdp/",
-    },
-    {
-      name: "Jerry Han",
-      role: "President-Emeritus",
-      description: "Junior, Math major \n\n Interested in trading, researching state space models",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQGd-QPCGBDQaQ/profile-displayphoto-scale_400_400/B4EZnRQS1QIMAg-/0/1760152334915?e=1763596800&v=beta&t=_jACbD-dTwU4o0wNkTmwv-zeGVXh1NMcj5DXHeWC40w",
-      linkedin_url: "https://www.linkedin.com/in/jerry-han/",
-      instagram_url: "https://www.instagram.com/j.erry.han/",
-    },
-    {
-      name: "Tom Wang",
-      role: "Web Development Lead",
-      description: "Sophomore, ECE major \n\n Interested in generalist robots, machine learning, and embedded systems",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEAijlufTxPiw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1706971701106?e=1763596800&v=beta&t=eh3wSvKyQBI4oqdff4hELLzXmRrGpgu-yfzcok0Wk_U",
-      linkedin_url: "https://www.linkedin.com/in/tom-wang-105a6722b/",
-      instagram_url: "https://www.instagram.com/tom_wang_05/",
-    },
-    {
-      name: "Joshua Lin",
-      role: "Tournament Events Officer",
-      description: "Junior, Math major \n\n Interested in optimization, probability, and analysis",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQF8iE4_LFn0ag/profile-displayphoto-shrink_400_400/B4EZYiuwgzHgAk-/0/1744339405331?e=1763596800&v=beta&t=1c4hVnKYd4VHrieoEC_kq0uMiy5InWw6Rsk1vk3kMFY",
-      linkedin_url: "https://www.linkedin.com/in/lintropic-joshua/",
-      instagram_url: "https://www.instagram.com/perplexed._.panda/",
-    },
-    {
-      name: "Andrew Chen",
-      role: "Tournament Director",
-      description: "Grad Student, ChemE major",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D5603AQGUGLyXDiAQyA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1692736493041?e=1763596800&v=beta&t=4l3eYxt_4PISD2NEDr94Ua71ekD9QT8FxJntXveDJbA",
-      linkedin_url: "https://www.linkedin.com/in/andrewchen0201/",
-      instagram_url: "https://www.instagram.com/an6rew_chen/",
-    },
-    {
-      name: "Jaime Nunez",
-      role: "Outreach",
-      description: "Sophomore, ORFE major",
-      img_src:
-        "https://media.licdn.com/dms/image/v2/D4E03AQEVhNB32GE6EA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1690314745956?e=1763596800&v=beta&t=rsnGJYe7TGTuYfbNpQIbQ3fxCKaTSbzbRTD04ZBjitU",
-      linkedin_url: "https://www.linkedin.com/in/jaime-nunez8031/",
-      instagram_url: "https://www.instagram.com/jaimen8031/",
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-[#d2c3b3] text-[#2e2b28] font-sans antialiased">
-    <div className="relative z-10">
-    <LiveTicker />
-      {/* rest of your page... */}
-        {/* Hero Section */}
-        <section className="px-6 sm:px-10 lg:px-16 py-28 border-b border-[#e2dcd6] text-center">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight mb-6">
-              Princeton <span className="text-[#d3624e]">Quantitative Traders</span>
-            </h1>
-            <p className="text-lg text-[#4c4742] leading-relaxed mb-10">
-              Official Princeton University Quantitative Trading Club
+    <main>
+      <section className="pqt-home-hero" aria-labelledby="home-title">
+        <div className="pqt-container pqt-home-hero__inner">
+          <div className="pqt-home-hero__content">
+            <p className="pqt-label pqt-home-hero__eyebrow">
+              Princeton University
             </p>
-            
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/join"
-                className="bg-[#d26b2c] text-white px-4 py-3.5 rounded-full font-medium hover:bg-[#825c45] transition-colors"
-              >
-                Join Our Club
+            <h1 className="pqt-home-title" id="home-title">
+              Princeton Quantitative Traders
+            </h1>
+            <p className="pqt-home-hero__copy">
+              The official Princeton University quantitative trading club,
+              exploring quantitative finance, data, and applied mathematics.
+            </p>
+            <div className="pqt-home-hero__actions">
+              <Link className="pqt-btn pqt-btn--solid" href="/join">
+                Join our club
               </Link>
-              <Link
-                href="/about"
-                className="text-[#d26b2c] border border-[#d26b2c] px-4 py-3.5 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
-              >
-                Learn More
+              <Link className="pqt-btn pqt-btn--quiet" href="/about">
+                Learn more →
               </Link>
             </div>
-          </div>
-        </section>
-      </div>
-
-      <OfficersSection officers={officers} />
-
-      {/* Research Section */}
-      <section className="px-6 sm:px-10 lg:px-16 py-24 border-b border-[#e2dcd6]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <h2 className="text-3xl font-serif font-semibold mb-4">
-              Research & Learning
-            </h2>
-            <p className="text-[#4c4742] text-lg mb-4 leading-relaxed">
-              From theoretical models to practical trading systems, our members explore different
-              layers of quantitative structure. Collaboration and mentorship drive our learning.
-            </p>
-            <ul className="space-y-2 text-[#4c4742] mb-8">
-              {[
-                "Original research in quantitative analysis",
-                "Interview preparation for top firms",
-                "Participation in trading competitions",
-                "Community of analytical thinkers",
-              ].map((item, i) => (
-                <li key={i} className="flex items-start">
-                  <span className="text-[#d26b2c] mr-3 text-lg">•</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/about"
-              className="inline-block bg-[#d26b2c] text-white px-8 py-3 rounded-full font-medium hover:bg-[#bb5e27] transition-colors"
-            >
-              Learn More
-            </Link>
-          </div>
-
-          <div className="border-l-2 border-[#d26b2c]/20 pl-10">
-            <h3 className="text-xl font-semibold font-serif mb-4">
-              Current Programs
-            </h3>
-            <dl className="space-y-3 text-[#4c4742]">
-              <div className="flex justify-between">
-                <dt>Weekly Project Sessions (Machine Learning and Research)</dt>
-                <dd className="font-medium text-[#d26b2c]">
-                  Wednesdays 9:00pm
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>Weekly Interview Preparation Sessions</dt>
-                <dd className="font-medium text-[#d26b2c]">
-                  Thursdays 8:00pm
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>COSCONxPQT</dt>
-                <dd className="font-medium text-[#d26b2c]">
-                  November 16th
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <Link
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform"
-                  className="inline-block bg-[#d26b2c] justify-center text-white px-4 py-1 rounded-full font-small hover:bg-[#bb5e27] transition-colors"
-                >
-                  Sign Up for COSCON
-                </Link>
-              </div>
-              <div className="flex justify-between">
-                <dt>Fall Trading Competition</dt>
-                <dd className="font-medium text-[#d26b2c]">
-                  November 22nd
-                </dd>
-              </div>
-            </dl>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-6 sm:px-10 lg:px-16 py-24 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-serif font-semibold mb-4">Want to join?</h2>
-          <p className="text-[#4c4742] text-lg mb-8 leading-relaxed">
-            Interested in joining a community of like-minded peers, applying
-            theory to practice through real-world projects, or competing in
-            national trading competitions?
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/join"
-              className="bg-[#d26b2c] text-white px-8 py-3 rounded-full font-medium hover:bg-[#bb5e27] transition-colors"
-            >
-              Become a Member
-            </Link>
-            <Link
-              href="/about"
-              className="border border-[#d26b2c] text-[#d26b2c] px-8 py-3 rounded-full font-medium hover:bg-[#d26b2c] hover:text-white transition-colors"
-            >
-              Learn More
-            </Link>
+      <div className="pqt-home-program-strip">
+        <div
+          className="pqt-container pqt-home-facts"
+          aria-label="Club program schedule"
+        >
+          <div className="pqt-home-fact">
+            <p className="pqt-home-fact__value">TBD</p>
+            <p className="pqt-home-fact__label">Project sessions</p>
+          </div>
+          <div className="pqt-home-fact">
+            <p className="pqt-home-fact__value">TBD</p>
+            <p className="pqt-home-fact__label">Interview preparation</p>
+          </div>
+          <div className="pqt-home-fact">
+            <p className="pqt-home-fact__value">TBD</p>
+            <p className="pqt-home-fact__label">Trading competition</p>
+          </div>
+        </div>
+      </div>
+
+      <section className="pqt-container pqt-section">
+        <div className="pqt-section-head">
+          <div className="pqt-section-head__body">
+            <h2>Research &amp; Learning</h2>
+            <p className="pqt-lead">
+              From theoretical models to practical trading systems, members
+              explore quantitative structure through collaboration, mentorship,
+              projects, and industry workshops as a community of analytical
+              thinkers.
+            </p>
+          </div>
+        </div>
+        <div className="pqt-row">
+          <article className="pqt-item">
+            <p className="pqt-item__meta">TBD</p>
+            <h3 className="pqt-item__title">Research and projects</h3>
+            <p>
+              Members conduct original quantitative analysis and study market
+              structure, machine learning, and data within trading systems.
+            </p>
+          </article>
+          <article className="pqt-item">
+            <p className="pqt-item__meta">TBD</p>
+            <h3 className="pqt-item__title">Interview preparation</h3>
+            <p>
+              Weekly sessions prepare members for quantitative trading roles at
+              top firms through collaborative practice and shared materials.
+            </p>
+          </article>
+          <article className="pqt-item">
+            <p className="pqt-item__meta">TBD</p>
+            <h3 className="pqt-item__title">Trading competitions</h3>
+            <p>
+              National competitions offer opportunities to win prizes and meet
+              industry professionals.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="pqt-container pqt-section">
+        <div className="pqt-section-head">
+          <div className="pqt-section-head__body">
+            <h2>Current Programs</h2>
+            <p>
+              Locations, content, and updates are shared through the club
+              listserv and GroupMe.
+            </p>
+          </div>
+        </div>
+        <div className="pqt-table-wrap">
+          <table className="pqt-table">
+            <thead>
+              <tr>
+                <th>Program</th>
+                <th>Cadence</th>
+                <th>Time</th>
+                <th>Focus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Project sessions</td>
+                <td>Weekly</td>
+                <td className="pqt-td-num">TBD</td>
+                <td>Machine learning, research, and market structure</td>
+              </tr>
+              <tr>
+                <td>Interview preparation</td>
+                <td>Weekly</td>
+                <td className="pqt-td-num">TBD</td>
+                <td>Quantitative trading interview practice</td>
+              </tr>
+              <tr>
+                <td>Trading competition</td>
+                <td>Each semester</td>
+                <td className="pqt-td-num">TBD</td>
+                <td>National trading competition</td>
+              </tr>
+              <tr>
+                <td>COSCON × PQT Trading Game</td>
+                <td>One-time event</td>
+                <td className="pqt-td-num">November 16, 2025</td>
+                <td>
+                  <span className="pqt-resource-links">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSctc8kj4kSqcGILcnSzHVq91J1wlUO0bfZ0ZUYuy64_JxoLPA/viewform">
+                      Event signup
+                    </a>
+                    <a href="https://princeton-quant.com/tournament/info">
+                      Game statistics
+                    </a>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>PQT Fall Trading Competition</td>
+                <td>One-time event</td>
+                <td className="pqt-td-num">November 22, 2025</td>
+                <td>
+                  <span className="pqt-resource-links">
+                    <a href="https://docs.google.com/presentation/d/1RwFBHAHHFX3gDR4hwMGh7NcxoejEfTR1nqP94tbmF18/edit?usp=sharing">
+                      Opening slides
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/17p3TQaNijcdxqyxTr2MtW6nBulJAXyUT?usp=sharing">
+                      Rounds 1–8
+                    </a>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="pqt-container pqt-section">
+        <div className="pqt-section-head">
+          <div className="pqt-section-head__body">
+            <h2>Meet Our Officers</h2>
+          </div>
+        </div>
+        <div className="pqt-officer-grid">
+          {officers.map((officer) => (
+            <article className="pqt-officer" key={officer.name}>
+              <Image
+                className="pqt-officer__photo"
+                src={officer.image}
+                alt={officer.name}
+                width={176}
+                height={176}
+                sizes="(max-width: 520px) 176px, (max-width: 900px) 25vw, 176px"
+                unoptimized
+              />
+              <div>
+                <p className="pqt-officer__name">{officer.name}</p>
+                <p className="pqt-officer__role">{officer.role}</p>
+              </div>
+              <p className="pqt-officer__detail">{officer.detail}</p>
+              {officer.interest && (
+                <p className="pqt-officer__interest">{officer.interest}</p>
+              )}
+              <div className="pqt-resource-links">
+                <a
+                  className="pqt-officer__link"
+                  href={officer.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  LinkedIn ↗
+                </a>
+                <a
+                  className="pqt-officer__link"
+                  href={officer.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Instagram ↗
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="pqt-container pqt-section">
+        <div className="pqt-longform">
+          <div className="pqt-longform__body">
+            <h2>Want to join?</h2>
+            <p>
+              Interested in joining a community of like-minded peers, applying
+              theory to practice through real-world projects, or competing in
+              national trading competitions?
+            </p>
+            <p>
+              Membership is open to currently enrolled Princeton undergraduate
+              and graduate students. Dates and times for future weekly sessions
+              are TBD.
+            </p>
+            <p>
+              Questions: <a href="mailto:pqt@princeton.edu">pqt@princeton.edu</a>
+            </p>
+            <h3>Club Socials</h3>
+            <p>
+              Follow the club on Instagram and join the GroupMe to stay updated
+              on club events and opportunities, ask questions, and connect with
+              other members.
+            </p>
+            <div className="pqt-cluster">
+              <Link className="pqt-btn pqt-btn--solid" href="/join">
+                Become a Member
+              </Link>
+              <a
+                className="pqt-btn pqt-btn--quiet"
+                href="https://www.instagram.com/princetonquanttraders/"
+              >
+                Instagram →
+              </a>
+              <a
+                className="pqt-btn pqt-btn--quiet"
+                href="https://groupme.com/join_group/111159295/jL93cFqW"
+              >
+                GroupMe →
+              </a>
+            </div>
           </div>
         </div>
       </section>

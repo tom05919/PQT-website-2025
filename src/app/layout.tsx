@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../styles/index.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "Princeton Quantitative Traders",
-  description: "Join Princeton Quantitative Traders! Fostering a community of students in quantitative finance and applied mathematics.",
+  description:
+    "Princeton University's quantitative trading club, with weekly project and interview-preparation sessions.",
   icons: {
     icon: '/images/logo-no-text.png',
     shortcut: '/images/logo-no-text.png',
@@ -31,13 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body>
         <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        {children}
         <Footer />
       </body>
     </html>
