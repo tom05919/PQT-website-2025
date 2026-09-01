@@ -109,7 +109,7 @@ export default function SponsorsPage() {
             <p>
               <a
                 className="pqt-btn pqt-btn--quiet"
-                href="/documents/Sponsorship_Package.pdf"
+                href="/documents/pqt-sponsorship26.pdf"
               >
                 View sponsorship tiers →
               </a>
