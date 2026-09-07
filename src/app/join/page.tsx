@@ -1,154 +1,123 @@
-const applicationUrl =
-  "https://docs.google.com/forms/d/1Q6CNYd_oekxA043g30jHWzbNC6qtgB-muzVjNrvJw4U/edit";
+import type { Metadata } from "next";
+import Reveal from "@/components/Reveal";
+import { clubLinks } from "@/data/site";
+
+export const metadata: Metadata = {
+  title: "Join",
+  description:
+    "Learn about upcoming Princeton Quantitative Traders membership applications, interviews, and open sponsor events.",
+};
+
+const expectations = [
+  {
+    number: "01",
+    title: "Applications open soon",
+    description:
+      "Membership applications for Princeton undergraduate and graduate students will open soon. Details will be announced in GroupMe.",
+  },
+  {
+    number: "02",
+    title: "Interview process",
+    description:
+      "Applicants will complete an interview before membership decisions are made.",
+  },
+  {
+    number: "03",
+    title: "Open sponsor events",
+    description:
+      "Most events hosted with sponsors are open to all Princeton students, including students who are not club members.",
+  },
+];
 
 export default function JoinPage() {
   return (
-    <main>
-      <header className="pqt-container pqt-page-head">
-        <div className="pqt-page-head__body">
-          <h1>Join Princeton Quantitative Traders</h1>
-          <p className="pqt-lead">
-            Become part of a community of Princeton students who share
-            curiosity, rigor, and collaboration. Membership is open to currently
-            enrolled undergraduate and graduate students.
-          </p>
-          <div className="pqt-cluster">
-            <a
-              className="pqt-btn pqt-btn--solid"
-              href={applicationUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open membership form
-            </a>
-          </div>
-        </div>
-      </header>
-
-      <section className="pqt-container pqt-section">
-        <div className="pqt-longform">
-          <div className="pqt-longform__body">
-            <h2>Membership Requirements</h2>
-            <p className="pqt-note">
-              The stated prerequisites are Princeton enrollment and an interest
-              in quantitative finance and applied mathematics.
-            </p>
-            <div className="pqt-row">
-              <article className="pqt-item">
-                <h3 className="pqt-item__title">Academic eligibility</h3>
-                <p>
-                  Currently enrolled undergraduate or graduate students at
-                  Princeton University, across backgrounds and majors.
-                </p>
-              </article>
-              <article className="pqt-item">
-                <h3 className="pqt-item__title">Club participation</h3>
-                <p>
-                  Members commit to club activities and research projects,
-                  actively engaging in events, project-based learning, interview
-                  preparation, and trading competitions.
-                </p>
-              </article>
-              <article className="pqt-item">
-                <h3 className="pqt-item__title">Conduct</h3>
-                <p>
-                  Members are expected to contribute to the collaborative
-                  culture of the club and maintain academic integrity and
-                  professionalism.
-                </p>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pqt-container pqt-section">
-        <div className="pqt-longform">
-          <div className="pqt-longform__body">
-            <h2>Weekly meeting times</h2>
-            <div className="pqt-table-wrap">
-              <table className="pqt-table">
-                <thead>
-                  <tr>
-                    <th>Session</th>
-                    <th>Day</th>
-                    <th>Time</th>
-                    <th>Location</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Project session</td>
-                    <td>TBD</td>
-                    <td className="pqt-td-num">TBD</td>
-                    <td>Shared through listserv and GroupMe</td>
-                  </tr>
-                  <tr>
-                    <td>Interview preparation</td>
-                    <td>TBD</td>
-                    <td className="pqt-td-num">TBD</td>
-                    <td>Shared through listserv and GroupMe</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pqt-container pqt-section">
-        <div className="pqt-longform">
-          <div className="pqt-longform__body">
-            <h2>How to get started</h2>
-            <ol className="pqt-steps">
-              <li>Review the membership expectations and weekly schedule.</li>
-              <li>
-                Submit the club&apos;s membership form with the button at the top
-                of this page.
-              </li>
-              <li>
-                Follow session updates through the club&apos;s GroupMe and
-                listserv.
-              </li>
-            </ol>
+    <main id="main-content">
+      <header className="pqt-page-head pqt-page-head--join">
+        <div className="pqt-container pqt-page-head__grid">
+          <p className="pqt-label pqt-label--orange">Membership applications</p>
+          <Reveal>
+            <h1>Join Princeton Quantitative Traders</h1>
             <p>
-              Questions: <a href="mailto:pqt@princeton.edu">pqt@princeton.edu</a>
+              Applications for new members will open soon and will include an
+              interview process. Most events hosted with sponsors are open to
+              all Princeton students.
             </p>
-            <p>
-              <a href="https://groupme.com/join_group/111159295/jL93cFqW">
-                Open the club GroupMe ↗
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="pqt-container pqt-section">
-        <div className="pqt-longform">
-          <div className="pqt-longform__body">
-            <h2>Ready to get started?</h2>
-            <p>
-              Take your first step into quantitative trading, data-driven
-              research, and a welcoming academic community.
-            </p>
-            <p>
-              Questions? Reach out to the membership team at
-              {" "}<a href="mailto:pqt@princeton.edu">pqt@princeton.edu</a>.
-            </p>
-            <p>Campus Group: Princeton Quantitative Traders</p>
-            <p>
+            <div className="pqt-actions">
               <a
-                className="pqt-btn pqt-btn--quiet"
-                href={applicationUrl}
+                className="pqt-btn pqt-btn--orange"
+                href={clubLinks.groupMe}
                 target="_blank"
                 rel="noreferrer"
               >
-                Start application →
+                Get application updates <span aria-hidden="true">↗</span>
               </a>
-            </p>
-          </div>
+              <a className="pqt-text-link pqt-text-link--light" href={clubLinks.email}>
+                Email the team <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </header>
+
+      <section className="pqt-section">
+        <div className="pqt-container">
+          <Reveal className="pqt-section-intro">
+            <p className="pqt-label">Applications</p>
+            <div>
+              <h2>Membership and open events</h2>
+              <p>
+                Club membership requires an application and interview. Most
+                sponsor events do not require club membership.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal className="pqt-program-list">
+            {expectations.map((expectation) => (
+              <article className="pqt-program" key={expectation.number}>
+                <span className="pqt-program__number">{expectation.number}</span>
+                <h3>{expectation.title}</h3>
+                <p>{expectation.description}</p>
+              </article>
+            ))}
+          </Reveal>
         </div>
       </section>
+
+      <section className="pqt-section pqt-section--soft">
+        <Reveal className="pqt-container pqt-join-grid">
+          <div>
+            <p className="pqt-label">Process</p>
+            <h2>How to apply</h2>
+          </div>
+          <ol className="pqt-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <h3>Follow application updates</h3>
+                <p>
+                  Application details will be announced in GroupMe when the
+                  next cycle opens.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <h3>Submit an application</h3>
+                <p>Complete the membership application when it becomes available.</p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <h3>Complete an interview</h3>
+                <p>Applicants will interview before membership decisions are made.</p>
+              </div>
+            </li>
+          </ol>
+        </Reveal>
+      </section>
+
     </main>
   );
 }

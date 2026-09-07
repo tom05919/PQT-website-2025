@@ -1,123 +1,92 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+import Reveal from "@/components/Reveal";
+import { clubLinks, goldSponsors, silverSponsors } from "@/data/site";
 
-const goldSponsors = [
-  {
-    name: "Citadel",
-    logo: "/images/citadel-logo.jpg",
-    description:
-      "A global leader in investment and risk management, empowering analytical minds to solve hard problems.",
-  },
-  {
-    name: "Jane Street",
-    logo: "/images/jane-street-logo.png",
-    description:
-      "A research-driven trading firm where curiosity and collaboration drive innovation.",
-  },
-  {
-    name: "Hudson River Trading",
-    logo: "/images/hrt-logo.svg",
-    description:
-      "Engineers and researchers united to build technology for the world's financial markets.",
-  },
-  {
-    name: "Five Rings",
-    logo: "/images/five-rings-logo.jpeg",
-    description:
-      "A team-first meritocracy built on innovation, curiosity, and rapid problem-solving.",
-  },
-  {
-    name: "D.E. Shaw",
-    logo: "/images/DEShaw-logo.jpg",
-    description:
-      "A global investment and technology firm driven by analytical rigor and open exploration of ideas.",
-  },
-];
+export const metadata: Metadata = {
+  title: "Sponsors",
+  description:
+    "The industry partners supporting Princeton Quantitative Traders and its student programs.",
+};
 
 export default function SponsorsPage() {
   return (
-    <main>
-      <header className="pqt-container pqt-page-head">
-        <div className="pqt-page-head__body">
-          <h1>Our Sponsors</h1>
-          <p className="pqt-lead">
-            We&apos;re deeply grateful to the organizations that fuel our mission.
-          </p>
+    <main id="main-content">
+      <header className="pqt-page-head">
+        <div className="pqt-container pqt-page-head__grid">
+          <p className="pqt-label pqt-label--orange">Industry partners</p>
+          <Reveal>
+            <h1>Sponsors</h1>
+            <p>
+              Our partners help Princeton students learn from practitioners,
+              build projects, and take part in trading competitions.
+            </p>
+          </Reveal>
         </div>
       </header>
 
-      <section className="pqt-container pqt-section">
-        <div className="pqt-section-head">
-          <div className="pqt-section-head__body">
-            <h2>Gold Sponsors</h2>
-            <p>
-              Our premier partners whose collaboration powers everything we do.
-            </p>
-          </div>
-        </div>
-        <div className="pqt-sponsor-grid">
-          {goldSponsors.map((sponsor) => (
-            <article className="pqt-sponsor" key={sponsor.name}>
-              <Image
-                className="pqt-sponsor__logo"
-                src={sponsor.logo}
-                alt={`${sponsor.name} logo`}
-                width={220}
-                height={64}
-              />
-              <p className="pqt-sponsor__name">{sponsor.name}</p>
-              <p className="pqt-sponsor__description">
-                {sponsor.description}
-              </p>
-            </article>
-          ))}
+      <section className="pqt-section">
+        <div className="pqt-container">
+          <Reveal className="pqt-sponsor-tier">
+            <div className="pqt-sponsor-tier__heading">
+              <p className="pqt-label">Gold partners</p>
+              <span>{String(goldSponsors.length).padStart(2, "0")}</span>
+            </div>
+            <div className="pqt-logo-wall">
+              {goldSponsors.map((sponsor) => (
+                <article className="pqt-logo-cell" key={sponsor.name}>
+                  <Image
+                    src={sponsor.logo}
+                    alt={`${sponsor.name} logo`}
+                    width={240}
+                    height={72}
+                  />
+                  <p>{sponsor.name}</p>
+                </article>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal className="pqt-sponsor-tier" delay={0.08}>
+            <div className="pqt-sponsor-tier__heading">
+              <p className="pqt-label">Silver partners</p>
+              <span>{String(silverSponsors.length).padStart(2, "0")}</span>
+            </div>
+            <div className="pqt-logo-wall pqt-logo-wall--silver">
+              {silverSponsors.map((sponsor) => (
+                <article className="pqt-logo-cell" key={sponsor.name}>
+                  <Image
+                    src={sponsor.logo}
+                    alt={`${sponsor.name} logo`}
+                    width={240}
+                    height={72}
+                  />
+                  <p>{sponsor.name}</p>
+                </article>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="pqt-container pqt-section">
-        <div className="pqt-section-head">
-          <div className="pqt-section-head__body">
-            <h2>Silver Sponsors</h2>
-            <p>Our valued partners supporting our growth and initiatives.</p>
-          </div>
-        </div>
-        <div className="pqt-sponsor-grid">
-          <article className="pqt-sponsor pqt-sponsor--silver">
-            <Image
-              className="pqt-sponsor__logo"
-              src="/images/tower-logo.svg"
-              alt="Tower Research logo"
-              width={220}
-              height={64}
-            />
-            <p className="pqt-sponsor__name">Tower Research</p>
-            <p className="pqt-sponsor__description">
-              Tower is a technology-driven trading firm where teams innovate
-              and compete on the world&apos;s markets.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section className="pqt-container pqt-section">
-        <div className="pqt-longform">
-          <div className="pqt-longform__body">
-            <h2>Interested in sponsoring our club?</h2>
+      <section className="pqt-section pqt-section--soft">
+        <div className="pqt-container pqt-partner-grid">
+          <p className="pqt-label">Work with PQT</p>
+          <Reveal>
+            <h2>Sponsorship opportunities</h2>
             <p>
-              Join our network of sponsors and help Princeton students explore
-              quantitative research, trading, and finance with purpose.
+              Read the sponsorship package or contact the team to discuss
+              workshops, competitions, and student programming.
             </p>
-            <p>
-              <a
-                className="pqt-btn pqt-btn--quiet"
-                href="/documents/pqt-sponsorship26.pdf"
-              >
-                View sponsorship tiers →
+            <div className="pqt-actions">
+              <a className="pqt-btn pqt-btn--dark" href={clubLinks.sponsorshipPackage}>
+                Sponsorship package <span aria-hidden="true">↗</span>
               </a>
-            </p>
-            <p>
-              Questions: <a href="mailto:pqt@princeton.edu">pqt@princeton.edu</a>
-            </p>
-          </div>
+              <a className="pqt-text-link" href={clubLinks.email}>
+                {clubLinks.emailLabel} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </Reveal>
         </div>
       </section>
     </main>

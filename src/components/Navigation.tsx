@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import Brand from "@/components/Brand";
 
 const links = [
   { href: "/", label: "Home" },
@@ -13,39 +14,46 @@ const links = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="pqt-site-header">
       <nav className="pqt-container pqt-nav" aria-label="Primary navigation">
-        <Link
-          className="pqt-nav__brand"
-          href="/"
-          aria-label="Princeton Quantitative Traders home"
+        <Brand />
+        <button
+          className="pqt-nav__toggle"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="primary-menu"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          <Image
-            src="/images/logo-no-text.png"
-            alt=""
-            width={28}
-            height={28}
-            priority
-          />
-          <span>Princeton Quantitative Traders</span>
-        </Link>
-        <div className="pqt-nav__links">
+          <span>{menuOpen ? "Close" : "Menu"}</span>
+          <span className="pqt-nav__toggle-lines" aria-hidden="true">
+            <i />
+            <i />
+          </span>
+        </button>
+        <div
+          className="pqt-nav__links"
+          id="primary-menu"
+          data-open={menuOpen ? "true" : "false"}
+        >
           {links.map((link) => (
             <Link
               className="pqt-nav__link"
               href={link.href}
               aria-current={pathname === link.href ? "page" : undefined}
+              onClick={() => setMenuOpen(false)}
               key={link.href}
             >
               {link.label}
             </Link>
           ))}
           <Link
-            className="pqt-btn pqt-btn--solid"
+            className="pqt-btn pqt-btn--orange"
             href="/join"
             aria-current={pathname === "/join" ? "page" : undefined}
+            onClick={() => setMenuOpen(false)}
           >
             Join
           </Link>
