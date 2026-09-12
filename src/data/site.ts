@@ -8,9 +8,9 @@ export type Officer = {
   name: string;
   role: string;
   detail: string;
+  photo?: string;
   interest?: string;
   linkedin?: string;
-  instagram?: string;
 };
 
 export type EventMaterial = {
@@ -35,6 +35,7 @@ export const clubLinks = {
   emailLabel: "pqt@princeton.edu",
   instagram: "https://www.instagram.com/princetonquanttraders/",
   groupMe: "https://groupme.com/join_group/111159295/jL93cFqW",
+  resumeDrop: "https://docs.google.com/forms/d/e/1FAIpQLSedo1q-9jpVy9vmNfgHkwhd5PxIcfWzH5PwR9M80UDY_WJ6CQ/viewform",
   sponsorshipPackage: "/documents/pqt-sponsorship26.pdf",
 } as const;
 
@@ -63,54 +64,102 @@ export const officers: Officer[] = [
   {
     name: "Grace Im",
     role: "President",
-    detail: "Sophomore · Philosophy",
-    interest: "AI, stochastic modeling, and reliable autonomy research",
+    detail: "Class of 2029",
+    photo: "/images/officers/grace.webp",
+    interest: "Direction, sponsor relationships, and the fall competition.",
+    linkedin: "https://www.linkedin.com/in/grace-im-293095241/",
   },
   {
-    name: "Ahbi Bansal",
+    name: "Abhi Bansal",
     role: "Vice President",
-    detail: "Senior · Economics",
-    interest: "The intersection of finance and technology",
+    detail: "Class of 2027",
+    photo: "/images/officers/abhi.jpeg",
+    interest: "Programming, partnerships, and keeping the semester on the rails.",
+    linkedin: "https://www.linkedin.com/in/abhi-bansal-2000b3296/",
+  },
+  {
+    name: "Evan Xie",
+    role: "Head of Education",
+    detail: "Class of 2028",
+    interest: "Weekly curriculum: probability, market making, and Python.",
+    linkedin: "https://www.linkedin.com/in/evan-xie-ex57/",
+  },
+  {
+    name: "Brooke Xu",
+    role: "Head of Education",
+    detail: "Class of 2028",
+    photo: "/images/officers/brooke.webp",
+    interest: "Weekly curriculum: probability, market making, and Python.",
+    linkedin: "https://www.linkedin.com/in/brooke-xu/",
+  },
+  {
+    name: "Tom Wang",
+    role: "Head of Competitions & Tech Lead",
+    detail: "Class of 2028",
+    photo: "/images/officers/tom.webp",
+    interest: "The fall trading competition and our in-house simulated markets.",
+    linkedin: "https://www.linkedin.com/in/tom-wang-105a6722b/",
+  },
+  {
+    name: "Joshua Lin",
+    role: "Head of Competitions & Tech Lead",
+    detail: "Class of 2027",
+    interest: "The fall trading competition and our in-house simulated markets.",
+    linkedin: "https://www.linkedin.com/in/lin-joshua/",
+  },
+  {
+    name: "Ty Lipscomb",
+    role: "Corporate Relations",
+    detail: "Class of 2028",
+    interest: "Sponsors, firm treks, and speaker events.",
+    linkedin: "https://www.linkedin.com/in/tylipscomb/",
   },
   {
     name: "Brandon Wilk",
     role: "Treasurer",
-    detail: "Junior · MAE",
+    detail: "Class of 2028",
+    photo: "/images/officers/brandon.webp",
+    interest: "Budget, travel logistics, and trek applications.",
+    linkedin: "https://www.linkedin.com/in/brandwilk/",
   },
   {
-    name: "Jerry Han",
-    role: "President-Emeritus",
-    detail: "Junior · Mathematics",
-    interest: "Trading and state-space model research",
-    linkedin: "https://www.linkedin.com/in/jerry-han/",
-    instagram: "https://www.instagram.com/j.erry.han/",
+    name: "Graham Smith",
+    role: "Internal Development",
+    detail: "Class of 2028",
+    interest: "Member development and recruitment preparation.",
+    linkedin: "https://www.linkedin.com/in/graham-smith1/",
   },
   {
-    name: "Tom Wang",
-    role: "Tech Lead",
-    detail: "Sophomore · ECE",
-    interest: "Generalist robots, machine learning, and embedded systems",
-    linkedin: "https://www.linkedin.com/in/tom-wang-105a6722b/",
-    instagram: "https://www.instagram.com/tom_wang_05/",
+    name: "Daniel Amoils",
+    role: "Internal Development",
+    detail: "Class of 2029",
+    photo: "/images/officers/daniel.webp",
+    interest: "Member development and recruitment preparation.",
+    linkedin: "https://www.linkedin.com/in/daniel-amoils-851047316/",
   },
   {
-    name: "Joshua Lin",
-    role: "Tournament Events Officer",
-    detail: "Junior · Mathematics",
-    interest: "Optimization, probability, and analysis",
-    linkedin: "https://www.linkedin.com/in/lintropic-joshua/",
-    instagram: "https://www.instagram.com/perplexed._.panda/",
-  },
-  {
-    name: "Andrew Chen",
-    role: "Tournament Director",
-    detail: "Graduate student · Chemical Engineering",
-    linkedin: "https://www.linkedin.com/in/andrewchen0201/",
-    instagram: "https://www.instagram.com/an6rew_chen/",
+    name: "Deeta Saravanan",
+    role: "Operations & Recruitment",
+    detail: "Class of 2029",
+    photo: "/images/officers/deeta.webp",
+    interest: "Interviews and applications.",
+    linkedin: "https://www.linkedin.com/in/deeta-saravanan/",
   },
 ];
 
 export const events: ClubEvent[] = [
+  {
+    title: "PQT Fall 2026 Info Session",
+    date: "September 10, 2026",
+    description:
+      "An introduction to Princeton Quantitative Traders and the 2026–2027 application process, held in Lewis Center 138.",
+    materials: [
+      {
+        label: "Presentation slides",
+        href: "https://docs.google.com/presentation/d/165YcKL3ncGRNbvKiccc9S9HWKNLClWtk/edit?usp=sharing&ouid=112795248828502944495&rtpof=true&sd=true",
+      },
+    ],
+  },
   {
     title: "PQT Fall Trading Competition 2025",
     date: "November 22, 2025",
@@ -193,8 +242,12 @@ export const goldSponsors: Sponsor[] = [
   { name: "Hudson River Trading", logo: "/images/hrt-logo.svg" },
   { name: "Five Rings", logo: "/images/five-rings-logo.jpeg" },
   { name: "D.E. Shaw", logo: "/images/DEShaw-logo.jpg" },
+  { name: "Jump Trading", logo: "/images/jump-trading-logo.webp" },
+  { name: "Susquehanna", logo: "/images/susquehanna-logo.svg" },
 ];
 
 export const silverSponsors: Sponsor[] = [
+  { name: "Seven Research", logo: "/images/seven-research-logo.svg" },
   { name: "Tower Research", logo: "/images/tower-logo.svg" },
+  { name: "Walleye Capital", logo: "/images/walleye-capital-logo.svg" },
 ];

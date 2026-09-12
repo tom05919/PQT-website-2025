@@ -32,9 +32,6 @@ export const metadata: Metadata = {
   },
   description:
     "Princeton University's student community for quantitative finance, market structure, and trading.",
-  icons: {
-    icon: "/icon.svg",
-  },
 };
 
 export default function RootLayout({

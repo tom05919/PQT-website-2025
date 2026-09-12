@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type BrandProps = {
@@ -11,9 +12,14 @@ export default function Brand({ compact = false }: BrandProps) {
       href="/"
       aria-label="Princeton Quantitative Traders home"
     >
-      <span className="pqt-brand__mark" aria-hidden="true">
-        PQT
-      </span>
+      <Image
+        className="pqt-brand__mark"
+        src="/images/logo-no-text.png"
+        alt=""
+        width={56}
+        height={58}
+        preload={!compact}
+      />
       <span className="pqt-brand__name">
         <span>Princeton</span>
         <span>Quantitative Traders</span>

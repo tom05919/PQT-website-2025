@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import { officers, programs } from "@/data/site";
@@ -85,8 +86,8 @@ export default function AboutPage() {
             <div>
               <h2>Officers</h2>
               <p>
-                The club is organized by Princeton students with interests
-                spanning mathematics, economics, engineering, and research.
+                Meet the 2026–27 board organizing the club&apos;s education,
+                competitions, partnerships, and recruitment.
               </p>
             </div>
           </Reveal>
@@ -94,9 +95,20 @@ export default function AboutPage() {
           <Reveal className="pqt-officer-grid">
             {officers.map((officer) => (
               <article className="pqt-officer" key={officer.name}>
-                <div className="pqt-officer__initials" aria-hidden="true">
-                  {initials(officer.name)}
-                </div>
+                {officer.photo ? (
+                  <div className="pqt-officer__photo">
+                    <Image
+                      src={officer.photo}
+                      alt={`${officer.name}, ${officer.role}`}
+                      fill
+                      sizes="(max-width: 700px) calc(100vw - 3rem), (max-width: 1050px) calc(50vw - 3rem), 30vw"
+                    />
+                  </div>
+                ) : (
+                  <div className="pqt-officer__initials" aria-hidden="true">
+                    {initials(officer.name)}
+                  </div>
+                )}
                 <div className="pqt-officer__identity">
                   <h3>{officer.name}</h3>
                   <p>{officer.role}</p>
@@ -105,18 +117,11 @@ export default function AboutPage() {
                 {officer.interest && (
                   <p className="pqt-officer__interest">{officer.interest}</p>
                 )}
-                {(officer.linkedin || officer.instagram) && (
+                {officer.linkedin && (
                   <div className="pqt-officer__links">
-                    {officer.linkedin && (
-                      <a href={officer.linkedin} target="_blank" rel="noreferrer">
-                        LinkedIn ↗
-                      </a>
-                    )}
-                    {officer.instagram && (
-                      <a href={officer.instagram} target="_blank" rel="noreferrer">
-                        Instagram ↗
-                      </a>
-                    )}
+                    <a href={officer.linkedin} target="_blank" rel="noreferrer">
+                      LinkedIn ↗
+                    </a>
                   </div>
                 )}
               </article>
