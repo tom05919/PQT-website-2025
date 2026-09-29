@@ -145,6 +145,13 @@ export const officers: Officer[] = [
     interest: "Interviews and applications.",
     linkedin: "https://www.linkedin.com/in/deeta-saravanan/",
   },
+  {
+    name: "Jaymin Ding",
+    role: "Head of Recruitment & Events Planning",
+    detail: "Class of 2029",
+    interest: "Recruiting new members and planning club events.",
+    linkedin: "https://linkedin.com/in/jaymin-ding",
+  },
 ];
 
 export const events: ClubEvent[] = [
